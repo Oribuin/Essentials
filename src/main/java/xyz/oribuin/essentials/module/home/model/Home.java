@@ -3,7 +3,9 @@ package xyz.oribuin.essentials.module.home.model;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public record Home(String name, Location location) {
+import java.util.UUID;
+
+public record Home(String name, UUID owner, Location location) {
 
     /**
      * Teleport a player to the home location

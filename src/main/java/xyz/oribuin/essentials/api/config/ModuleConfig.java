@@ -17,8 +17,6 @@ public abstract class ModuleConfig {
 
     /**
      * Create a new instance of the module config
-     *
-     * @param name The name of the module
      */
     public ModuleConfig(String name) {
         this.name = name;

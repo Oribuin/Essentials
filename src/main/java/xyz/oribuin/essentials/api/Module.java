@@ -6,7 +6,8 @@ import dev.rosewood.rosegarden.command.framework.RoseCommandWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import xyz.oribuin.essentials.EssentialsPlugin;
+import xyz.oribuin.essentials.Essentials;
+import xyz.oribuin.essentials.api.config.DefaultConfig;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 
 import java.io.File;
@@ -17,17 +18,20 @@ import java.util.logging.Logger;
 public abstract class Module implements Listener {
 
     protected final Logger logger = Logger.getLogger("ess-" + this.name());
-    protected final EssentialsPlugin plugin;
+    protected final Essentials plugin;
     protected File folder;
-    private List<RoseCommandWrapper> commands = new ArrayList<>();
+    private boolean enabled;
+    private List<RoseCommandWrapper> commands;
 
     /**
      * Create a new instance of the module
      *
      * @param plugin The plugin instance
      */
-    public Module(EssentialsPlugin plugin) {
+    public Module(Essentials plugin) {
         this.plugin = plugin;
+        this.enabled = false;
+        this.commands = new ArrayList<>();
     }
 
     /**
@@ -41,11 +45,10 @@ public abstract class Module implements Listener {
         this.folder = new File(modulesFolder, this.name());
         if (!this.folder.exists()) this.folder.mkdirs();
 
-        boolean enabled = false;
         // Create and load the default configuration
         for (ModuleConfig config : this.configs()) {
-            if (!enabled && config.get("enabled").asBoolean())
-                enabled = true;
+            if (!this.enabled && config.get("enabled").asBoolean())
+                this.enabled = true;
 
             config.reload(this.folder);
         }
@@ -80,12 +83,16 @@ public abstract class Module implements Listener {
     /**
      * When the module is finished loading and is ready to be used.
      */
-    public abstract void enable();
+    public void enable() {
+        // Empty
+    }
 
     /**
      * When the module is being disabled.
      */
-    public abstract void disable();
+    public void disable() {
+        // Empty
+    }
 
     /**
      * Get all the commands for the module
@@ -98,7 +105,7 @@ public abstract class Module implements Listener {
      * Get all the configuration files for the module
      */
     public List<ModuleConfig> configs() {
-        return new ArrayList<>();
+        return new ArrayList<>(List.of(new DefaultConfig()));
     }
 
     /**
@@ -108,5 +115,31 @@ public abstract class Module implements Listener {
         return new ArrayList<>();
     }
 
+    /**
+     * Check if the module is enabled
+     *
+     * @return If the module is enabled
+     */
+    public final boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Set the module to be enabled or disabled
+     *
+     * @param enabled If the module is enabled
+     */
+    public final void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * Get the logger for the module
+     *
+     * @return The logger for the module
+     */
+    public Logger getLogger() {
+        return logger;
+    }
 
 }

@@ -5,6 +5,7 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import xyz.oribuin.essentials.module.home.model.Home;
 
 public class HomeCommand extends BaseRoseCommand {
 
@@ -14,6 +15,7 @@ public class HomeCommand extends BaseRoseCommand {
 
     @RoseExecutable
     public void execute(CommandContext context) {
+        Home home = context.get("home");
 
     }
 

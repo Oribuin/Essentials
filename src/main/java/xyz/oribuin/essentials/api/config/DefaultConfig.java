@@ -1,14 +1,12 @@
 package xyz.oribuin.essentials.api.config;
 
-public abstract class DefaultConfig extends ModuleConfig {
+public class DefaultConfig extends ModuleConfig {
 
     /**
      * Create a new instance of the module config
-     *
-     * @param name The name of the module
      */
-    public DefaultConfig(String name) {
-        super(name);
+    public DefaultConfig() {
+        super("config");
     }
 
     /**
