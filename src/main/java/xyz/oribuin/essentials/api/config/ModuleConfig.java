@@ -190,5 +190,18 @@ public abstract class ModuleConfig {
                 .orElse(null);
     }
 
+    /**
+     * Get a config option by its path
+     *
+     * @param option The config option to get
+     * @return The config option
+     */
+    public final ConfigOption get(ConfigOption option) {
+        return this.options.stream()
+                .filter(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))
+                .findFirst()
+                .orElse(null);
+    }
+
 
 }

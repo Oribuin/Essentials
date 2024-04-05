@@ -3,11 +3,15 @@ package xyz.oribuin.essentials.module.home.model;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.oribuin.essentials.Essentials;
-import xyz.oribuin.essentials.module.home.config.HomeConfig;
 import xyz.oribuin.essentials.module.home.HomeModule;
+import xyz.oribuin.essentials.module.home.config.HomeConfig;
 import xyz.oribuin.essentials.module.home.config.HomeMessages;
 
 import java.util.List;
@@ -43,14 +47,40 @@ public record Home(String name, UUID owner, Location location) {
         // TODO: Check for cooldown between commands
         // TODO: Check for teleport cost
 
-        if (teleportDelay <= 0) {
-            PaperLib.teleportAsync(player, this.location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            return;
+        if (cost > 0.0) {
+            player.sendMessage("You have been charged $" + cost + " to teleport to your home.");
         }
 
-        Bukkit.getScheduler().runTaskLater(Essentials.get(), () -> {
+        // Create the tp effects task
+        BukkitTask effectTask;
+        if (config.get(HomeConfig.TP_EFFECTS).asBoolean() && teleportDelay > 0) {
+            // Give the player blindness
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
+                    teleportDelay * 20 - 10, 4,
+                    false,
+                    false,
+                    false)
+            );
 
-        });
+            effectTask = Bukkit.getScheduler().runTaskTimerAsynchronously(Essentials.get(), () -> player.spawnParticle(
+                    Particle.SPELL_WITCH,
+                    player.getLocation(),
+                    10,
+                    0.5, 0.5, 0.5,
+                    0.1
+            ), 0L, 20L);
+        } else {
+            effectTask = null;
+        }
+
+        // Teleport the player to the location
+        Bukkit.getScheduler().runTaskLater(Essentials.get(), () -> {
+            if (effectTask != null)
+                effectTask.cancel();
+
+            PaperLib.teleportAsync(player, this.location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        }, teleportDelay * 20L);
+
     }
 
 }
