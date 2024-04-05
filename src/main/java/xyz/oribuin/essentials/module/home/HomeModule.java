@@ -3,9 +3,11 @@ package xyz.oribuin.essentials.module.home;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import xyz.oribuin.essentials.Essentials;
 import xyz.oribuin.essentials.api.Module;
-import xyz.oribuin.essentials.api.database.ModuleRepository;
+import xyz.oribuin.essentials.api.config.ModuleConfig;
 import xyz.oribuin.essentials.manager.DataManager;
 import xyz.oribuin.essentials.module.home.command.HomeCommand;
+import xyz.oribuin.essentials.module.home.config.HomeConfig;
+import xyz.oribuin.essentials.module.home.config.HomeMessages;
 import xyz.oribuin.essentials.module.home.database.HomeRepository;
 
 import java.util.List;
@@ -63,6 +65,14 @@ public class HomeModule extends Module {
     @Override
     public List<BaseRoseCommand> commands() {
         return List.of(new HomeCommand(this.plugin));
+    }
+
+    /**
+     * Get all the configuration files for the module
+     */
+    @Override
+    public List<ModuleConfig> configs() {
+        return List.of(new HomeConfig(), new HomeMessages());
     }
 
 }

@@ -27,6 +27,20 @@ public class ConfigOption {
         this.comments = comments;
     }
 
+
+    /**
+     * Create a new ConfigOption with a default value and comments
+     *
+     * @param path         The path of the config option
+     * @param defaultValue The default value of the config option
+     * @param comments     The comments for the config option
+     */
+    public ConfigOption(@NotNull String path, @NotNull Object defaultValue, String... comments) {
+        this.path = path;
+        this.defaultValue = defaultValue;
+        this.comments = List.of(comments);
+    }
+
     /**
      * Create a new ConfigOption with a default value
      *
@@ -35,26 +49,6 @@ public class ConfigOption {
      */
     public ConfigOption(@NotNull String path, @NotNull Object defaultValue) {
         this(path, defaultValue, List.of());
-    }
-
-    /**
-     * Create a new ConfigOption with comments
-     *
-     * @param path     The path of the config option
-     * @param comments The comments for the config option
-     */
-    public static ConfigOption of(String path, Object defaultValue, List<String> comments) {
-        return new ConfigOption(path, defaultValue, comments);
-    }
-
-    /**
-     * Create a new ConfigOption with a default value
-     *
-     * @param path         The path of the config option
-     * @param defaultValue The default value of the config option
-     */
-    public static ConfigOption of(String path, Object defaultValue) {
-        return new ConfigOption(path, defaultValue);
     }
 
     /**

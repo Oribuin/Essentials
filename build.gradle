@@ -37,20 +37,17 @@ repositories {
 
 dependencies {
     api "dev.rosewood:rosegarden:${gardenVersion}"
+    api "io.papermc:paperlib:1.0.7"
 
     compileOnly "org.spigotmc:spigot-api:${spigotVersion}-R0.1-SNAPSHOT"
     compileOnly "me.clip:placeholderapi:2.11.3"
-
+    compileOnly "org.jetbrains:annotations:23.0.0"
 }
 
 shadowJar {
     archiveClassifier.set(null)
 
     relocate("dev.rosewood.rosegarden", "${project.group}.essentials.rosegarden")
-
-    // Remove comments if you"re not using SQL/SQLite
-    exclude "dev/rosewood/rosegarden/lib/hikaricp/**/*.class"
-    exclude "dev/rosewood/rosegarden/lib/slf4j/**/*.class"
 }
 
 // Include version replacement

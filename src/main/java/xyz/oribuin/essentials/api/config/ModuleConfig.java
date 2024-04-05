@@ -1,15 +1,23 @@
 package xyz.oribuin.essentials.api.config;
 
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class ModuleConfig {
+
+    public static final ConfigOption DEFAULT = new ConfigOption("enabled", false, List.of("Should the module and all of its featured be enabled?"));
 
     private final String name;
     protected List<ConfigOption> options;
@@ -64,6 +72,52 @@ public abstract class ModuleConfig {
     }
 
     /**
+     * Send a message from the config to a CommandSender
+     *
+     * @param sender       The CommandSender to send the message to
+     * @param path         The path of the message in the config
+     * @param placeholders The placeholders to apply to the message
+     */
+    public final void send(CommandSender sender, String path, StringPlaceholders placeholders) {
+        String message = this.config.getString(path);
+        if (message == null) return;
+
+        String parsed = PlaceholderAPIHook.applyPlaceholders(sender instanceof Player player ? player : null, placeholders.apply(message));
+        sender.sendMessage(HexUtils.colorify(parsed));
+    }
+
+    /**
+     * Send a message from the config to a CommandSender using a config option
+     *
+     * @param sender The CommandSender to send the message to
+     * @param option The option to send the message for
+     */
+    public final void send(CommandSender sender, ConfigOption option) {
+        this.send(sender, option.getPath());
+    }
+
+    /**
+     * Send a message from the config to a CommandSender using a config option
+     *
+     * @param sender       The CommandSender to send the message to
+     * @param option       The option to send the message for
+     * @param placeholders The placeholders to apply to the message
+     */
+    public final void send(CommandSender sender, ConfigOption option, StringPlaceholders placeholders) {
+        this.send(sender, option.getPath(), placeholders);
+    }
+
+    /**
+     * Send a message from the config to a CommandSender
+     *
+     * @param sender The CommandSender to send the message to
+     * @param path   The path of the message in the config
+     */
+    public final void send(CommandSender sender, String path) {
+        this.send(sender, path, StringPlaceholders.empty());
+    }
+
+    /**
      * Register all the options
      *
      * @param option The option to register
@@ -75,6 +129,23 @@ public abstract class ModuleConfig {
 
         this.options.add(option);
     }
+
+    /**
+     * Find all the static ConfigOptions in the class and register them
+     */
+    public final void registerClass() {
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (!field.getType().equals(ConfigOption.class)) continue;
+
+            try {
+                ConfigOption option = (ConfigOption) field.get(null);
+                this.register(option);
+            } catch (IllegalAccessException ex) {
+                Bukkit.getLogger().severe("Failed to register ConfigOption in " + this.getClass().getSimpleName());
+            }
+        }
+    }
+
 
     /**
      * Create a new ConfigOption with a default value

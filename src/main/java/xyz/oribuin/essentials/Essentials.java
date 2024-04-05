@@ -4,6 +4,8 @@ import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import xyz.oribuin.essentials.api.Module;
+import xyz.oribuin.essentials.api.config.ModuleConfig;
+import xyz.oribuin.essentials.manager.DataManager;
 import xyz.oribuin.essentials.module.home.HomeModule;
 import xyz.oribuin.essentials.module.teleport.TeleportModule;
 
@@ -13,13 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Plugin Hex Code: #bc7dff
 public class Essentials extends RosePlugin {
 
     private static final Map<Class<? extends Module>, Module> modules = new HashMap<>();
     private static Essentials instance;
 
     public Essentials() {
-        super(-1, -1, null, null, null, null);
+        super(-1, -1, null, DataManager.class, null, null);
 
         instance = this;
     }
@@ -68,6 +71,21 @@ public class Essentials extends RosePlugin {
         }
 
         return null;
+    }
+
+    /**
+     * Get the configuration of a module from the map
+     *
+     * @param module The module to get the config from
+     * @param config The config class
+     * @param <T>    The config type
+     * @return The config
+     */
+    public static <T extends ModuleConfig> T getConfig(Class<? extends Module> module, Class<T> config) {
+        Module moduleInstance = modules.get(module);
+        if (moduleInstance == null) return null;
+
+        return moduleInstance.config(config);
     }
 
     /**

@@ -12,16 +12,19 @@ import xyz.oribuin.essentials.api.config.ModuleConfig;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class Module implements Listener {
 
-    protected final Logger logger = Logger.getLogger("ess-" + this.name());
     protected final Essentials plugin;
+    protected final Logger logger = Logger.getLogger("ess-" + this.name());
+    private Map<Class<? extends ModuleConfig>, ModuleConfig> configs = new HashMap<>();
     protected File folder;
-    private boolean enabled;
     private List<RoseCommandWrapper> commands;
+    private boolean enabled;
 
     /**
      * Create a new instance of the module
@@ -51,6 +54,7 @@ public abstract class Module implements Listener {
                 this.enabled = true;
 
             config.reload(this.folder);
+            this.configs.put(config.getClass(), config);
         }
 
         // Don't register anything if the module is disabled
@@ -62,6 +66,7 @@ public abstract class Module implements Listener {
         // Register all the commands
         this.commands = this.commands().stream().map(baseRoseCommand -> new RoseCommandWrapper(this.plugin, baseRoseCommand)).toList();
         this.commands.forEach(RoseCommandWrapper::register);
+
     }
 
     /**
@@ -72,6 +77,22 @@ public abstract class Module implements Listener {
 
         this.commands.forEach(RoseCommandWrapper::unregister);
         this.commands.clear();
+        this.configs.clear();
+    }
+
+    /**
+     * Get a configuration file from the module
+     *
+     * @param clazz The class of the configuration file
+     * @param <T>   The type of the configuration file
+     * @return The configuration file
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ModuleConfig> T config(Class<T> clazz) {
+        if (!this.configs.containsKey(clazz))
+            return null;
+
+        return (T) this.configs.get(clazz);
     }
 
     /**
