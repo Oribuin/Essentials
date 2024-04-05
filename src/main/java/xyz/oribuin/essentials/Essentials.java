@@ -5,6 +5,7 @@ import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
+import xyz.oribuin.essentials.manager.ConfigurationManager;
 import xyz.oribuin.essentials.manager.DataManager;
 import xyz.oribuin.essentials.module.home.HomeModule;
 import xyz.oribuin.essentials.module.teleport.TeleportModule;
@@ -22,7 +23,7 @@ public class Essentials extends RosePlugin {
     private static Essentials instance;
 
     public Essentials() {
-        super(-1, -1, null, DataManager.class, null, null);
+        super(-1, -1, ConfigurationManager.class, DataManager.class, null, null);
 
         instance = this;
     }

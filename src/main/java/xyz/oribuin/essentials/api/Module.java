@@ -50,7 +50,7 @@ public abstract class Module implements Listener {
 
         // Create and load the default configuration
         for (ModuleConfig config : this.configs()) {
-            if (!this.enabled && config.get("enabled").asBoolean())
+            if (!this.enabled && config != null && config.get("enabled").asBoolean())
                 this.enabled = true;
 
             config.reload(this.folder);

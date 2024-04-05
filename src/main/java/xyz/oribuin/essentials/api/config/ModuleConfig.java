@@ -184,6 +184,8 @@ public abstract class ModuleConfig {
      * @return The config option
      */
     public final ConfigOption get(String path) {
+        if (this.config == null || path == null) return null;
+
         return this.options.stream()
                 .filter(option -> option.getPath().equalsIgnoreCase(path))
                 .findFirst()
@@ -197,6 +199,8 @@ public abstract class ModuleConfig {
      * @return The config option
      */
     public final ConfigOption get(ConfigOption option) {
+        if (this.config == null || option == null) return null;
+        
         return this.options.stream()
                 .filter(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))
                 .findFirst()
