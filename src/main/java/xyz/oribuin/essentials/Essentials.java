@@ -28,6 +28,7 @@ public class Essentials extends RosePlugin {
     public void enable() {
         // TODO: Load all the modules
         modules.put(HomeModule.class, new HomeModule(this));
+        modules.put(TeleportModule.class, new TeleportModule(this));
 
         modules.values().forEach(Module::load);
     }
