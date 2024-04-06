@@ -9,9 +9,9 @@ import java.util.List;
 public class ConfigOption {
 
     private final @NotNull String path;
-    private final @NotNull Object defaultValue;
+    private final @NotNull ConfigValue defaultValue;
     private final @NotNull List<String> comments;
-    private @Nullable Object value;
+    private @Nullable ConfigValue value;
 
     /**
      * Create a new ConfigOption with a default value and comments
@@ -22,8 +22,8 @@ public class ConfigOption {
      */
     public ConfigOption(@NotNull String path, @NotNull Object defaultValue, @NotNull List<String> comments) {
         this.path = path;
-        this.defaultValue = defaultValue;
-        this.value = defaultValue;
+        this.defaultValue = new ConfigValue(defaultValue);
+        this.value = new ConfigValue(defaultValue);
         this.comments = comments;
     }
 
@@ -37,7 +37,7 @@ public class ConfigOption {
      */
     public ConfigOption(@NotNull String path, @NotNull Object defaultValue, String... comments) {
         this.path = path;
-        this.defaultValue = defaultValue;
+        this.defaultValue = new ConfigValue(defaultValue);
         this.comments = List.of(comments);
     }
 
@@ -58,6 +58,37 @@ public class ConfigOption {
      */
     public static ConfigOption enabled() {
         return new ConfigOption("enabled", false, List.of("Should the module and all of its featured be enabled?"));
+    }
+
+    /**
+     * Get the value of the config option or null;
+     *
+     * @param config The module config
+     * @return The value of the config option or null
+     */
+    public ConfigValue get(ModuleConfig config) {
+        return config.get(this).map(ConfigOption::getValue).orElse(null);
+    }
+
+    /**
+     * Get the value of the config option or the default value
+     *
+     * @param config The module config
+     * @return The value of the config option or the default value
+     */
+    public ConfigValue getOrDef(ModuleConfig config) {
+        return config.get(this).map(ConfigOption::getValue).orElse(this.defaultValue);
+    }
+
+    /**
+     * Get the value of the config option or the default value
+     *
+     * @param config The module config
+     * @param value  The default value
+     * @return The value of the config option or the default value
+     */
+    public ConfigValue getOr(ModuleConfig config, Object value) {
+        return config.get(this).map(ConfigOption::getValue).orElse(new ConfigValue(value));
     }
 
     /**
@@ -96,63 +127,8 @@ public class ConfigOption {
      * @return The value of the config option
      */
     @Nullable
-    public Object getValue() {
+    public ConfigValue getValue() {
         return value;
-    }
-
-    /**
-     * Get the value of the config option as a boolean
-     */
-    public boolean asBoolean() {
-        return value instanceof Boolean result ? result : false;
-    }
-
-    /**
-     * Get the value of the config option as a String
-     */
-    public String asString() {
-        return value instanceof String result ? result : null;
-    }
-
-    /**
-     * Get the value of the config option as an integer
-     */
-    public Integer asInt() {
-        return value instanceof Integer result ? result : null;
-    }
-
-    /**
-     * Get the value of the config option as a double
-     */
-    public Double asDouble() {
-        return value instanceof Double result ? result : null;
-    }
-
-    /**
-     * Get the value of the config option as a long
-     */
-    public Long asLong() {
-        return value instanceof Long result ? result : null;
-    }
-
-    /**
-     * Get the list of strings from the config option
-     *
-     * @return The list of strings
-     */
-    public List<String> asStringList() {
-        return (List<String>) value;
-    }
-
-    /**
-     * Get the value of the config option as a specific type
-     *
-     * @param type The type of the value
-     * @param <T>  The type of the value
-     * @return The value of the config option
-     */
-    public <T> T as(Class<T> type) {
-        return type.cast(value);
     }
 
     /**
@@ -160,7 +136,7 @@ public class ConfigOption {
      *
      * @param value The value of the config option
      */
-    public void setValue(@Nullable Object value) {
+    public void setValue(@Nullable ConfigValue value) {
         this.value = value;
     }
 

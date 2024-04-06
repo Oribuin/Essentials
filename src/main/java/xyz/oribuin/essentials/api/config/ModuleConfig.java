@@ -7,6 +7,8 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class ModuleConfig {
 
@@ -63,7 +66,7 @@ public abstract class ModuleConfig {
                 }
 
                 Object value = this.config.get(option.getPath(), option.getDefaultValue());
-                option.setValue(value);
+                option.setValue(new ConfigValue(value));
                 this.config.set(option.getPath(), value);
             }
 
@@ -185,13 +188,13 @@ public abstract class ModuleConfig {
      * @param path The path of the config option
      * @return The config option
      */
-    public final ConfigOption get(String path) {
-        if (this.config == null || path == null) return null;
+    @NotNull
+    public final Optional<ConfigOption> get(@Nullable String path) {
+        if (this.config == null || path == null) return Optional.empty();
 
         return this.options.stream()
                 .filter(option -> option.getPath().equalsIgnoreCase(path))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     /**
@@ -200,14 +203,12 @@ public abstract class ModuleConfig {
      * @param option The config option to get
      * @return The config option
      */
-    public final ConfigOption get(ConfigOption option) {
-        if (this.config == null || option == null) return null;
-        
+    public final Optional<ConfigOption> get(ConfigOption option) {
+        if (this.config == null || option == null) return Optional.empty();
+
         return this.options.stream()
                 .filter(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
-
 
 }

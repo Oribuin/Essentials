@@ -10,10 +10,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import xyz.oribuin.essentials.Essentials;
+import xyz.oribuin.essentials.api.config.ConfigOption;
 import xyz.oribuin.essentials.module.home.HomeModule;
 import xyz.oribuin.essentials.module.home.config.HomeConfig;
 import xyz.oribuin.essentials.module.home.config.HomeMessages;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,15 +35,16 @@ public record Home(String name, UUID owner, Location location) {
         if (config == null || messages == null) return;
 
         // Check if the world is disabled
-        List<String> disabledWorlds = config.get(HomeConfig.DISABLED_WORLDS.getPath()).asStringList();
+        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getOr(config, new ArrayList<>()).asStringList();
         if (disabledWorlds.contains(this.location.getWorld().getName())) {
             messages.send(player, HomeMessages.DISABLED_WORLD.getPath());
             return;
         }
 
-        int cooldown = config.get(HomeConfig.TP_COOLDOWN.getPath()).asInt();
-        int teleportDelay = config.get(HomeConfig.TP_DELAY.getPath()).asInt();
-        double cost = config.get(HomeConfig.TP_COST.getPath()).asDouble();
+        // Number values are defaulted to 0 when not found
+        int cooldown = HomeConfig.TP_COOLDOWN.get(config).asInt();
+        int teleportDelay = HomeConfig.TP_DELAY.get(config).asInt();
+        double cost = HomeConfig.TP_COST.get(config).asDouble();
 
         // TODO: Check for teleport delay
         // TODO: Check for cooldown between commands
@@ -53,7 +56,7 @@ public record Home(String name, UUID owner, Location location) {
 
         // Create the tp effects task
         BukkitTask effectTask;
-        if (config.get(HomeConfig.TP_EFFECTS).asBoolean() && teleportDelay > 0) {
+        if (HomeConfig.TP_EFFECTS.get(config).asBoolean() && teleportDelay > 0) {
             // Give the player blindness
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
                     teleportDelay * 20 - 10, 4,

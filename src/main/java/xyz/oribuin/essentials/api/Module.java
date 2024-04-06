@@ -55,12 +55,9 @@ public abstract class Module implements Listener {
 
             // Check if the module is enabled
             if (!this.enabled) {
-                ConfigOption enabledOption = config.get(ModuleConfig.DEFAULT);
-                if (enabledOption != null)
-                    this.enabled = enabledOption.asBoolean();
-
+                this.enabled = ModuleConfig.DEFAULT.get(config).asBoolean();
             }
-
+            
             this.configs.put(config.getClass(), config);
         }
 
