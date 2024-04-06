@@ -5,6 +5,8 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public record ConfigValue(Object value) {
 
+    public static ConfigValue EMPTY = new ConfigValue(null);
+
     /**
      * Get the value of the config option as a boolean
      */
@@ -46,6 +48,8 @@ public record ConfigValue(Object value) {
      * @return The list of strings
      */
     public List<String> asStringList() {
+        if (value == null || !(value instanceof List<?>)) return List.of();
+
         return (List<String>) value;
     }
 

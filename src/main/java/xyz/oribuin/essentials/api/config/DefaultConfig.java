@@ -14,7 +14,7 @@ public class DefaultConfig extends ModuleConfig {
      */
     @Override
     public void load() {
-        this.register(ConfigOption.enabled());
+        this.register(ModuleConfig.DEFAULT);
     }
 
 }

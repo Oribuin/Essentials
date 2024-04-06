@@ -60,14 +60,21 @@ public abstract class ModuleConfig {
             // Load the config
             this.config = CommentedFileConfiguration.loadConfiguration(configFile);
             for (ConfigOption option : this.options) {
+
+                // If the config contains the path, cache the value
+                if (this.config.contains(option.getPath())) {
+                    option.setValue(new ConfigValue(this.config.get(option.getPath())));
+                    continue;
+                }
+
                 // Add comments to the config
                 if (!option.getComments().isEmpty()) {
                     this.config.addPathedComments(option.getPath(), Arrays.toString(option.getComments().toArray()));
                 }
 
-                Object value = this.config.get(option.getPath(), option.getDefaultValue());
-                option.setValue(new ConfigValue(value));
-                this.config.set(option.getPath(), value);
+                // Set the default valueR
+                this.config.set(option.getPath(), option.getDefaultValue().value());
+                option.setValue(new ConfigValue(option.getDefaultValue()));
             }
 
             this.config.save(configFile);
@@ -209,6 +216,15 @@ public abstract class ModuleConfig {
         return this.options.stream()
                 .filter(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))
                 .findFirst();
+    }
+
+    /**
+     * Get the name of the module
+     *
+     * @return The name of the module
+     */
+    public CommentedFileConfiguration getFile() {
+        return this.config;
     }
 
 }

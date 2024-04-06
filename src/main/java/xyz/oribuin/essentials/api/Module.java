@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import xyz.oribuin.essentials.Essentials;
-import xyz.oribuin.essentials.api.config.ConfigOption;
 import xyz.oribuin.essentials.api.config.DefaultConfig;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 
@@ -49,6 +48,12 @@ public abstract class Module implements Listener {
         this.folder = new File(modulesFolder, this.name());
         if (!this.folder.exists()) this.folder.mkdirs();
 
+        // Make sure the module has configurations
+        if (this.configs().isEmpty()) {
+            this.logger.severe("The module " + this.getClass().getSimpleName() + " has no configurations defined, This module will be skipped.");
+            return;
+        }
+
         // Create and load the default configuration
         for (ModuleConfig config : this.configs()) {
             config.reload(this.folder);
@@ -57,7 +62,7 @@ public abstract class Module implements Listener {
             if (!this.enabled) {
                 this.enabled = ModuleConfig.DEFAULT.get(config).asBoolean();
             }
-            
+
             this.configs.put(config.getClass(), config);
         }
 

@@ -6,7 +6,9 @@ import xyz.oribuin.essentials.Essentials;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 import xyz.oribuin.essentials.manager.DataManager;
-import xyz.oribuin.essentials.module.home.command.HomeCommand;
+import xyz.oribuin.essentials.module.home.command.HomeDeleteCommand;
+import xyz.oribuin.essentials.module.home.command.HomeSetCommand;
+import xyz.oribuin.essentials.module.home.command.HomeTPCommand;
 import xyz.oribuin.essentials.module.home.config.HomeConfig;
 import xyz.oribuin.essentials.module.home.config.HomeMessages;
 import xyz.oribuin.essentials.module.home.database.HomeRepository;
@@ -40,7 +42,6 @@ public class HomeModule extends Module implements Listener {
      */
     @Override
     public void enable() {
-        this.logger.info("Loading all the homes for all players.");
         this.repository = DataManager.create(HomeRepository.class);
 
         if (this.repository == null) {
@@ -67,7 +68,11 @@ public class HomeModule extends Module implements Listener {
      */
     @Override
     public List<BaseRoseCommand> commands() {
-        return List.of(new HomeCommand(this.plugin));
+        return List.of(
+                new HomeDeleteCommand(this.plugin),
+                new HomeSetCommand(this.plugin),
+                new HomeTPCommand(this.plugin)
+        );
     }
 
     /**
@@ -78,4 +83,10 @@ public class HomeModule extends Module implements Listener {
         return List.of(new HomeConfig(), new HomeMessages());
     }
 
+    /**
+     * Get the repository for the module
+     */
+    public HomeRepository getRepository() {
+        return repository;
+    }
 }

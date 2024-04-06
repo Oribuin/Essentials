@@ -7,6 +7,7 @@ import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 import xyz.oribuin.essentials.manager.ConfigurationManager;
 import xyz.oribuin.essentials.manager.DataManager;
+import xyz.oribuin.essentials.manager.LocaleManager;
 import xyz.oribuin.essentials.module.home.HomeModule;
 import xyz.oribuin.essentials.module.teleport.TeleportModule;
 
@@ -16,14 +17,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Plugin Hex Code: #bc7dff
 public class Essentials extends RosePlugin {
 
     private static final Map<Class<? extends Module>, Module> modules = new ConcurrentHashMap<>();
     private static Essentials instance;
 
     public Essentials() {
-        super(-1, -1, ConfigurationManager.class, DataManager.class, null, null);
+        super(-1, -1,
+                ConfigurationManager.class,
+                DataManager.class,
+                LocaleManager.class,
+                null
+        );
 
         instance = this;
     }
@@ -33,15 +38,13 @@ public class Essentials extends RosePlugin {
         // TODO: Load all the modules
         modules.put(HomeModule.class, new HomeModule(this));
         modules.put(TeleportModule.class, new TeleportModule(this));
-
-        for (Module module : modules.values()) {
-            module.load();
-        }
+        modules.forEach((aClass, module) -> module.load());
     }
 
     @Override
     public void disable() {
-
+        modules.forEach((aClass, module) -> module.unload());
+        modules.clear();
     }
 
     @Override

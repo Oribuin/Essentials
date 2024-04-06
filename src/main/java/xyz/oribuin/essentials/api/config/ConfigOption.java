@@ -1,5 +1,7 @@
 package xyz.oribuin.essentials.api.config;
 
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,22 +54,14 @@ public class ConfigOption {
     }
 
     /**
-     * The default ConfigOption for enabling/disabling a module
-     *
-     * @return The default ConfigOption for enabling/disabling a module
-     */
-    public static ConfigOption enabled() {
-        return new ConfigOption("enabled", false, List.of("Should the module and all of its featured be enabled?"));
-    }
-
-    /**
      * Get the value of the config option or null;
      *
      * @param config The module config
      * @return The value of the config option or null
      */
+    @NotNull
     public ConfigValue get(ModuleConfig config) {
-        return config.get(this).map(ConfigOption::getValue).orElse(null);
+        return config.get(this).map(ConfigOption::getValue).orElse(ConfigValue.EMPTY);
     }
 
     /**
@@ -76,6 +70,7 @@ public class ConfigOption {
      * @param config The module config
      * @return The value of the config option or the default value
      */
+    @NotNull
     public ConfigValue getOrDef(ModuleConfig config) {
         return config.get(this).map(ConfigOption::getValue).orElse(this.defaultValue);
     }
@@ -87,8 +82,32 @@ public class ConfigOption {
      * @param value  The default value
      * @return The value of the config option or the default value
      */
+    @NotNull
     public ConfigValue getOr(ModuleConfig config, Object value) {
-        return config.get(this).map(ConfigOption::getValue).orElse(new ConfigValue(value));
+        return config.get(this)
+                .map(ConfigOption::getValue)
+                .orElse(new ConfigValue(value));
+    }
+
+    /**
+     * Send a message from the config to a CommandSender
+     *
+     * @param config       The module config
+     * @param sender       The CommandSender to send the message to
+     * @param placeholders The placeholders to apply to the message
+     */
+    public final void send(ModuleConfig config, CommandSender sender, StringPlaceholders placeholders) {
+        config.send(sender, this, placeholders);
+    }
+
+    /**
+     * Send a message from the config to a CommandSender using a config option
+     *
+     * @param config The module config
+     * @param sender The CommandSender to send the message to
+     */
+    public final void send(ModuleConfig config, CommandSender sender) {
+        this.send(config, sender, StringPlaceholders.empty());
     }
 
     /**
@@ -107,7 +126,7 @@ public class ConfigOption {
      * @return The default value of the config option
      */
     @NotNull
-    public Object getDefaultValue() {
+    public ConfigValue getDefaultValue() {
         return defaultValue;
     }
 

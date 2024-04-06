@@ -1,4 +1,4 @@
-package xyz.oribuin.essentials.module.home.command.argument;
+package xyz.oribuin.essentials.command.argument;
 
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
@@ -10,7 +10,6 @@ import xyz.oribuin.essentials.manager.DataManager;
 import xyz.oribuin.essentials.module.home.database.HomeRepository;
 import xyz.oribuin.essentials.module.home.model.Home;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeArgumentHandler extends ArgumentHandler<Home> {
@@ -26,8 +25,8 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
             target = player;
         }
 
-        // TODO: Argument Handler
-        if (target == null) return null;
+        // Target was not defined and the sender is not a player
+        if (target == null) throw new HandledArgumentException("argument-handler-home");
 
         return DataManager.getRepository(HomeRepository.class).getHomes(target.getUniqueId()).stream()
                 .filter(home -> home.name().equalsIgnoreCase(inputIterator.next().toLowerCase()))
@@ -42,14 +41,16 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
             target = player;
         }
 
-        if (target == null) {
-            return new ArrayList<>();
-        }
+        // Target was not defined and the sender is not a player
+        if (target == null) return List.of("<no homes>");
 
-        return DataManager.getRepository(HomeRepository.class)
+        // Get the homes of the target
+        List<String> result = DataManager.getRepository(HomeRepository.class)
                 .getHomes(target.getUniqueId()).stream()
                 .map(Home::name)
                 .toList();
+
+        return result.isEmpty() ? List.of("<no homes>") : result;
     }
 
 }
