@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import xyz.oribuin.essentials.Essentials;
+import xyz.oribuin.essentials.api.config.ConfigOption;
 import xyz.oribuin.essentials.api.config.DefaultConfig;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 
@@ -21,8 +22,8 @@ public abstract class Module implements Listener {
 
     protected final Essentials plugin;
     protected final Logger logger = Logger.getLogger("ess-" + this.name());
-    private Map<Class<? extends ModuleConfig>, ModuleConfig> configs = new HashMap<>();
     protected File folder;
+    private final Map<Class<? extends ModuleConfig>, ModuleConfig> configs = new HashMap<>();
     private List<RoseCommandWrapper> commands;
     private boolean enabled;
 
@@ -50,15 +51,25 @@ public abstract class Module implements Listener {
 
         // Create and load the default configuration
         for (ModuleConfig config : this.configs()) {
-            if (!this.enabled && config != null && config.get("enabled").asBoolean())
-                this.enabled = true;
-
             config.reload(this.folder);
+
+            // Check if the module is enabled
+            if (!this.enabled) {
+                ConfigOption enabledOption = config.get(ModuleConfig.DEFAULT);
+                if (enabledOption != null)
+                    this.enabled = enabledOption.asBoolean();
+
+            }
+
             this.configs.put(config.getClass(), config);
         }
 
         // Don't register anything if the module is disabled
-        if (!enabled) return;
+        if (!enabled) {
+            this.logger.warning("The module is disabled, skipping loading.");
+            Essentials.unload(this);
+            return;
+        }
 
         // Register all the events
         this.listeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this.plugin));
@@ -67,6 +78,7 @@ public abstract class Module implements Listener {
         this.commands = this.commands().stream().map(baseRoseCommand -> new RoseCommandWrapper(this.plugin, baseRoseCommand)).toList();
         this.commands.forEach(RoseCommandWrapper::register);
 
+        this.enable();
     }
 
     /**
@@ -74,10 +86,11 @@ public abstract class Module implements Listener {
      */
     public final void unload() {
         this.listeners().forEach(HandlerList::unregisterAll);
-
         this.commands.forEach(RoseCommandWrapper::unregister);
         this.commands.clear();
         this.configs.clear();
+
+        this.disable();
     }
 
     /**

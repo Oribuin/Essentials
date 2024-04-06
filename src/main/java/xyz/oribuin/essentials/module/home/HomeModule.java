@@ -1,6 +1,7 @@
 package xyz.oribuin.essentials.module.home;
 
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
+import org.bukkit.event.Listener;
 import xyz.oribuin.essentials.Essentials;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
@@ -12,7 +13,7 @@ import xyz.oribuin.essentials.module.home.database.HomeRepository;
 
 import java.util.List;
 
-public class HomeModule extends Module {
+public class HomeModule extends Module implements Listener {
 
     private HomeRepository repository;
 
@@ -48,7 +49,7 @@ public class HomeModule extends Module {
             return;
         }
 
-        this.repository.load();
+        this.repository.createTable();
     }
 
     /**
@@ -56,7 +57,9 @@ public class HomeModule extends Module {
      */
     @Override
     public void disable() {
-        this.logger.info("Saving all the homes for all players.");
+        if (this.repository != null) {
+            this.repository.getHomes().clear();
+        }
     }
 
     /**

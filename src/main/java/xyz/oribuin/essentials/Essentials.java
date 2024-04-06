@@ -12,14 +12,14 @@ import xyz.oribuin.essentials.module.teleport.TeleportModule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 // Plugin Hex Code: #bc7dff
 public class Essentials extends RosePlugin {
 
-    private static final Map<Class<? extends Module>, Module> modules = new HashMap<>();
+    private static final Map<Class<? extends Module>, Module> modules = new ConcurrentHashMap<>();
     private static Essentials instance;
 
     public Essentials() {
@@ -34,7 +34,9 @@ public class Essentials extends RosePlugin {
         modules.put(HomeModule.class, new HomeModule(this));
         modules.put(TeleportModule.class, new TeleportModule(this));
 
-        modules.values().forEach(Module::load);
+        for (Module module : modules.values()) {
+            module.load();
+        }
     }
 
     @Override
@@ -97,12 +99,13 @@ public class Essentials extends RosePlugin {
     public static void unload(Module module) {
         try {
             module.setEnabled(false);
-            module.disable();
-            modules.remove(module.getClass());
-
+            module.unload();
         } catch (Exception e) {
             Bukkit.getLogger().severe("Failed to unload the module: " + module.name() + " - " + e.getMessage());
+        } finally {
+            modules.remove(module.getClass());
         }
     }
+
 
 }

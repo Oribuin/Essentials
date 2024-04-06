@@ -17,7 +17,7 @@ import java.util.List;
 
 public abstract class ModuleConfig {
 
-    public static final ConfigOption DEFAULT = new ConfigOption("enabled", false, List.of("Should the module and all of its featured be enabled?"));
+    public static final ConfigOption DEFAULT = new ConfigOption("enabled", true, List.of("Should the module and all of its featured be enabled?"));
 
     private final String name;
     protected List<ConfigOption> options;
@@ -66,6 +66,8 @@ public abstract class ModuleConfig {
                 option.setValue(value);
                 this.config.set(option.getPath(), value);
             }
+
+            this.config.save(configFile);
         } catch (IOException ex) {
             Bukkit.getLogger().severe("Failed to create config file for module " + this.name);
         }

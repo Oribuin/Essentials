@@ -4,6 +4,11 @@ import dev.rosewood.rosegarden.database.DatabaseConnector;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import xyz.oribuin.essentials.api.database.ModuleRepository;
 import xyz.oribuin.essentials.module.home.model.Home;
 
@@ -16,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class HomeRepository extends ModuleRepository {
+public class HomeRepository extends ModuleRepository implements Listener {
 
     private final Map<UUID, List<Home>> homes = new HashMap<>();
     private final Map<String, World> worldCache = new HashMap<>();
@@ -25,7 +30,7 @@ public class HomeRepository extends ModuleRepository {
         super(connector, "homes");
     }
 
-    public void load() {
+    public void createTable() {
         this.async(() -> this.connector.connect(connection -> {
             String createTable = "CREATE TABLE IF NOT EXISTS `" + this.table + "` (" +
                                  "`owner` VARCHAR(36) NOT NULL," +
@@ -39,26 +44,58 @@ public class HomeRepository extends ModuleRepository {
                                  "PRIMARY KEY (`owner`, `name`)" +
                                  ");";
 
-            String selectHomes = "SELECT * FROM `" + this.table + "`;";
-
-
-            try (
-                    PreparedStatement createStatement = connection.prepareStatement(createTable);
-                    PreparedStatement selectStatement = connection.prepareStatement(selectHomes)
-            ) {
+            try (PreparedStatement createStatement = connection.prepareStatement(createTable)) {
                 createStatement.executeUpdate();
-
-                ResultSet resultSet = selectStatement.executeQuery();
-                while (resultSet.next()) {
-                    Home home = this.construct(resultSet);
-
-                    List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
-                    homes.add(home);
-
-                    this.homes.put(home.owner(), homes);
-                }
             }
         }));
+    }
+
+    /**
+     * Load all the homes for a player from the database
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onJoin(PlayerJoinEvent event) {
+        this.load(event.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Remove all the homes for a player from the cache
+     */
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        this.unload(event.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Load all the homes for a player from the database
+     *
+     * @param owner The owner of the homes
+     */
+    public void load(UUID owner) {
+        this.async(() -> this.connector.connect(connection -> {
+            String selectHomes = "SELECT * FROM `" + this.table + "` WHERE `owner` = ?";
+            try (PreparedStatement statement = connection.prepareStatement(selectHomes)) {
+                statement.setString(1, owner.toString());
+                ResultSet resultSet = statement.executeQuery();
+
+                List<Home> homes = new ArrayList<>();
+                while (resultSet.next()) {
+                    Home home = this.construct(resultSet);
+                    homes.add(home);
+                }
+
+                this.homes.put(owner, homes);
+            }
+        }));
+    }
+
+    /**
+     * Remove all the homes for a player from the cache
+     *
+     * @param owner The owner of the homes
+     */
+    public void unload(UUID owner) {
+        this.homes.remove(owner);
     }
 
     /**
@@ -71,7 +108,6 @@ public class HomeRepository extends ModuleRepository {
         homes.add(home);
 
         this.homes.put(home.owner(), homes);
-
         this.async(() -> this.connector.connect(connection -> {
             String insertHome = "REPLACE INTO `" + this.table + "` (`owner`, `name`, `world`, `x`, `y`, `z`, `yaw`, `pitch`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(insertHome)) {
@@ -97,8 +133,8 @@ public class HomeRepository extends ModuleRepository {
     public void delete(Home home) {
         List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
         homes.remove(home);
-        this.homes.put(home.owner(), homes);
 
+        this.homes.put(home.owner(), homes);
         this.async(() -> this.connector.connect(connection -> {
             String deleteHome = "DELETE FROM `" + this.table + "` WHERE `owner` = ? AND `name` = ?";
             try (PreparedStatement statement = connection.prepareStatement(deleteHome)) {
