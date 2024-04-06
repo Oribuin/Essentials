@@ -60,8 +60,8 @@ public class HomeDeleteCommand extends BaseRoseCommand {
 
     @Override
     protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("sethome")
-                .aliases("createhome")
+        return CommandInfo.builder("delhome")
+                .aliases("deletehome", "removehome", "unsethome")
                 .permission("essentials.command.home")
                 .playerOnly(true)
                 .build();

@@ -187,6 +187,8 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @return The homes
      */
     public List<Home> getHomes(UUID owner) {
+        if (owner == null) return new ArrayList<>();
+
         return this.homes.getOrDefault(owner, new ArrayList<>());
     }
 

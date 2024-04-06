@@ -19,6 +19,7 @@ command-reload-description: "Reloads the plugin."
 command-reload-reloaded: "Configuration and locale files were reloaded"
 
 # Argument Handler Messages
-argument-handler-warp: 'The warp that you specified does not exist.'
 argument-handler-player: 'Please provide a valid player name.'
 argument-handler-string: 'Please provide a valid string.'
+argument-handler-home: 'Please provide a valid home name.'
+argument-handler-null: 'Please provide a valid argument.'

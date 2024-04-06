@@ -5,7 +5,7 @@ import xyz.oribuin.essentials.api.config.ModuleConfig;
 
 public class HomeMessages extends ModuleConfig {
 
-    private static final String PREFIX = "<##bc7dff>&lHomes &8| &f";
+    private static final String PREFIX = "<#bc7dff>&lHomes &8| &f";
     public static ConfigOption HOME_SET = new ConfigOption("home-set", PREFIX + "You have created the home, <#bc7dff>%home%&f.", "The message sent when a player sets a home.");
     public static ConfigOption HOME_DELETED = new ConfigOption("home-deleted", PREFIX + "You have deleted the home, <#bc7dff>%home%&f.", "The message sent when a player deletes a home.");
     public static ConfigOption HOME_TELEPORT = new ConfigOption("home-teleport", PREFIX + "Teleporting to <#bc7dff>%home%&f.", "The message sent when a player teleports to a home.");

@@ -13,8 +13,8 @@ public class HomeConfig extends ModuleConfig {
     public static ConfigOption MIN_HOMES = new ConfigOption("min-homes", 1, "The minimum amount of homes a player can have.", "This will be overwritten with the permission 'essentials.home.#");
 
     // Teleport Options
-    public static ConfigOption TP_DELAY = new ConfigOption("teleport-delay", 0, "The delay in seconds before teleporting to a home.", "This will be overwritten with the permission 'essentials.home.bypass-delay'");
-    public static ConfigOption TP_COOLDOWN = new ConfigOption("teleport-cooldown", 60, "The cooldown in seconds between teleporting to homes.", "This will be overwritten with the permission 'essentials.home.bypass-cooldown'");
+    public static ConfigOption TP_DELAY = new ConfigOption("teleport-delay", 5, "The delay in seconds before teleporting to a home.", "This will be overwritten with the permission 'essentials.home.bypass-delay'");
+    public static ConfigOption TP_COOLDOWN = new ConfigOption("teleport-cooldown", 30, "The cooldown in seconds between teleporting to homes.", "This will be overwritten with the permission 'essentials.home.bypass-cooldown'");
     public static ConfigOption TP_COST = new ConfigOption("teleport-cost", 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.home.bypass-cost'");
     public static ConfigOption TP_EFFECTS = new ConfigOption("teleport-effects", true, "Should the teleport effects be enabled?", "This will be overwritten with the permission 'essentials.home.bypass-effects'");
 

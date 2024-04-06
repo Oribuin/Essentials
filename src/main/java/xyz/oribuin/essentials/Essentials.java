@@ -3,6 +3,7 @@ package xyz.oribuin.essentials;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 import xyz.oribuin.essentials.manager.ConfigurationManager;
@@ -39,6 +40,9 @@ public class Essentials extends RosePlugin {
         modules.put(HomeModule.class, new HomeModule(this));
         modules.put(TeleportModule.class, new TeleportModule(this));
         modules.forEach((aClass, module) -> module.load());
+
+        // Update the commands for all online players
+        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
     }
 
     @Override

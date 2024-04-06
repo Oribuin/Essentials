@@ -26,7 +26,7 @@ public class HomeSetCommand extends BaseRoseCommand {
     @RoseExecutable
     public void execute(CommandContext context) {
         Player sender = (Player) context.getSender();
-        Home home = context.get("home");
+        String name = context.get("name");
 
         HomeModule module = Essentials.getModule(HomeModule.class);
         if (module == null || !module.isEnabled()) return;
@@ -37,7 +37,7 @@ public class HomeSetCommand extends BaseRoseCommand {
 
         // Check if the world is disabled
         List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getOr(config, List.of()).asStringList();
-        if (disabledWorlds.contains(home.location().getWorld().getName())) {
+        if (disabledWorlds.contains(sender.getWorld().getName())) {
             HomeMessages.DISABLED_WORLD.send(msgConfig, sender);
             return;
         }
@@ -54,6 +54,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         // TODO: Check if home exists
 
         // Set the home
+        Home home = new Home(name.toLowerCase(), sender.getUniqueId(), sender.getLocation());
         module.getRepository().save(home);
         HomeMessages.HOME_SET.send(msgConfig, sender, StringPlaceholders.of("home", home.name()));
     }

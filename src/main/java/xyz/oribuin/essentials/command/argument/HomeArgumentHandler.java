@@ -31,7 +31,7 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
         return DataManager.getRepository(HomeRepository.class).getHomes(target.getUniqueId()).stream()
                 .filter(home -> home.name().equalsIgnoreCase(inputIterator.next().toLowerCase()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new HandledArgumentException("argument-handler-home"));
     }
 
     @Override
