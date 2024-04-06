@@ -36,9 +36,16 @@ public class Essentials extends RosePlugin {
 
     @Override
     public void enable() {
-        // TODO: Load all the modules
+        // TODO: Register modules using reflections
         modules.put(HomeModule.class, new HomeModule(this));
         modules.put(TeleportModule.class, new TeleportModule(this));
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+
+        modules.forEach((aClass, module) -> module.disable());
         modules.forEach((aClass, module) -> module.load());
 
         // Update the commands for all online players
