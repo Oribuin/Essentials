@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
+import xyz.oribuin.essentials.manager.CommandManager;
 import xyz.oribuin.essentials.manager.ConfigurationManager;
 import xyz.oribuin.essentials.manager.DataManager;
 import xyz.oribuin.essentials.manager.LocaleManager;
@@ -28,7 +29,7 @@ public class Essentials extends RosePlugin {
                 ConfigurationManager.class,
                 DataManager.class,
                 LocaleManager.class,
-                null
+                CommandManager.class
         );
 
         instance = this;
@@ -39,6 +40,9 @@ public class Essentials extends RosePlugin {
         // TODO: Register modules using reflections
         modules.put(HomeModule.class, new HomeModule(this));
         modules.put(TeleportModule.class, new TeleportModule(this));
+        modules.forEach((aClass, module) -> module.load());
+
+        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
     }
 
     @Override

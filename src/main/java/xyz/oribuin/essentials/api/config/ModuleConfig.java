@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +68,11 @@ public abstract class ModuleConfig {
 
                 // Add comments to the config
                 if (!option.getComments().isEmpty()) {
-                    this.config.addPathedComments(option.getPath(), Arrays.toString(option.getComments().toArray()));
+                    for (String comment : option.getComments()) {
+                        this.config.addPathedComments(option.getPath(), comment);
+                    }
+
+                    this.config.addPathedComments(option.getPath(),"Default: " + option.getDefaultValue().value());
                 }
 
                 // Set the default valueR

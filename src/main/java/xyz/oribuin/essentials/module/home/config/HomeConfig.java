@@ -10,7 +10,7 @@ public class HomeConfig extends ModuleConfig {
 
     // Module Options
     public static ConfigOption DISABLED_WORLDS = new ConfigOption("disabled-worlds", List.of("world_nether", "world_the_end"), "Homes cannot be set in these worlds.");
-    public static ConfigOption MIN_HOMES = new ConfigOption("min-homes", 1, "The minimum amount of homes a player can have.", "This will be overwritten with the permission 'essentials.home.#");
+    public static ConfigOption MIN_HOMES = new ConfigOption("min-homes", 1, "The minimum amount of homes a player can have.", "This will be overwritten with the permission 'essentials.home.#'");
 
     // Teleport Options
     public static ConfigOption TP_DELAY = new ConfigOption("teleport-delay", 5, "The delay in seconds before teleporting to a home.", "This will be overwritten with the permission 'essentials.home.bypass-delay'");

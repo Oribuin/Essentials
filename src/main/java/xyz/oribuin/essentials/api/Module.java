@@ -41,6 +41,7 @@ public abstract class Module implements Listener {
      * Load the configuration for the module
      */
     public final void load() {
+
         // Create the default folder for the module
         File modulesFolder = new File(this.plugin.getDataFolder(), "modules");
         if (!modulesFolder.exists()) modulesFolder.mkdirs();
@@ -58,12 +59,13 @@ public abstract class Module implements Listener {
         for (ModuleConfig config : this.configs()) {
             config.reload(this.folder);
 
+            // Register the config once loaded
+            this.configs.put(config.getClass(), config);
+
             // Check if the module is enabled
             if (!this.enabled) {
-                this.enabled = ModuleConfig.DEFAULT.get(config).asBoolean();
+                this.enabled = config.getFile().getBoolean("enabled", false);
             }
-
-            this.configs.put(config.getClass(), config);
         }
 
         // Don't register anything if the module is disabled
@@ -79,7 +81,6 @@ public abstract class Module implements Listener {
         // Register all the commands
         this.commands = this.commands().stream().map(baseRoseCommand -> new RoseCommandWrapper(this.plugin, baseRoseCommand)).toList();
         this.commands.forEach(RoseCommandWrapper::register);
-
         this.enable();
     }
 
