@@ -3,7 +3,10 @@ package xyz.oribuin.essentials;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
+import org.bukkit.ServerTickManager;
 import org.bukkit.entity.Player;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import xyz.oribuin.essentials.api.Module;
 import xyz.oribuin.essentials.api.config.ModuleConfig;
 import xyz.oribuin.essentials.manager.CommandManager;
@@ -14,9 +17,11 @@ import xyz.oribuin.essentials.module.home.HomeModule;
 import xyz.oribuin.essentials.module.teleport.TeleportModule;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Essentials extends RosePlugin {
@@ -37,9 +42,20 @@ public class Essentials extends RosePlugin {
 
     @Override
     public void enable() {
-        // TODO: Register modules using reflections
-        modules.put(HomeModule.class, new HomeModule(this));
-        modules.put(TeleportModule.class, new TeleportModule(this));
+        Reflections reflections = new Reflections("xyz.oribuin.essentials.module", Scanners.SubTypes);
+        Set<Class<? extends Module>> moduleClasses = reflections.getSubTypesOf(Module.class);
+
+        // Register all the modules
+        moduleClasses.forEach(aClass -> {
+            if (Modifier.isAbstract(aClass.getModifiers())) return;
+
+            try {
+                modules.put(aClass, aClass.getConstructor(Essentials.class).newInstance(this));
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                Bukkit.getLogger().severe("Failed to create a new instance of the module: " + e.getMessage());
+            }
+        });
+
         modules.forEach((aClass, module) -> module.load());
 
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands);

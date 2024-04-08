@@ -116,7 +116,7 @@ public class HomeTPCommand extends BaseRoseCommand {
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("home")
                 .descriptionKey("command-home")
-                .permission("essentials.command.home")
+                .permission("essentials.home")
                 .playerOnly(true)
                 .build();
     }

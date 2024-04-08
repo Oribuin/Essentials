@@ -36,7 +36,10 @@ public abstract class ModuleConfig {
     /**
      * Load the configuration for the module
      */
-    public abstract void load();
+    public void load() {
+        this.register(DEFAULT);
+        this.registerClass();
+    }
 
     /**
      * Load this config inside the module folder
@@ -72,7 +75,7 @@ public abstract class ModuleConfig {
                         this.config.addPathedComments(option.getPath(), comment);
                     }
 
-                    this.config.addPathedComments(option.getPath(),"Default: " + option.getDefaultValue().value());
+                    this.config.addPathedComments(option.getPath(), "Default: " + option.getDefaultValue().value());
                 }
 
                 // Set the default valueR

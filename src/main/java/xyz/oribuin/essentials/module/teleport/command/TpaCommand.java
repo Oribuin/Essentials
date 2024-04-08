@@ -25,7 +25,7 @@ public class TpaCommand extends BaseRoseCommand {
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("tpa")
                 .aliases("tpask")
-                .permission("essentials.command.tpa")
+                .permission("essentials.tpa")
                 .build();
     }
 
