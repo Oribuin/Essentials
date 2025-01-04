@@ -21,7 +21,7 @@ public class PingCommand extends BaseRoseCommand {
 
     @RoseExecutable
     public void execute(CommandContext context, Player target) {
-        BasicMessages messages = EssentialsPlugin.getConfig(BasicAddon.class, BasicMessages.class);
+        BasicMessages messages = EssentialsPlugin.config(BasicAddon.class, BasicMessages.class);
         if (messages == null) return;
 
         // Swap the target if the sender does not have permission to view other player's ping

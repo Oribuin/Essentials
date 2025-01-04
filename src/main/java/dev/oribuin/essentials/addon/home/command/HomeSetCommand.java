@@ -29,7 +29,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         Player sender = (Player) context.getSender();
         String name = context.get("name");
 
-        HomeAddon addon = EssentialsPlugin.getModule(HomeAddon.class);
+        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
         if (addon == null || !addon.enabled()) return;
 
         HomeConfig config = addon.config(HomeConfig.class);

@@ -28,7 +28,7 @@ public class HomeDeleteCommand extends BaseRoseCommand {
         Player sender = (Player) context.getSender();
         Home home = context.get("home");
 
-        HomeAddon addon = EssentialsPlugin.getModule(HomeAddon.class);
+        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
         if (addon == null || !addon.enabled()) return;
 
         HomeConfig config = addon.config(HomeConfig.class);

@@ -116,13 +116,11 @@ public class StatementProvider {
         if (this.connection == null) return CompletableFuture.failedFuture(new IllegalStateException("Connection cannot be null"));
 
         // Make sure the columns are not null before executing the statement
-        if (this.columns == null || columns.isEmpty()) {
-            return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be null or empty"));
-        }
+        if (columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be null or empty"));
 
         // Create the table if it does not exist
         return switch (this.type) {
-            case CREATE_TABLE -> this.createTable(this.connection).thenApply(b -> null);
+            case CREATE_TABLE -> this.createTable().thenApply(b -> null);
             case DROP_TABLE -> this.dropTable().thenApply(b -> null);
             case SELECT -> this.select();
             case INSERT -> this.insert();
@@ -134,13 +132,12 @@ public class StatementProvider {
     /**
      * Create a table in the database if it does not exist already
      *
-     * @param connection The connection to use
-     *
      * @return If the table was created successfully
      */
-    private CompletableFuture<Boolean> createTable(Connection connection) {
+    private CompletableFuture<Boolean> createTable() {
         if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
 
+        System.out.println("Creating table: " + this.table); // Debugging
         return CompletableFuture.supplyAsync(() -> {
             StringBuilder statement = new StringBuilder("CREATE TABLE IF NOT EXISTS " + this.table + " (");
 
@@ -153,14 +150,21 @@ public class StatementProvider {
 
             // Append the columns to the statement
             statement.append(columns);
-            statement.append(this.primaryKeys.isEmpty() ? ")" : this.constructPrimary());
+
+            if (!this.primaryKeys.isEmpty()) {
+                statement.append(", ").append(this.constructPrimary());
+            }
+
+            statement.append(")");
 
             // Execute the statement
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement.toString())) {
+            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
+                System.out.printf("Statement: %s%n", statement); // Debugging
                 preparedStatement.executeUpdate();
                 return true;
             } catch (Exception e) {
-                throw new RuntimeException("An error occurred while creating the table", e);
+                EssentialsPlugin.get().getLogger().severe("An error occurred while creating the table: " + e.getMessage());
+                return false;
             }
         });
 

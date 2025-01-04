@@ -20,7 +20,7 @@ public class EnderchestCommand extends BaseRoseCommand {
 
     @RoseExecutable
     public void execute(CommandContext context, Player target) {
-        BasicMessages messages = EssentialsPlugin.getConfig(BasicAddon.class, BasicMessages.class);
+        BasicMessages messages = EssentialsPlugin.config(BasicAddon.class, BasicMessages.class);
         if (messages == null) return;
 
         if (!(context.getSender() instanceof Player commandSender)) return;

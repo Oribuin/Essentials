@@ -17,7 +17,7 @@ public class TpaCommand extends BaseRoseCommand {
 
     @RoseExecutable
     public void execute(CommandContext context) {
-        TeleportAddon addon = EssentialsPlugin.getModule(TeleportAddon.class);
+        TeleportAddon addon = EssentialsPlugin.addon(TeleportAddon.class);
         Player target = context.get("target");
     }
 

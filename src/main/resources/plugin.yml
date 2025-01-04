@@ -4,7 +4,5 @@ description: Modular essentials plugin for Spigot
 api-version: '1.20'
 version: '${version}'
 author: Oribuin
-libraries:
-  - 'org.reflections:reflections:0.10.2'
 softdepend:
   - PlaceholderAPI

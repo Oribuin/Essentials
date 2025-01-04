@@ -28,7 +28,7 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
         // Target was not defined and the sender is not a player
         if (target == null) throw new HandledArgumentException("argument-handler-home");
 
-        return DataManager.getRepository(HomeRepository.class).getHomes(target.getUniqueId()).stream()
+        return DataManager.repository(HomeRepository.class).getHomes(target.getUniqueId()).stream()
                 .filter(home -> home.name().equalsIgnoreCase(inputIterator.next().toLowerCase()))
                 .findFirst()
                 .orElseThrow(() -> new HandledArgumentException("argument-handler-home"));
@@ -45,7 +45,7 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
         if (target == null) return List.of("<no homes>");
 
         // Get the homes of the target
-        List<String> result = DataManager.getRepository(HomeRepository.class)
+        List<String> result = DataManager.repository(HomeRepository.class)
                 .getHomes(target.getUniqueId()).stream()
                 .map(Home::name)
                 .toList();

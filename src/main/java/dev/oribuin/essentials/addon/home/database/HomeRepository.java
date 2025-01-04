@@ -59,6 +59,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
                 .column("name", DataTypes.STRING)
                 .column("location", DataTypes.LOCATION, false)
                 .primary("owner", "name")
+                .execute()
         );
     }
 
@@ -68,6 +69,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @param owner The owner of the homes
      */
     public void load(UUID owner) {
+        
         this.connector.connect(x -> StatementProvider.create(StatementType.SELECT, x)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, owner)
@@ -104,16 +106,18 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @param home The home to save
      */
     public void save(Home home) {
-        this.connector.connect(x -> StatementProvider.create(StatementType.UPDATE, x)
+        this.connector.connect(x ->
+
+                StatementProvider.create(StatementType.UPDATE, x)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, home.owner())
                 .column("name", DataTypes.STRING, home.name())
                 .column("location", DataTypes.LOCATION, home.location())
                 .execute());
 
-        List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
-        homes.add(home);
-        this.homes.put(home.owner(), homes);
+//        List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
+//        homes.add(home);
+//        this.homes.put(home.owner(), homes);
     }
 
     /**

@@ -1,7 +1,10 @@
 package dev.oribuin.essentials;
 
+import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.hook.plugin.economy.PointsProvider;
+import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.manager.CommandManager;
 import dev.oribuin.essentials.manager.DataManager;
 import dev.oribuin.essentials.manager.LocaleManager;
@@ -10,14 +13,9 @@ import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EssentialsPlugin extends RosePlugin {
@@ -37,23 +35,10 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void enable() {
-        Reflections reflections = new Reflections("xyz.oribuin.essentials.addon", Scanners.SubTypes);
-        Set<Class<? extends Addon>> addonClasses = reflections.getSubTypesOf(Addon.class);
-
-        // Register all the addons
-        addonClasses.forEach(aClass -> {
-            if (Modifier.isAbstract(aClass.getModifiers())) return;
-
-            try {
-                addons.put(aClass, aClass.getConstructor(EssentialsPlugin.class).newInstance(this));
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                this.getLogger().severe("Failed to create a new instance of the addon: " + e.getMessage());
-            }
-        });
-
-        addons.forEach((aClass, addon) -> addon.load());
-
-        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+        AddonProvider.register(this); // Register default addons for the plugin
+        VaultProvider.get(); // Load the vault provider
+        PointsProvider.get();  // Load the points provider
+        Bukkit.getOnlinePlayers().forEach(Player::updateCommands); // Update the commands for all online players
     }
 
     @Override
@@ -96,17 +81,8 @@ public class EssentialsPlugin extends RosePlugin {
      * @return The addon
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Addon> T getModule(Class<T> clazz) {
+    public static <T extends Addon> T addon(Class<T> clazz) {
         if (addons.containsKey(clazz)) return (T) addons.get(clazz);
-
-        try {
-            T addon = clazz.getConstructor(EssentialsPlugin.class).newInstance(EssentialsPlugin.get());
-            addon.load();
-            addons.put(clazz, addon);
-            return addon;
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to create a new instance of the addon: " + e.getMessage());
-        }
 
         return null;
     }
@@ -114,17 +90,31 @@ public class EssentialsPlugin extends RosePlugin {
     /**
      * Get the configuration of a addon from the map
      *
-     * @param addon The addon to get the config from
+     * @param addon  The addon to get the config from
      * @param config The config class
      * @param <T>    The config type
      *
      * @return The config
      */
-    public static <T extends AddonConfig> T getConfig(Class<? extends Addon> addon, Class<T> config) {
+    public static <T extends AddonConfig> T config(Class<? extends Addon> addon, Class<T> config) {
         Addon addonInstance = addons.get(addon);
         if (addonInstance == null) return null;
 
         return addonInstance.config(config);
+    }
+
+    /**
+     * Register a new addon to the map
+     *
+     * @param addon The addon to register
+     */
+    public static void registerAddon(Addon addon) {
+        try {
+            addon.load(); // Load the addon
+            addons.put(addon.getClass(), addon);
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e.getMessage());
+        }
     }
 
     /**

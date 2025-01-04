@@ -38,7 +38,6 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:23.0.0")
-    compileOnly("org.reflections:reflections:0.10.2")
 
     // External Plugins
     compileOnly("me.clip:placeholderapi:2.11.6")
@@ -58,7 +57,6 @@ tasks {
     this.shadowJar {
         this.archiveClassifier.set("")
 
-        this.minimize()
         this.relocate("dev.rosewood.rosegarden", "${project.group}.essentials.libs.rosegarden")
         this.relocate("net.objecthunter.exp4j", "${project.group}.essentials.libs.exp4j")
         this.relocate("com.jeff_media", "${project.group}.essentials.libs.morepersistentdatatypes")

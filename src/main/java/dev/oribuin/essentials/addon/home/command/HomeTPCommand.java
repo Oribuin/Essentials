@@ -42,7 +42,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         Player sender = (Player) context.getSender();
         Home home = context.get("home");
 
-        HomeAddon addon = EssentialsPlugin.getModule(HomeAddon.class);
+        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
         if (addon == null || !addon.enabled()) return;
 
         HomeConfig config = addon.config(HomeConfig.class);
@@ -60,6 +60,8 @@ public class HomeTPCommand extends BaseRoseCommand {
         int cooldown = HomeConfig.TP_COOLDOWN.get(config).asInt();
         int teleportDelay = HomeConfig.TP_DELAY.get(config).asInt();
         double cost = HomeConfig.TP_COST.get(config).asDouble();
+
+        System.out.println("Teleporting to home: " + home.name() + " in " + teleportDelay + " seconds.");
 
         // Check if the player is on cooldown
         if (cooldown > 0) {
@@ -102,6 +104,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
         // Teleport the player to the location
         ScheduledTask finalTask = effectTask;
+        System.out.println("Teleporting to home: " + home.name() + " in " + teleportDelay + " seconds.");
         EssentialsPlugin.scheduler().runTaskLater(() -> {
             if (finalTask != null) finalTask.cancel();
 
@@ -113,7 +116,6 @@ public class HomeTPCommand extends BaseRoseCommand {
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("home")
-                .descriptionKey("command-home")
                 .permission("essentials.home")
                 .playerOnly(true)
                 .arguments(this.createArgumentsDefinition())

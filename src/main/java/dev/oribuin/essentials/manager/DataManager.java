@@ -32,12 +32,7 @@ public class DataManager extends AbstractDataManager {
      */
     public static <T extends ModuleRepository> T create(Class<T> repository) {
         try {
-            DatabaseConnector connector = EssentialsPlugin.get().getManager(DataManager.class).databaseConnector;
-
-            if (connector == null) {
-                Bukkit.getLogger().severe("Failed to create repository: " + repository.getSimpleName() + " - DatabaseConnector is null");
-                return null;
-            }
+            DatabaseConnector connector = EssentialsPlugin.get().getManager(DataManager.class).getDatabaseConnector();
 
             T repo = repository.getConstructor(DatabaseConnector.class).newInstance(connector);
             repositories.put(repository, repo);
@@ -56,7 +51,7 @@ public class DataManager extends AbstractDataManager {
      * @param <T>   The repository type
      * @return The repository
      */
-    public static <T extends ModuleRepository> T getRepository(Class<T> clazz) {
+    public static <T extends ModuleRepository> T repository(Class<T> clazz) {
         return clazz.cast(repositories.get(clazz));
     }
 
