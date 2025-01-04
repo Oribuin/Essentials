@@ -18,12 +18,6 @@ java {
     }
 }
 
-tasks.compileJava {
-    options.compilerArgs.add("-parameters")
-    options.isFork = true
-    options.encoding = "UTF-8"
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -54,6 +48,12 @@ dependencies {
 }
 
 tasks {
+    
+    this.compileJava {
+        this.options.compilerArgs.add("-parameters")
+        this.options.isFork = true
+        this.options.encoding = "UTF-8"
+    }
 
     this.shadowJar {
         this.archiveClassifier.set("")
