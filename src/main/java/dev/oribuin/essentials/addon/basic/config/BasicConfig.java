@@ -1,11 +1,13 @@
-package dev.oribuin.essentials.api.config;
+package dev.oribuin.essentials.addon.basic.config;
 
-public class DefaultConfig extends AddonConfig {
+import dev.oribuin.essentials.api.config.AddonConfig;
+
+public class BasicConfig extends AddonConfig {
 
     /**
      * Create a new instance of the addon config
      */
-    public DefaultConfig() {
+    public BasicConfig() {
         super("config");
     }
 

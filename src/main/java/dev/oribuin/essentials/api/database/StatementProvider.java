@@ -2,12 +2,13 @@ package dev.oribuin.essentials.api.database;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.database.serializer.DataType;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,10 +16,10 @@ public class StatementProvider {
 
     private final StatementType type;
     private final Connection connection;
+    private final Map<String, DataColumn<?>> columns; // The columns to use for the statement
+    private final List<String> primaryKeys; // The primary keys for the table
     private String table; // The table to use
-    private Map<String, DataColumn<?>> columns; // The columns to use for the statement
     private int limit; // Used for SELECT statements
-    private DataColumn<?> primaryKey; // The primary key for the table
     private boolean autoIncrement; // If the primary key should auto increment or not
 
     /**
@@ -32,7 +33,7 @@ public class StatementProvider {
         this.table = null;
         this.limit = -1;
         this.columns = new HashMap<>();
-        this.primaryKey = null;
+        this.primaryKeys = new ArrayList<>();
         this.autoIncrement = false;
     }
 
@@ -58,6 +59,47 @@ public class StatementProvider {
      */
     public <T> StatementProvider column(String name, DataType<T> type, T value) {
         this.columns.put(name, DataColumn.of(name, type, value));
+        return this;
+    }
+
+    /**
+     * Add a column to the statement provider to use
+     *
+     * @param name The name of the column
+     * @param type The type of the column
+     *
+     * @return The statement provider
+     */
+    public <T> StatementProvider column(String name, DataType<T> type) {
+        this.columns.put(name, DataColumn.of(name, type, null));
+        return this;
+    }
+
+    /**
+     * Add a column to the statement provider to use
+     *
+     * @param name  The name of the column
+     * @param type  The type of the column
+     * @param value The value of the column
+     *
+     * @return The statement provider
+     */
+    public <T> StatementProvider column(String name, DataType<T> type, T value, boolean nullable) {
+        this.columns.put(name, DataColumn.of(name, type, value, nullable));
+        return this;
+    }
+
+    /**
+     * Add a column to the statement provider to use
+     *
+     * @param name     The name of the column
+     * @param type     The type of the column
+     * @param nullable If the column is nullable
+     *
+     * @return The statement provider
+     */
+    public <T> StatementProvider column(String name, DataType<T> type, boolean nullable) {
+        this.columns.put(name, DataColumn.of(name, type, null, nullable));
         return this;
     }
 
@@ -102,11 +144,6 @@ public class StatementProvider {
         return CompletableFuture.supplyAsync(() -> {
             StringBuilder statement = new StringBuilder("CREATE TABLE IF NOT EXISTS " + this.table + " (");
 
-            // Append the primary key to the statement
-            if (this.primaryKey != null) {
-                statement.append(this.constructPrimary()).append(", ");
-            }
-
             // Append the columns to the statement
             String columns = this.columns.values()
                     .stream()
@@ -115,7 +152,8 @@ public class StatementProvider {
                     .orElse("");
 
             // Append the columns to the statement
-            statement.append(columns).append(")");
+            statement.append(columns);
+            statement.append(this.primaryKeys.isEmpty() ? ")" : this.constructPrimary());
 
             // Execute the statement
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement.toString())) {
@@ -268,7 +306,7 @@ public class StatementProvider {
      */
     public CompletableFuture<ResultSet> delete() {
         if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
-        if (this.columns == null || this.columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be empty"));
+        if (this.columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be empty"));
 
         return CompletableFuture.supplyAsync(() -> {
 
@@ -317,16 +355,10 @@ public class StatementProvider {
      * @return Create the columns for the statement provider to use
      */
     private String constructPrimary() {
-        if (this.primaryKey == null) {
-            throw new IllegalStateException("Primary key cannot be null when constructing the primary key");
-        }
+        if (this.primaryKeys.isEmpty()) throw new IllegalStateException("Primary keys cannot be empty when constructing the primary key");
 
-        return String.format(
-                "%s %s PRIMARY KEY%s",
-                this.primaryKey.name(),
-                this.primaryKey.dataType().type(),
-                this.autoIncrement ? " AUTO_INCREMENT" : ""
-        );
+        String primary = this.primaryKeys.stream().reduce((s1, s2) -> s1 + ", " + s2).orElse("");
+        return String.format("PRIMARY KEY (%s)", primary);
     }
 
     /**
@@ -354,15 +386,14 @@ public class StatementProvider {
     }
 
     /**
-     * Set the primary key for the table
+     * Add primary keys for the table
      *
-     * @param name The name of the primary key
-     * @param type The type of the primary key
+     * @param names The names of the primary keys
      *
      * @return The statement provider
      */
-    public StatementProvider primary(String name, DataType<?> type) {
-        this.primaryKey = DataColumn.of(name, type, null);
+    public StatementProvider primary(String... names) {
+        this.primaryKeys.addAll(List.of(names));
         return this;
     }
 
@@ -375,7 +406,7 @@ public class StatementProvider {
      */
     public StatementProvider primaryAuto(String name) {
         this.autoIncrement = true;
-        return this.primary(name, DataTypes.INTEGER);
+        return this.primary(name);
     }
 
 

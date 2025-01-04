@@ -52,12 +52,23 @@ public abstract class DataType<T> {
     public abstract T deserialize(ResultSet resultSet, int index) throws SQLException;
 
     /**
+     * Deserialize a value from a result set
+     *
+     * @param resultSet The result set
+     * @param column     The column
+     *
+     * @throws SQLException If an error occurs while deserializing the value
+     */
+    public final T deserialize(ResultSet resultSet, String column) throws SQLException {
+        return this.deserialize(resultSet, resultSet.findColumn(column));
+    }
+
+    /**
      * The mysql column type for the database
      *
      * @return The column type
      */
-    public String type() {
+    public String columnType() {
         return this.type;
     }
-
 }

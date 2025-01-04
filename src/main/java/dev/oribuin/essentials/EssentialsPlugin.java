@@ -1,7 +1,7 @@
 package dev.oribuin.essentials;
 
-import dev.oribuin.essentials.api.Module;
-import dev.oribuin.essentials.api.config.ModuleConfig;
+import dev.oribuin.essentials.api.Addon;
+import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.manager.CommandManager;
 import dev.oribuin.essentials.manager.DataManager;
 import dev.oribuin.essentials.manager.LocaleManager;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EssentialsPlugin extends RosePlugin {
 
-    private static final Map<Class<? extends Module>, Module> modules = new ConcurrentHashMap<>();
+    private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
     private static EssentialsPlugin instance;
 
     public EssentialsPlugin() {
@@ -37,21 +37,21 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void enable() {
-        Reflections reflections = new Reflections("xyz.oribuin.essentials.module", Scanners.SubTypes);
-        Set<Class<? extends Module>> moduleClasses = reflections.getSubTypesOf(Module.class);
+        Reflections reflections = new Reflections("xyz.oribuin.essentials.addon", Scanners.SubTypes);
+        Set<Class<? extends Addon>> addonClasses = reflections.getSubTypesOf(Addon.class);
 
-        // Register all the modules
-        moduleClasses.forEach(aClass -> {
+        // Register all the addons
+        addonClasses.forEach(aClass -> {
             if (Modifier.isAbstract(aClass.getModifiers())) return;
 
             try {
-                modules.put(aClass, aClass.getConstructor(EssentialsPlugin.class).newInstance(this));
+                addons.put(aClass, aClass.getConstructor(EssentialsPlugin.class).newInstance(this));
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                this.getLogger().severe("Failed to create a new instance of the module: " + e.getMessage());
+                this.getLogger().severe("Failed to create a new instance of the addon: " + e.getMessage());
             }
         });
 
-        modules.forEach((aClass, module) -> module.load());
+        addons.forEach((aClass, addon) -> addon.load());
 
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
     }
@@ -60,8 +60,8 @@ public class EssentialsPlugin extends RosePlugin {
     public void reload() {
         super.reload();
 
-        modules.forEach((aClass, module) -> module.disable());
-        modules.forEach((aClass, module) -> module.load());
+        addons.forEach((aClass, addon) -> addon.disable());
+        addons.forEach((aClass, addon) -> addon.load());
 
         // Update the commands for all online players
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
@@ -69,8 +69,8 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void disable() {
-        modules.forEach((aClass, module) -> module.unload());
-        modules.clear();
+        addons.forEach((aClass, addon) -> addon.unload());
+        addons.clear();
     }
 
     @Override
@@ -88,58 +88,58 @@ public class EssentialsPlugin extends RosePlugin {
     }
 
     /**
-     * Grab a module from the map
+     * Grab a addon from the map
      *
-     * @param clazz The class of the module
-     * @param <T>   The module type
+     * @param clazz The class of the addon
+     * @param <T>   The addon type
      *
-     * @return The module
+     * @return The addon
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Module> T getModule(Class<T> clazz) {
-        if (modules.containsKey(clazz)) return (T) modules.get(clazz);
+    public static <T extends Addon> T getModule(Class<T> clazz) {
+        if (addons.containsKey(clazz)) return (T) addons.get(clazz);
 
         try {
-            T module = clazz.getConstructor(EssentialsPlugin.class).newInstance(EssentialsPlugin.get());
-            module.load();
-            modules.put(clazz, module);
-            return module;
+            T addon = clazz.getConstructor(EssentialsPlugin.class).newInstance(EssentialsPlugin.get());
+            addon.load();
+            addons.put(clazz, addon);
+            return addon;
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to create a new instance of the module: " + e.getMessage());
+            EssentialsPlugin.get().getLogger().severe("Failed to create a new instance of the addon: " + e.getMessage());
         }
 
         return null;
     }
 
     /**
-     * Get the configuration of a module from the map
+     * Get the configuration of a addon from the map
      *
-     * @param module The module to get the config from
+     * @param addon The addon to get the config from
      * @param config The config class
      * @param <T>    The config type
      *
      * @return The config
      */
-    public static <T extends ModuleConfig> T getConfig(Class<? extends Module> module, Class<T> config) {
-        Module moduleInstance = modules.get(module);
-        if (moduleInstance == null) return null;
+    public static <T extends AddonConfig> T getConfig(Class<? extends Addon> addon, Class<T> config) {
+        Addon addonInstance = addons.get(addon);
+        if (addonInstance == null) return null;
 
-        return moduleInstance.config(config);
+        return addonInstance.config(config);
     }
 
     /**
-     * Unload a specified module from the map
+     * Unload a specified addon from the map
      *
-     * @param module The module to unload
+     * @param addon The addon to unload
      */
-    public static void unload(Module module) {
+    public static void unload(Addon addon) {
         try {
-            module.enabled(false);
-            module.unload();
+            addon.enabled(false);
+            addon.unload();
         } catch (Exception e) {
-            Bukkit.getLogger().severe("Failed to unload the module: " + module.name() + " - " + e.getMessage());
+            Bukkit.getLogger().severe("Failed to unload the addon: " + addon.name() + " - " + e.getMessage());
         } finally {
-            modules.remove(module.getClass());
+            addons.remove(addon.getClass());
         }
     }
 

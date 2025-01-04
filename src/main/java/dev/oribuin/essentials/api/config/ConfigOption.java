@@ -56,34 +56,34 @@ public class ConfigOption {
     /**
      * Get the value of the config option or null;
      *
-     * @param config The module config
+     * @param config The addon config
      * @return The value of the config option or null
      */
     @NotNull
-    public ConfigValue get(ModuleConfig config) {
+    public ConfigValue get(AddonConfig config) {
         return config.get(this).map(ConfigOption::getValue).orElse(ConfigValue.EMPTY);
     }
 
     /**
      * Get the value of the config option or the default value
      *
-     * @param config The module config
+     * @param config The addon config
      * @return The value of the config option or the default value
      */
     @NotNull
-    public ConfigValue getOrDef(ModuleConfig config) {
+    public ConfigValue getOrDef(AddonConfig config) {
         return config.get(this).map(ConfigOption::getValue).orElse(this.defaultValue);
     }
 
     /**
      * Get the value of the config option or the default value
      *
-     * @param config The module config
+     * @param config The addon config
      * @param value  The default value
      * @return The value of the config option or the default value
      */
     @NotNull
-    public ConfigValue getOr(ModuleConfig config, Object value) {
+    public ConfigValue getOr(AddonConfig config, Object value) {
         return config.get(this)
                 .map(ConfigOption::getValue)
                 .orElse(new ConfigValue(value));
@@ -92,21 +92,21 @@ public class ConfigOption {
     /**
      * Send a message from the config to a CommandSender
      *
-     * @param config       The module config
+     * @param config       The addon config
      * @param sender       The CommandSender to send the message to
      * @param placeholders The placeholders to apply to the message
      */
-    public final void send(ModuleConfig config, CommandSender sender, StringPlaceholders placeholders) {
+    public final void send(AddonConfig config, CommandSender sender, StringPlaceholders placeholders) {
         config.send(sender, this, placeholders);
     }
 
     /**
      * Send a message from the config to a CommandSender using a config option
      *
-     * @param config The module config
+     * @param config The addon config
      * @param sender The CommandSender to send the message to
      */
-    public final void send(ModuleConfig config, CommandSender sender) {
+    public final void send(AddonConfig config, CommandSender sender) {
         this.send(config, sender, StringPlaceholders.empty());
     }
 

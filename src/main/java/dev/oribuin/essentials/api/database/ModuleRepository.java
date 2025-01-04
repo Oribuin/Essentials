@@ -17,7 +17,7 @@ public abstract class ModuleRepository {
     /**
      * Load the repository
      */
-    public abstract void createTable();
+    public abstract void establishTables();
 
     /**
      * Unload the repository

@@ -7,8 +7,8 @@ import dev.rosewood.rosegarden.command.framework.InputIterator;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import dev.oribuin.essentials.manager.DataManager;
-import dev.oribuin.essentials.module.home.database.HomeRepository;
-import dev.oribuin.essentials.module.home.model.Home;
+import dev.oribuin.essentials.addon.home.database.HomeRepository;
+import dev.oribuin.essentials.addon.home.model.Home;
 
 import java.util.List;
 

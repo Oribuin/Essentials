@@ -1,8 +1,10 @@
 package dev.oribuin.essentials.api.database.serializer.def;
 
 import dev.oribuin.essentials.api.database.serializer.impl.spigot.ItemStackArrayDataType;
+import dev.oribuin.essentials.api.database.serializer.impl.spigot.NamespaceDataType;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.impl.BooleanDataType;
@@ -43,6 +45,7 @@ public class DataTypes {
     public static final DataType<Material> MATERIAL = new MaterialDataType();
     public static final DataType<ItemStack> ITEM_STACK = new ItemStackDataType();
     public static final DataType<ItemStack[]> ITEM_STACK_ARRAY = new ItemStackArrayDataType();
+    public static final DataType<NamespacedKey> NAMESPACE = new NamespaceDataType();
 
     /**
      * @return Create a new EnumDataType instance
