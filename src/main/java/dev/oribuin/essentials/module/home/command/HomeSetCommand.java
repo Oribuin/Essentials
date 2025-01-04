@@ -63,15 +63,9 @@ public class HomeSetCommand extends BaseRoseCommand {
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("sethome")
                 .aliases("createhome")
+                .arguments(ArgumentsDefinition.of("name", ArgumentHandlers.STRING))
                 .permission("essentials.home")
                 .playerOnly(true)
-                .build();
-    }
-
-    @Override
-    protected ArgumentsDefinition createArgumentsDefinition() {
-        return ArgumentsDefinition.builder()
-                .required("name", ArgumentHandlers.STRING)
                 .build();
     }
 
