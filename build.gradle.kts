@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
     id("com.gradleup.shadow") version "8.3.5"
 }
-group = "xyz.oribuin"
+group = "dev.oribuin"
 version = "1.0"
 
 java {
@@ -33,12 +33,12 @@ repositories {
 
 dependencies {
     api("dev.rosewood:rosegarden:1.4.6")
-    api("org.reflections:reflections:0.10.2")
     api("net.objecthunter:exp4j:0.4.8")
     api("com.jeff-media:MorePersistentDataTypes:2.4.0")
 
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.reflections:reflections:0.10.2")
 
     // External Plugins
     compileOnly("me.clip:placeholderapi:2.11.6")
@@ -57,7 +57,16 @@ tasks {
 
     this.shadowJar {
         this.archiveClassifier.set("")
-        this.relocate("dev.rosewood.rosegarden", "${project.group}.essentials.rosegarden")
+
+        this.minimize()
+        this.relocate("dev.rosewood.rosegarden", "${project.group}.essentials.libs.rosegarden")
+        this.relocate("net.objecthunter.exp4j", "${project.group}.essentials.libs.exp4j")
+        this.relocate("com.jeff_media", "${project.group}.essentials.libs.morepersistentdatatypes")
+        this.relocate("org.jetbrains", "${project.group}.essentials.libs.jetbrains")
+
+        // rosegarden should be relocating this
+        this.relocate("com.zaxxer", "dev.rosewood.rosegarden.libs.hikari")
+        this.relocate("org.slf4j", "dev.rosewood.rosegarden.libs.slf4j")
     }
 
     this.processResources {
