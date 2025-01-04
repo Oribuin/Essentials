@@ -48,7 +48,7 @@ dependencies {
 }
 
 tasks {
-    
+
     this.compileJava {
         this.options.compilerArgs.add("-parameters")
         this.options.isFork = true
@@ -61,11 +61,7 @@ tasks {
     }
 
     this.processResources {
-        this.from(java.sourceSets["main"].resources.srcDirs) {
-            this.include("**/*.yml")
-            this.filter(ReplaceTokens::class, mapOf("version" to project.version))
-            this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        }
+        this.expand("version" to project.version)
     }
 
     this.build {

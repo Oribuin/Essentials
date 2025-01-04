@@ -1,8 +1,8 @@
 name: OriEssentials
-main: xyz.oribuin.essentials.Essentials
+main: dev.oribuin.essentials.EssentialsPlugin
 description: Modular essentials plugin for Spigot
 api-version: '1.20'
-version: '@version@'
+version: '${version}'
 author: Oribuin
 softdepend:
   - PlaceholderAPI
