@@ -16,7 +16,7 @@ public class ListDataType<T> extends DataType<T> {
     private final List<T> list;
 
     public ListDataType(Class<T> type, List<T> list) {
-        super(ColumnType.STRING);
+        super(ColumnType.TEXT);
         this.type = type;
         this.list = list;
     }

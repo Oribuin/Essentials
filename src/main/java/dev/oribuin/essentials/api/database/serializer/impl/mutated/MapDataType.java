@@ -16,7 +16,7 @@ public class MapDataType<K, V> extends DataType<Map<DataType<K>, DataType<V>>> {
     private final Map<DataType<K>, DataType<V>> map;
 
     public MapDataType(DataType<K> keyType, DataType<V> valueType, Map<DataType<K>, DataType<V>> map) {
-        super(ColumnType.STRING);
+        super(ColumnType.TEXT);
         this.keyType = keyType;
         this.valueType = valueType;
         this.map = map;
