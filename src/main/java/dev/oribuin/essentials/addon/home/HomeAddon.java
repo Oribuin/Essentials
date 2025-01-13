@@ -1,23 +1,27 @@
 package dev.oribuin.essentials.addon.home;
 
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.manager.DataManager;
 import dev.oribuin.essentials.addon.home.command.HomeDeleteCommand;
 import dev.oribuin.essentials.addon.home.command.HomeSetCommand;
 import dev.oribuin.essentials.addon.home.command.HomeTPCommand;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
+import dev.oribuin.essentials.api.Addon;
+import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.manager.DataManager;
+import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.List;
 
-public class HomeAddon extends Addon implements Listener {
+public class HomeAddon extends Addon {
 
     private HomeRepository repository;
 
@@ -53,6 +57,9 @@ public class HomeAddon extends Addon implements Listener {
         }
 
         this.repository.establishTables();
+
+        // Load Existing Users
+        Bukkit.getOnlinePlayers().forEach(player -> this.repository.load(player.getUniqueId()));
     }
 
     /**
@@ -86,6 +93,22 @@ public class HomeAddon extends Addon implements Listener {
     }
 
     /**
+     * Load all the homes for a player from the database
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onJoin(PlayerJoinEvent event) {
+        this.repository.load(event.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Remove all the homes for a player from the cache
+     */
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        this.repository.unload(event.getPlayer().getUniqueId());
+    }
+
+    /**
      * Get the repository for the addon
      */
     public HomeRepository repository() {
@@ -96,6 +119,7 @@ public class HomeAddon extends Addon implements Listener {
      * Get the maximum amount of homes a player can have
      *
      * @param player The player to get the limit of
+     *
      * @return The limit of homes the player can have
      */
     public static int limit(Player player) {

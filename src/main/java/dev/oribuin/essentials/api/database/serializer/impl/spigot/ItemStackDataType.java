@@ -1,11 +1,11 @@
 package dev.oribuin.essentials.api.database.serializer.impl.spigot;
 
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ItemStackDataType extends DataType<ItemStack> {
@@ -32,16 +32,19 @@ public class ItemStackDataType extends DataType<ItemStack> {
     }
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
+     *
+     * @return The deserialized value
      *
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public ItemStack deserialize(ResultSet resultSet, int index) throws SQLException {
-        return ItemStack.deserializeBytes(resultSet.getBytes(index));
+    public ItemStack deserialize(QueryResult.Row row, String name) {
+        Object ambiguousResult = row.content().get(name);
+        return ambiguousResult instanceof byte[] array ? ItemStack.deserializeBytes(array) : null;
     }
 
 }

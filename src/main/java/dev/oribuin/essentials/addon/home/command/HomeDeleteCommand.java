@@ -10,12 +10,10 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.entity.Player;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.home.HomeAddon;
-import dev.oribuin.essentials.command.argument.HomeArgumentHandler;
+import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
-
-import java.util.List;
 
 public class HomeDeleteCommand extends BaseRoseCommand {
 
@@ -24,9 +22,8 @@ public class HomeDeleteCommand extends BaseRoseCommand {
     }
 
     @RoseExecutable
-    public void execute(CommandContext context) {
+    public void execute(CommandContext context, Home home) {
         Player sender = (Player) context.getSender();
-        Home home = context.get("home");
 
         HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
         if (addon == null || !addon.enabled()) return;
@@ -35,19 +32,11 @@ public class HomeDeleteCommand extends BaseRoseCommand {
         HomeMessages msgConfig = addon.config(HomeMessages.class);
         if (config == null || msgConfig == null) return;
 
-        // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getOr(config, List.of()).asStringList();
-        if (disabledWorlds.contains(home.location().getWorld().getName())) {
-            HomeMessages.DISABLED_WORLD.send(msgConfig, sender);
-            return;
-        }
-
-        // TODO: check if max homes reached
         // TODO: Check if home exists
 
         // Set the home
-        addon.repository().save(home);
-        HomeMessages.HOME_SET.send(msgConfig, sender, StringPlaceholders.of("home", home.name()));
+        addon.repository().delete(home);
+        HomeMessages.HOME_DELETED.send(sender, home.placeholders());
     }
 
     @Override
@@ -55,7 +44,7 @@ public class HomeDeleteCommand extends BaseRoseCommand {
         return CommandInfo.builder("delhome")
                 .aliases("deletehome", "removehome", "unsethome")
                 .arguments(ArgumentsDefinition.of("home", new HomeArgumentHandler()))
-                .permission("essentials.home")
+                .permission("essentials.home.delete")
                 .playerOnly(true)
                 .build();
     }

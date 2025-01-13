@@ -1,24 +1,14 @@
 package dev.oribuin.essentials.addon.home.database;
 
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.api.database.ModuleRepository;
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.StatementProvider;
 import dev.oribuin.essentials.api.database.StatementType;
-import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,33 +24,16 @@ public class HomeRepository extends ModuleRepository implements Listener {
     }
 
     /**
-     * Load all the homes for a player from the database
-     */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
-        this.load(event.getPlayer().getUniqueId());
-    }
-
-    /**
-     * Remove all the homes for a player from the cache
-     */
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        this.unload(event.getPlayer().getUniqueId());
-    }
-
-    /**
      * Create the table for the homes in the database
      */
     public void establishTables() {
-        this.connector.connect(x -> StatementProvider.create(StatementType.CREATE_TABLE, x)
+        StatementProvider.create(StatementType.CREATE_TABLE, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID)
                 .column("name", DataTypes.STRING)
                 .column("location", DataTypes.LOCATION, false)
                 .primary("owner", "name")
-                .execute()
-        );
+                .execute();
     }
 
     /**
@@ -69,26 +42,19 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @param owner The owner of the homes
      */
     public void load(UUID owner) {
-        
-        this.connector.connect(x -> StatementProvider.create(StatementType.SELECT, x)
+        StatementProvider.create(StatementType.SELECT, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, owner)
                 .execute()
-                .thenAcceptAsync(resultSet -> {
-                    if (resultSet == null) return;
-
-                    try {
-                        List<Home> homes = new ArrayList<>();
-                        while (resultSet.next()) {
-                            homes.add(Home.construct(resultSet));
-                        }
-
-                        this.homes.put(owner, homes);
-                    } catch (Exception ex) {
-                        EssentialsPlugin.get().getLogger().severe("[HomeModule] Error while loading homes for " + owner.toString());
-                        EssentialsPlugin.get().getLogger().severe(ex.getMessage());
+                .thenAccept(queryResult -> {
+                    List<Home> results = new ArrayList<>();
+                    for (QueryResult.Row row : queryResult.results()) {
+                        Home home = Home.construct(row);
+                        if (home != null) results.add(home);
                     }
-                }));
+                    
+                    this.homes.put(owner, results);
+                });
     }
 
     /**
@@ -106,16 +72,17 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @param home The home to save
      */
     public void save(Home home) {
-        this.connector.connect(x -> StatementProvider.create(StatementType.UPDATE, x)
+        StatementProvider.create(StatementType.INSERT, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, home.owner())
                 .column("name", DataTypes.STRING, home.name())
                 .column("location", DataTypes.LOCATION, home.location())
-                .execute());
-
-        List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
-        homes.add(home);
-        this.homes.put(home.owner(), homes);
+                .execute()
+                .thenRun(() -> {
+                    List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
+                    homes.add(home);
+                    this.homes.put(home.owner(), homes);
+                });
     }
 
     /**
@@ -124,11 +91,11 @@ public class HomeRepository extends ModuleRepository implements Listener {
      * @param home The home to delete
      */
     public void delete(Home home) {
-        this.connector.connect(x -> StatementProvider.create(StatementType.DELETE, x)
+        StatementProvider.create(StatementType.DELETE, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, home.owner())
                 .column("name", DataTypes.STRING, home.name())
-                .execute());
+                .execute();
 
         List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
         homes.remove(home);

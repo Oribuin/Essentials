@@ -1,14 +1,15 @@
 package dev.oribuin.essentials.addon.home.model;
 
+import dev.oribuin.essentials.api.Placeholder;
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
-public final class Home {
+public final class Home implements Placeholder {
 
     private final String name;
     private final UUID owner;
@@ -23,18 +24,17 @@ public final class Home {
     /**
      * Construct a home from a result set row
      *
-     * @param resultSet The result set
+     * @param row The row to construct a home from
      *
      * @return The home
-     *
-     * @throws SQLException If an error occurs
      */
-    public static Home construct(ResultSet resultSet) throws SQLException {
-        return new Home(
-                DataTypes.STRING.deserialize(resultSet, "name"),
-                DataTypes.UUID.deserialize(resultSet, "owner"),
-                DataTypes.LOCATION.deserialize(resultSet, "location")
-        );
+    public static Home construct(QueryResult.Row row) {
+        String name = DataTypes.STRING.deserialize(row, "name");
+        UUID owner = DataTypes.UUID.deserialize(row, "owner");
+        Location location = DataTypes.LOCATION.deserialize(row, "location");
+        if (name == null || owner == null || location == null) return null;
+        
+        return new Home(name, owner, location);
     }
 
     /**
@@ -63,7 +63,22 @@ public final class Home {
         if (below.getType().isAir() || below.isLiquid()) return false;
 
         // Make sure the player is not in a block
-        return !(location.getY() <= location.getBlockY() + block.getBoundingBox().getHeight());
+        if (block.getType().isAir()) return true;
+        return location.getY() >= block.getY() + block.getBoundingBox().getHeight();
+    }
+
+    /**
+     * The string placeholders for this object
+     *
+     * @return The compiled string placeholders
+     */
+    @Override
+    public StringPlaceholders placeholders() {
+        return StringPlaceholders.builder()
+                .add("home", this.name)
+                .add("location", String.format("%s, %s, %s @ %s", this.location.x(), this.location.y(), this.location.z(), this.location.getWorld().getName()))
+                .add("owner-uuid", this.owner) // TODO: add %owner% = owner name
+                .build();
     }
 
     public String name() {

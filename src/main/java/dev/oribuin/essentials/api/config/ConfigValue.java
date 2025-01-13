@@ -5,8 +5,10 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public record ConfigValue(Object value) {
 
-    public static ConfigValue EMPTY = new ConfigValue(null);
-
+    public static ConfigValue empty() {
+        return new ConfigValue(null);
+    }
+    
     /**
      * Get the value of the config option as a boolean
      */
@@ -61,7 +63,7 @@ public record ConfigValue(Object value) {
      * @return The value of the config option
      */
     public <T> T as(Class<T> type) {
-        if (value == null) return null;
+        if (value == null || value.getClass().equals(type)) return null;
 
         return type.cast(value);
     }

@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.api.database.serializer.impl;
 
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -32,16 +32,18 @@ public class DateDataType extends DataType<Date> {
     }
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
+     *
+     * @return The deserialized value
      *
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public Date deserialize(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getDate(index);
+    public Date deserialize(QueryResult.Row row, String name) {
+        return row.get(Date.class, name);
     }
-
+    
 }

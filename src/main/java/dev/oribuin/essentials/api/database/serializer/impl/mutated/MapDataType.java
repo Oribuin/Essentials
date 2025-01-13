@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.api.database.serializer.impl.mutated;
 
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -37,15 +37,21 @@ public class MapDataType<K, V> extends DataType<Map<DataType<K>, DataType<V>>> {
     }
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
+     *
+     * @return The deserialized value
      *
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public Map<DataType<K>, DataType<V>> deserialize(ResultSet resultSet, int index) throws SQLException {
-        return GSON.fromJson(resultSet.getString(index), MapDataType.class).map; // could not work
+    public Map<DataType<K>, DataType<V>> deserialize(QueryResult.Row row, String name) {
+        String result = row.getString(name);
+        if (result == null) return null;
+
+        return GSON.fromJson(result, MapDataType.class).map;
     }
+    
 }

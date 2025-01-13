@@ -1,11 +1,16 @@
 package dev.oribuin.essentials.api.config;
 
+import dev.oribuin.essentials.util.EssUtils;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unchecked")
 public class ConfigOption {
@@ -61,7 +66,7 @@ public class ConfigOption {
      */
     @NotNull
     public ConfigValue get(AddonConfig config) {
-        return config.get(this).map(ConfigOption::getValue).orElse(ConfigValue.EMPTY);
+        return config.get(this).map(ConfigOption::getValue).orElse(ConfigValue.empty());
     }
 
     /**
@@ -92,22 +97,26 @@ public class ConfigOption {
     /**
      * Send a message from the config to a CommandSender
      *
-     * @param config       The addon config
      * @param sender       The CommandSender to send the message to
      * @param placeholders The placeholders to apply to the message
      */
-    public final void send(AddonConfig config, CommandSender sender, StringPlaceholders placeholders) {
-        config.send(sender, this, placeholders);
+    public final void send(CommandSender sender, StringPlaceholders placeholders) {
+        if (this.value == null || this.value.asString() == null) return;
+
+        String message = this.value.asString();
+        String parsed = PlaceholderAPIHook.applyPlaceholders(sender instanceof Player player ? player : null, placeholders.apply(message));
+
+        // maybe async not necessary, but minimessage is not very optimised
+        CompletableFuture.runAsync(() -> sender.sendMessage(EssUtils.kyorify(parsed)));
     }
 
     /**
      * Send a message from the config to a CommandSender using a config option
      *
-     * @param config The addon config
      * @param sender The CommandSender to send the message to
      */
-    public final void send(AddonConfig config, CommandSender sender) {
-        this.send(config, sender, StringPlaceholders.empty());
+    public final void send(CommandSender sender) {
+        this.send(sender, StringPlaceholders.empty());
     }
 
     /**

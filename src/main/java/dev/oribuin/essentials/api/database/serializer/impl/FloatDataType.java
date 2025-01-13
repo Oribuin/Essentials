@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.api.database.serializer.impl;
 
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class FloatDataType extends DataType<Float> {
@@ -31,15 +31,18 @@ public class FloatDataType extends DataType<Float> {
     }
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
+     *
+     * @return The deserialized value
+     *
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public Float deserialize(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getFloat(index);
+    public Float deserialize(QueryResult.Row row, String name) {
+        return row.get(Float.class, name);
     }
 
 }

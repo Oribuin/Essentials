@@ -1,8 +1,42 @@
-name: OriEssentials
+name: Essentials
 main: dev.oribuin.essentials.EssentialsPlugin
-description: Modular essentials plugin for Spigot
+description: Modular essentials plugin for Paper Servers
 api-version: '1.20'
 version: '${version}'
 author: Oribuin
 softdepend:
   - PlaceholderAPI
+permissions:
+  essentials.home.teleport:
+    description: Allows access to teleport to your home
+    default: op
+  essentials.home.delete:
+    description: Allows access to delete a home
+    default: op
+  essentials.home.create:
+    description: Allows access to create a home
+    default: op
+  essentials.home.bypass.*:
+    description: Allows access to bypass several functionalities
+    default: false
+    children:
+      essentials.home.bypass.delay:
+        description: Bypasses delays and animations home
+        default: false
+      essentials.home.bypass.cost:
+        description: Bypasses costs for homes
+        default: false
+      essentials.home.bypass.cooldown:
+        description: Bypasses the cooldowns for homes
+        default: false
+      essentials.home.bypass.confirm:
+        description: Bypass the confirm for homes
+        default: false
+      essentials.home.bypass.unsafe:
+        description: Bypasses the requirement for a home to be 'safe'
+        default: false
+  essentials.home.limit.<#>:
+    description: Sets the minimum amount of homes a player can have
+  essentials.home.limit.99:
+    description: Allows access to up to 99 homes
+    default: op

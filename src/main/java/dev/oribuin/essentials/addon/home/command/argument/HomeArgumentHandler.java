@@ -1,14 +1,15 @@
-package dev.oribuin.essentials.command.argument;
+package dev.oribuin.essentials.addon.home.command.argument;
 
+import dev.oribuin.essentials.addon.home.database.HomeRepository;
+import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.manager.DataManager;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.InputIterator;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import dev.oribuin.essentials.manager.DataManager;
-import dev.oribuin.essentials.addon.home.database.HomeRepository;
-import dev.oribuin.essentials.addon.home.model.Home;
 
 import java.util.List;
 
@@ -20,8 +21,12 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
 
     @Override
     public Home handle(CommandContext context, Argument argument, InputIterator inputIterator) throws HandledArgumentException {
+        CommandSender sender = context.getSender();
         OfflinePlayer target = context.get("target");
-        if (target == null && context.getSender() instanceof Player player) {
+        String input = inputIterator.next();
+
+        // todo: better target system
+        if (target == null && sender instanceof Player player) {
             target = player;
         }
 
@@ -29,7 +34,7 @@ public class HomeArgumentHandler extends ArgumentHandler<Home> {
         if (target == null) throw new HandledArgumentException("argument-handler-home");
 
         return DataManager.repository(HomeRepository.class).getHomes(target.getUniqueId()).stream()
-                .filter(home -> home.name().equalsIgnoreCase(inputIterator.next().toLowerCase()))
+                .filter(home -> home.name().equalsIgnoreCase(input))
                 .findFirst()
                 .orElseThrow(() -> new HandledArgumentException("argument-handler-home"));
     }

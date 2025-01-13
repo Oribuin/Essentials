@@ -1,11 +1,11 @@
 package dev.oribuin.essentials.api.database.serializer.impl.spigot;
 
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 import org.bukkit.NamespacedKey;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class NamespaceDataType extends DataType<NamespacedKey> {
@@ -32,16 +32,19 @@ public class NamespaceDataType extends DataType<NamespacedKey> {
     }
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
+     *
+     * @return The deserialized value
      *
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public NamespacedKey deserialize(ResultSet resultSet, int index) throws SQLException {
-        return NamespacedKey.fromString(resultSet.getString(index));
+    public NamespacedKey deserialize(QueryResult.Row row, String name) {
+        String result = row.getString(name);
+        return result != null ? NamespacedKey.fromString(result) : null;
     }
-
+    
 }

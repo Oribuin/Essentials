@@ -4,6 +4,7 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import io.papermc.paper.registry.RegistryAccess;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.NamespacedKey;
@@ -14,6 +15,7 @@ public class EssUtils {
 
     public static ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
     public static RegistryAccess REGISTRY = RegistryAccess.registryAccess();
+    public static MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     public static LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
 
     public EssUtils() {
@@ -28,7 +30,7 @@ public class EssUtils {
      * @return The component
      */
     public static Component kyorify(String text) {
-        return LEGACY_SERIALIZER.deserialize(text)
+        return MINI_MESSAGE.deserialize(text)
                 .decoration(TextDecoration.ITALIC, false);
     }
 
@@ -41,7 +43,7 @@ public class EssUtils {
      * @return The component
      */
     public static Component kyorify(String text, StringPlaceholders placeholders) {
-        return LEGACY_SERIALIZER.deserialize(placeholders.apply(text))
+        return MINI_MESSAGE.deserialize(placeholders.apply(text))
                 .decoration(TextDecoration.ITALIC, false);
     }
 

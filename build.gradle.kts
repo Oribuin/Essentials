@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    api("dev.rosewood:rosegarden:1.4.6")
+    api("dev.rosewood:rosegarden:1.4.7-SNAPSHOT")
     api("net.objecthunter:exp4j:0.4.8")
     api("com.jeff-media:MorePersistentDataTypes:2.4.0")
 

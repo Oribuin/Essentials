@@ -31,7 +31,8 @@ public class PingCommand extends BaseRoseCommand {
 
         // Send the ping message
         if (target != null) {
-            BasicMessages.PING_OTHER.send(messages, context.getSender(), StringPlaceholders.of(
+            
+            BasicMessages.PING_OTHER.send(context.getSender(), StringPlaceholders.of(
                     "ping", target.getPing(),
                     "player", target.getName()
             ));
@@ -40,7 +41,7 @@ public class PingCommand extends BaseRoseCommand {
         }
 
         // Send the ping message to the sender
-        BasicMessages.PING_SELF.send(messages, context.getSender(), StringPlaceholders.of(
+        BasicMessages.PING_SELF.send(context.getSender(), StringPlaceholders.of(
                 "ping", context.getSender() instanceof Player player ? player.getPing() : 0
         ));
     }

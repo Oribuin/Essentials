@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.addon.teleport.config;
 
-import dev.oribuin.essentials.api.config.ConfigOption;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.api.config.ConfigOption;
 
 public class TeleportConfig extends AddonConfig {
 
@@ -14,15 +14,6 @@ public class TeleportConfig extends AddonConfig {
      */
     public TeleportConfig() {
         super("config");
-    }
-
-    /**
-     * Load the configuration for the addon
-     */
-    @Override
-    public void load() {
-        this.register(AddonConfig.DEFAULT);
-        this.registerClass();
     }
 
 }

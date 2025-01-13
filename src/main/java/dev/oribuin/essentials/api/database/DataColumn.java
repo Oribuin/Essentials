@@ -72,23 +72,11 @@ public class DataColumn<T> {
      * Deserialize a value from a result set
      *
      * @param result The result set
-     * @param index     The index
-     *
-     * @throws SQLException If an error occurs while deserializing the value
-     */
-    public T deserialize(ResultSet result, int index) throws SQLException {
-        return this.type.deserialize(result, index);
-    }
-
-    /**
-     * Deserialize a value from a result set
-     *
-     * @param result The result set
      * @param column     The column
      *
      * @throws SQLException If an error occurs while deserializing the value
      */
-    public T deserialize(ResultSet result, String column) throws SQLException {
+    public T deserialize(QueryResult.Row result, String column) throws SQLException {
         return this.type.deserialize(result, column);
     }
 

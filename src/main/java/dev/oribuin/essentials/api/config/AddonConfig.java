@@ -88,53 +88,6 @@ public abstract class AddonConfig {
             Bukkit.getLogger().severe("Failed to create config file for addon " + this.name);
         }
     }
-
-    /**
-     * Send a message from the config to a CommandSender
-     *
-     * @param sender       The CommandSender to send the message to
-     * @param path         The path of the message in the config
-     * @param placeholders The placeholders to apply to the message
-     */
-    public final void send(CommandSender sender, String path, StringPlaceholders placeholders) {
-        String message = this.config.getString(path);
-        if (message == null) return;
-
-        String parsed = PlaceholderAPIHook.applyPlaceholders(sender instanceof Player player ? player : null, placeholders.apply(message));
-        sender.sendMessage(HexUtils.colorify(parsed));
-    }
-
-    /**
-     * Send a message from the config to a CommandSender using a config option
-     *
-     * @param sender The CommandSender to send the message to
-     * @param option The option to send the message for
-     */
-    public final void send(CommandSender sender, ConfigOption option) {
-        this.send(sender, option.getPath());
-    }
-
-    /**
-     * Send a message from the config to a CommandSender using a config option
-     *
-     * @param sender       The CommandSender to send the message to
-     * @param option       The option to send the message for
-     * @param placeholders The placeholders to apply to the message
-     */
-    public final void send(CommandSender sender, ConfigOption option, StringPlaceholders placeholders) {
-        this.send(sender, option.getPath(), placeholders);
-    }
-
-    /**
-     * Send a message from the config to a CommandSender
-     *
-     * @param sender The CommandSender to send the message to
-     * @param path   The path of the message in the config
-     */
-    public final void send(CommandSender sender, String path) {
-        this.send(sender, path, StringPlaceholders.empty());
-    }
-
     /**
      * Register all the options
      *
@@ -144,7 +97,7 @@ public abstract class AddonConfig {
         if (this.options.stream().anyMatch(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))) {
             throw new IllegalArgumentException("Option with path " + option.getPath() + " already exists");
         }
-
+        
         this.options.add(option);
     }
 

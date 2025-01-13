@@ -2,10 +2,11 @@ package dev.oribuin.essentials.api.database;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.database.serializer.DataType;
+import dev.rosewood.rosegarden.database.DatabaseConnector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,15 @@ public class StatementProvider {
         this.columns = new HashMap<>();
         this.primaryKeys = new ArrayList<>();
         this.autoIncrement = false;
+
+        try {
+            if (this.connection != null && !this.connection.getAutoCommit()) {
+                this.connection.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            EssentialsPlugin.get().getLogger().severe("Failed to establish auto commit: " + ex.getMessage());
+        }
+
     }
 
     /**
@@ -44,8 +54,13 @@ public class StatementProvider {
      *
      * @return The statement provider
      */
-    public static StatementProvider create(StatementType type, Connection connection) {
-        return new StatementProvider(type, connection);
+    public static StatementProvider create(StatementType type, DatabaseConnector connector) {
+        try {
+            return new StatementProvider(type, connector.connect());
+        } catch (SQLException ex) {
+            EssentialsPlugin.get().getLogger().severe("There was an issue establishing a ConnectionProvider: " + ex.getMessage());
+            return new StatementProvider(type, null);
+        }
     }
 
     /**
@@ -105,69 +120,66 @@ public class StatementProvider {
 
     /**
      * Create a new statement provider with a specific type of statement type
-     *
-     * @return The statement provider
      */
-    public CompletableFuture<ResultSet> execute() {
+    public CompletableFuture<QueryResult> execute() {
         // Make sure the table is not null before executing the statement
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
+        if (this.table == null) {
+            return CompletableFuture.failedFuture(new NullPointerException("Table does not exist"));
+        }
 
         // Make sure the connection is not null before executing the statement
-        if (this.connection == null) return CompletableFuture.failedFuture(new IllegalStateException("Connection cannot be null"));
-
-        // Make sure the columns are not null before executing the statement
-        if (columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be null or empty"));
+        if (this.connection == null) {
+            return CompletableFuture.failedFuture(new NullPointerException("Connection for " + this.table + " type [" + this.type + "] does not exist"));
+        }
 
         // Create the table if it does not exist
-        return switch (this.type) {
-            case CREATE_TABLE -> this.createTable().thenApply(b -> null);
-            case DROP_TABLE -> this.dropTable().thenApply(b -> null);
-            case SELECT -> this.select();
-            case INSERT -> this.insert();
+
+        return CompletableFuture.supplyAsync(() -> switch (this.type) {
             case UPDATE -> this.update();
             case DELETE -> this.delete();
-        };
+            case INSERT -> this.insert();
+            case SELECT -> this.select();
+
+            case DROP_TABLE -> {
+                this.dropTable();
+                yield null;
+            }
+
+            case CREATE_TABLE -> {
+                this.createTable();
+                yield null;
+            }
+        });
     }
 
     /**
      * Create a table in the database if it does not exist already
-     *
-     * @return If the table was created successfully
      */
-    private CompletableFuture<Boolean> createTable() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
+    private void createTable() {
+        StringBuilder statement = new StringBuilder("CREATE TABLE IF NOT EXISTS " + this.table + " (");
 
-        System.out.println("Creating table: " + this.table); // Debugging
-        return CompletableFuture.supplyAsync(() -> {
-            StringBuilder statement = new StringBuilder("CREATE TABLE IF NOT EXISTS " + this.table + " (");
+        // Append the columns to the statement
+        String columns = this.columns.values()
+                .stream()
+                .map(DataColumn::construct)
+                .reduce((s1, s2) -> s1 + ", " + s2)
+                .orElse("");
 
-            // Append the columns to the statement
-            String columns = this.columns.values()
-                    .stream()
-                    .map(DataColumn::construct)
-                    .reduce((s1, s2) -> s1 + ", " + s2)
-                    .orElse("");
+        // Append the columns to the statement
+        statement.append(columns);
 
-            // Append the columns to the statement
-            statement.append(columns);
+        if (!this.primaryKeys.isEmpty()) {
+            statement.append(", ").append(this.constructPrimary());
+        }
 
-            if (!this.primaryKeys.isEmpty()) {
-                statement.append(", ").append(this.constructPrimary());
-            }
+        statement.append(")");
 
-            statement.append(")");
-
-            // Execute the statement
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
-                System.out.printf("Statement: %s%n", statement); // Debugging
-                preparedStatement.executeUpdate();
-                return true;
-            } catch (Exception e) {
-                EssentialsPlugin.get().getLogger().severe("An error occurred while creating the table: " + e.getMessage());
-                return false;
-            }
-        });
-
+        // Execute the statement
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while creating the table: " + e.getMessage());
+        }
     }
 
     /**
@@ -175,110 +187,16 @@ public class StatementProvider {
      *
      * @return The result set from the select statement
      */
-    public CompletableFuture<ResultSet> select() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
+    private QueryResult select() {
+        StringBuilder statement = new StringBuilder("SELECT * FROM " + this.table);
 
-        return CompletableFuture.supplyAsync(() -> {
-            StringBuilder statement = new StringBuilder("SELECT * FROM " + this.table);
+        // Append the limit to the statement
+        if (this.limit > 0) {
+            statement.append(" LIMIT ").append(this.limit);
+        }
 
-            // Append the limit to the statement
-            if (this.limit > 0) {
-                statement.append(" LIMIT ").append(this.limit);
-            }
-            // Add columns aa "WHERE" statement to the query
-            if (!this.columns.isEmpty()) {
-                statement.append(" WHERE ");
-                statement.append(this.columns.values()
-                        .stream()
-                        .map(column -> column.name() + " = ?")
-                        .reduce((s1, s2) -> s1 + " AND " + s2)
-                        .orElse("")
-                );
-            }
-
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
-                int index = 1;
-
-                // Serialize the columns to the prepared statement
-                for (DataColumn<?> column : this.columns.values()) {
-                    column.serialize(preparedStatement, index++);
-                }
-
-                return preparedStatement.executeQuery();
-            } catch (Exception e) {
-                throw new RuntimeException("An error occurred while selecting from the table", e);
-            }
-        });
-    }
-
-    /**
-     * Insert into the table
-     *
-     * @return The result set from the insert statement
-     */
-    public CompletableFuture<ResultSet> insert() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
-
-        return CompletableFuture.supplyAsync(() -> {
-            StringBuilder statement = new StringBuilder("INSERT INTO " + this.table + " (");
-
-            // Append the columns to the statement
-            String columns = this.columns.values()
-                    .stream()
-                    .map(DataColumn::name)
-                    .reduce((s1, s2) -> s1 + ", " + s2)
-                    .orElse("");
-
-            statement.append(columns).append(") VALUES (");
-
-            // Append the values to the statement
-            String values = this.columns.values()
-                    .stream()
-                    .map(column -> "?")
-                    .reduce((s1, s2) -> s1 + ", " + s2)
-                    .orElse("");
-
-            statement.append(values).append(")");
-
-            // Execute the statement
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
-                int index = 1;
-
-                // Serialize the columns to the prepared statement
-                for (DataColumn<?> column : this.columns.values()) {
-                    column.serialize(preparedStatement, index++);
-                }
-
-                preparedStatement.executeUpdate();
-                return preparedStatement.getGeneratedKeys();
-            } catch (Exception e) {
-                throw new RuntimeException("An error occurred while inserting into the table", e);
-            }
-        });
-    }
-
-    /**
-     * Update the table where the columns match the values provided
-     *
-     * @return The result set from the update statement
-     */
-    public CompletableFuture<ResultSet> update() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
-        if (this.columns == null || this.columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be empty"));
-
-        return CompletableFuture.supplyAsync(() -> {
-            StringBuilder statement = new StringBuilder("UPDATE " + this.table + " SET ");
-
-            // Append the columns to the statement
-            String columns = this.columns.values()
-                    .stream()
-                    .map(column -> column.name() + " = ?")
-                    .reduce((s1, s2) -> s1 + ", " + s2)
-                    .orElse("");
-
-            statement.append(columns);
-
-            // Add columns aa "WHERE" statement to the query
+        // Add columns aa "WHERE" statement to the query
+        if (!this.columns.isEmpty()) {
             statement.append(" WHERE ");
             statement.append(this.columns.values()
                     .stream()
@@ -286,21 +204,113 @@ public class StatementProvider {
                     .reduce((s1, s2) -> s1 + " AND " + s2)
                     .orElse("")
             );
+        }
 
-            // Execute the statement
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
-                int index = 1;
+        // Execute the statement
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
+            int index = 1;
 
-                // Serialize the columns to the prepared statement
-                for (DataColumn<?> column : this.columns.values()) {
-                    column.serialize(preparedStatement, index++);
-                }
-
-                return preparedStatement.executeQuery();
-            } catch (Exception e) {
-                throw new RuntimeException("An error occurred while updating the table", e);
+            // Serialize the columns to the prepared statement
+            for (DataColumn<?> column : this.columns.values()) {
+                column.serialize(preparedStatement, index++);
             }
-        });
+
+            return new QueryResult(preparedStatement.executeQuery());
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while selecting from the table: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Insert into the table
+     *
+     * @return The result set from the insert statement
+     */
+    private QueryResult insert() {
+        StringBuilder statement = new StringBuilder("REPLACE INTO " + this.table + " (");
+
+        // Append the columns to the statement
+        String columns = this.columns.values()
+                .stream()
+                .map(DataColumn::name)
+                .reduce((s1, s2) -> s1 + ", " + s2)
+                .orElse("");
+
+        statement.append(columns).append(") VALUES (");
+
+        // Append the values to the statement
+        String values = this.columns.values()
+                .stream()
+                .map(column -> "?")
+                .reduce((s1, s2) -> s1 + ", " + s2)
+                .orElse("");
+
+        statement.append(values).append(")");
+
+        // Execute the statement
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
+            int index = 1;
+
+            // Serialize the columns to the prepared statement
+            for (DataColumn<?> column : this.columns.values()) {
+                column.serialize(preparedStatement, index++);
+            }
+
+            preparedStatement.executeUpdate();
+            return new QueryResult(preparedStatement.getGeneratedKeys());
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while inserting into the table: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Update the table where the columns match the values provided
+     *
+     * @return The result set from the update statement
+     */
+    private QueryResult update() {
+        if (this.columns.isEmpty()) {
+            EssentialsPlugin.get().getLogger().severe("Columns cannot be empty for type " + this.type.name());
+            return null;
+        }
+
+        StringBuilder statement = new StringBuilder("UPDATE " + this.table + " SET ");
+
+        // Append the columns to the statement
+        String columns = this.columns.values()
+                .stream()
+                .map(column -> column.name() + " = ?")
+                .reduce((s1, s2) -> s1 + ", " + s2)
+                .orElse("");
+
+        statement.append(columns);
+
+        // Add columns aa "WHERE" statement to the query
+        statement.append(" WHERE ");
+        statement.append(this.columns.values()
+                .stream()
+                .map(column -> column.name() + " = ?")
+                .reduce((s1, s2) -> s1 + " AND " + s2)
+                .orElse("")
+        );
+
+        // Execute the statement
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement.toString())) {
+            int index = 1;
+
+            // Serialize the columns to the prepared statement
+            for (DataColumn<?> column : this.columns.values()) {
+                column.serialize(preparedStatement, index++);
+            }
+
+            preparedStatement.executeUpdate();
+            return new QueryResult(preparedStatement.getGeneratedKeys());
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while updating the table: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -308,51 +318,45 @@ public class StatementProvider {
      *
      * @return The result set from the delete statement
      */
-    public CompletableFuture<ResultSet> delete() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
-        if (this.columns.isEmpty()) return CompletableFuture.failedFuture(new IllegalStateException("Columns cannot be empty"));
+    private QueryResult delete() {
+        if (this.columns.isEmpty()) {
+            EssentialsPlugin.get().getLogger().severe("Columns cannot be empty for type " + this.type.name());
+            return null;
+        }
 
-        return CompletableFuture.supplyAsync(() -> {
+        // Add columns aa "WHERE" statement to the query
+        String statement = "DELETE FROM " + this.table + " WHERE " + this.columns.values()
+                .stream()
+                .map(column -> column.name() + " = ?")
+                .reduce((s1, s2) -> s1 + " AND " + s2)
+                .orElse("");
 
-            // Add columns aa "WHERE" statement to the query
-            String statement = "DELETE FROM " + this.table + " WHERE " + this.columns.values()
-                    .stream()
-                    .map(column -> column.name() + " = ?")
-                    .reduce((s1, s2) -> s1 + " AND " + s2)
-                    .orElse("");
+        // Execute the statement
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement)) {
+            int index = 1;
 
-            // Execute the statement
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement(statement)) {
-                int index = 1;
-
-                // Serialize the columns to the prepared statement
-                for (DataColumn<?> column : this.columns.values()) {
-                    column.serialize(preparedStatement, index++);
-                }
-                return preparedStatement.executeQuery();
-            } catch (Exception e) {
-                throw new RuntimeException("An error occurred while deleting from the table", e);
+            // Serialize the columns to the prepared statement
+            for (DataColumn<?> column : this.columns.values()) {
+                column.serialize(preparedStatement, index++);
             }
-        });
+
+            preparedStatement.executeUpdate();
+            return new QueryResult(preparedStatement.getGeneratedKeys());
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while delete from the table: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
      * Drop the table from the database if it exists already
-     *
-     * @return If the table was dropped successfully
      */
-    private CompletableFuture<Boolean> dropTable() {
-        if (this.table == null) return CompletableFuture.failedFuture(new IllegalStateException("Table cannot be null"));
-
-        return CompletableFuture.supplyAsync(() -> {
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement("DROP TABLE IF EXISTS " + this.table)) {
-                preparedStatement.executeUpdate();
-                return true;
-            } catch (Exception e) {
-                EssentialsPlugin.get().getLogger().severe("An error occurred while dropping the table: " + e.getMessage());
-                return false;
-            }
-        });
+    private void dropTable() {
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("DROP TABLE IF EXISTS " + this.table)) {
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("An error occurred while dropping the table: " + e.getMessage());
+        }
     }
 
     /**
@@ -412,6 +416,5 @@ public class StatementProvider {
         this.autoIncrement = true;
         return this.primary(name);
     }
-
 
 }

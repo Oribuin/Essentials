@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.api.database.serializer;
 
 import com.google.gson.Gson;
+import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.def.ColumnType;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class DataType<T> {
@@ -42,26 +42,14 @@ public abstract class DataType<T> {
     public abstract void serialize(PreparedStatement statement, int index, T value) throws SQLException;
 
     /**
-     * Deserialize a value from a result set
+     * Deserialize a value from a column row
      *
-     * @param resultSet The result set
-     * @param index     The index
+     * @param row  The row to get the value from
+     * @param name The name of the value
      *
-     * @throws SQLException If an error occurs while deserializing the value
+     * @return The deserialized value
      */
-    public abstract T deserialize(ResultSet resultSet, int index) throws SQLException;
-
-    /**
-     * Deserialize a value from a result set
-     *
-     * @param resultSet The result set
-     * @param column     The column
-     *
-     * @throws SQLException If an error occurs while deserializing the value
-     */
-    public final T deserialize(ResultSet resultSet, String column) throws SQLException {
-        return this.deserialize(resultSet, resultSet.findColumn(column));
-    }
+    public abstract T deserialize(QueryResult.Row row, String name);
 
     /**
      * The mysql column type for the database

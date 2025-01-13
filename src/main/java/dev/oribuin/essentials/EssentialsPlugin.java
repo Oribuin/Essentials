@@ -13,6 +13,7 @@ import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -54,12 +55,11 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void disable() {
-        addons.forEach((aClass, addon) -> addon.unload());
-        addons.clear();
+        addons.values().forEach(Addon::unload);
     }
 
     @Override
-    protected List<Class<? extends Manager>> getManagerLoadPriority() {
+    protected @NotNull List<Class<? extends Manager>> getManagerLoadPriority() {
         return List.of();
     }
 
@@ -77,7 +77,6 @@ public class EssentialsPlugin extends RosePlugin {
      *
      * @param clazz The class of the addon
      * @param <T>   The addon type
-     *
      * @return The addon
      */
     @SuppressWarnings("unchecked")
@@ -93,7 +92,6 @@ public class EssentialsPlugin extends RosePlugin {
      * @param addon  The addon to get the config from
      * @param config The config class
      * @param <T>    The config type
-     *
      * @return The config
      */
     public static <T extends AddonConfig> T config(Class<? extends Addon> addon, Class<T> config) {
