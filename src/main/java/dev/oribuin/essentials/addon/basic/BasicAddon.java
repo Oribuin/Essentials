@@ -28,7 +28,7 @@ public class BasicAddon extends Addon {
      */
     @Override
     public String name() {
-        return "basic-commands";
+        return "basics";
     }
 
     /**
