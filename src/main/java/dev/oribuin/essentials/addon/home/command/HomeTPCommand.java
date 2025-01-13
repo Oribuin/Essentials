@@ -128,7 +128,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         if (sender.hasPermission("essentials.home.bypass.delay")) {
             // send the final message
             HomeMessages.HOME_TELEPORT.send(sender, placeholders);
-            this.teleport(messages, sender, home, cost, placeholders);
+            this.teleport(sender, home, cost, placeholders);
             return;
         }
 
@@ -162,20 +162,19 @@ public class HomeTPCommand extends BaseRoseCommand {
         EssentialsPlugin.scheduler().runTaskLater(() -> {
             if (finalTask != null) finalTask.cancel();
 
-            this.teleport(messages, sender, home, cost, placeholders);
+            this.teleport(sender, home, cost, placeholders);
         }, teleportDelay, TimeUnit.SECONDS);
     }
 
     /**
      * Actually teleport the player to their home and run all the associated functionalities <3
      *
-     * @param messages     The message config
      * @param player       The player to teleport
      * @param home         The home to teleport to
      * @param cost         How much it cost to teleport the player
      * @param placeholders The placeholders for messages
      */
-    private void teleport(HomeMessages messages, Player player, Home home, double cost, StringPlaceholders placeholders) {
+    private void teleport(Player player, Home home, double cost, StringPlaceholders placeholders) {
         player.teleportAsync(home.location(), PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(result -> {
             // check if teleport failed
             if (!result) {
