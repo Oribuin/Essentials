@@ -47,12 +47,14 @@ public class HomeRepository extends ModuleRepository implements Listener {
                 .column("owner", DataTypes.UUID, owner)
                 .execute()
                 .thenAccept(queryResult -> {
+                    if (queryResult == null) return;
+
                     List<Home> results = new ArrayList<>();
                     for (QueryResult.Row row : queryResult.results()) {
                         Home home = Home.construct(row);
                         if (home != null) results.add(home);
                     }
-                    
+
                     this.homes.put(owner, results);
                 });
     }
@@ -77,12 +79,11 @@ public class HomeRepository extends ModuleRepository implements Listener {
                 .column("owner", DataTypes.UUID, home.owner())
                 .column("name", DataTypes.STRING, home.name())
                 .column("location", DataTypes.LOCATION, home.location())
-                .execute()
-                .thenRun(() -> {
-                    List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
-                    homes.add(home);
-                    this.homes.put(home.owner(), homes);
-                });
+                .execute();
+
+        List<Home> homes = this.homes.getOrDefault(home.owner(), new ArrayList<>());
+        homes.add(home);
+        this.homes.put(home.owner(), homes);
     }
 
     /**
