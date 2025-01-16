@@ -77,10 +77,9 @@ public abstract class Addon implements Listener {
         }
 
         // Register all the events
+        this.listeners().add(this);
         this.listeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this.plugin));
-        
-        // Register this addon as a listener
-        Bukkit.getPluginManager().registerEvents(this, this.plugin);
+
 
         // Register all the commands
         this.commands = this.commands().stream().map(baseRoseCommand -> new RoseCommandWrapper(this.plugin, baseRoseCommand)).toList();
