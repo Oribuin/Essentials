@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.addon.home;
 
 import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.command.HomeDeleteCommand;
 import dev.oribuin.essentials.addon.home.command.HomeSetCommand;
 import dev.oribuin.essentials.addon.home.command.HomeTPCommand;
@@ -26,15 +27,6 @@ public class HomeAddon extends Addon {
     private HomeRepository repository;
 
     /**
-     * Create a new instance of the addon
-     *
-     * @param plugin The plugin instance
-     */
-    public HomeAddon(EssentialsPlugin plugin) {
-        super(plugin);
-    }
-
-    /**
      * The name of the addon
      * This will be used for logging and the name of the addon.
      */
@@ -52,12 +44,10 @@ public class HomeAddon extends Addon {
 
         if (this.repository == null) {
             this.logger.severe("The HomeRepository is null, this plugin will not work correctly.");
-            EssentialsPlugin.unload(this);
+            AddonProvider.unload(this);
             return;
         }
-
-        this.repository.establishTables();
-
+        
         // Load Existing Users
         Bukkit.getOnlinePlayers().forEach(player -> this.repository.load(player.getUniqueId()));
     }

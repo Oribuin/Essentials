@@ -1,5 +1,12 @@
 package dev.oribuin.essentials.addon.home.command;
 
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.home.HomeAddon;
+import dev.oribuin.essentials.addon.home.config.HomeConfig;
+import dev.oribuin.essentials.addon.home.config.HomeMessages;
+import dev.oribuin.essentials.addon.home.database.HomeRepository;
+import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
@@ -8,15 +15,9 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.home.HomeAddon;
-import dev.oribuin.essentials.addon.home.config.HomeConfig;
-import dev.oribuin.essentials.addon.home.config.HomeMessages;
-import dev.oribuin.essentials.addon.home.model.Home;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeSetCommand extends BaseRoseCommand {
@@ -26,48 +27,44 @@ public class HomeSetCommand extends BaseRoseCommand {
     }
 
     @RoseExecutable
-    public void execute(CommandContext context) {
+    public void execute(CommandContext context, String name) {
         Player sender = (Player) context.getSender();
-        String name = context.get("name");
-
-        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
-        if (addon == null || !addon.enabled()) return;
-
-        HomeConfig config = addon.config(HomeConfig.class);
-        HomeMessages messages = addon.config(HomeMessages.class);
-        if (config == null || messages == null) return;
-
+        
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getOr(config, List.of()).asStringList();
+        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getValue();
         if (disabledWorlds.contains(sender.getWorld().getName())) {
             HomeMessages.DISABLED_WORLD.send(sender);
             return;
         }
 
-        List<Home> current = addon.repository().getHomes(sender.getUniqueId());
+        HomeRepository repository = AddonProvider.HOME_ADDON.repository();
+        List<Home> current = repository.getHomes(sender.getUniqueId());
+        
+        // Check if a player has a home by that name already
+        if (repository.checkExists(sender.getUniqueId(), name)) {
+            HomeMessages.HOME_ALREADY_EXISTS.send(sender);
+            return;
+        }
 
         // Check the maximum homes a player can have
         int limit = HomeAddon.limit(sender);
         if (limit != -1 && current.size() >= limit) {
-            HomeMessages.MAX_HOMES.send(sender);
+            HomeMessages.HOME_LIMIT.send(sender, "amt", current.size(), "limit", limit);
             return;
         }
 
-        double setCost = HomeConfig.SET_COST.getOr(config, 0.0).asDouble();
+        // Check for price of setting a home
+        double setCost = HomeConfig.SET_COST.getValueOr(0.0);
         if (setCost > 0 && !VaultProvider.get().has(sender, setCost)) {
-
-            // if (!VaultHook.has(sender, setCost)) {
-            //     HomeMessages.INSUFFICIENT_FUNDS.send(msgConfig, sender);
-            //     return;
-            // }
+             if (!VaultProvider.get().has(sender, setCost)) {
+                 HomeMessages.INSUFFICIENT_FUNDS.send(sender, "cost", setCost);
+                 return;
+             }
         }
-
-        // TODO: check if max homes reached
-        // TODO: Check if home exists
 
         // Set the home
         Home home = new Home(name.toLowerCase(), sender.getUniqueId(), sender.getLocation().toCenterLocation());
-        addon.repository().save(home);
+        repository.save(home);
         HomeMessages.HOME_SET.send(sender, home.placeholders());
     }
 

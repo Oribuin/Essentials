@@ -1,28 +1,24 @@
 package dev.oribuin.essentials.api.config;
 
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.api.config.option.ConfigOptionType;
+import dev.oribuin.essentials.api.config.option.Option;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+@SuppressWarnings("unused")
 public abstract class AddonConfig {
 
-    public static final ConfigOption DEFAULT = new ConfigOption("enabled", true, List.of("Should the addon and all of its featured be enabled?"));
+    public static final Option<Boolean> ENABLED = new Option<>("enabled", true, "Should the addon and all of it's features be enabled?");
 
     private final String name;
-    protected List<ConfigOption> options;
+    protected List<ConfigOptionType<?>> options;
     protected CommentedFileConfiguration config;
 
     /**
@@ -37,7 +33,7 @@ public abstract class AddonConfig {
      * Load the configuration for the addon
      */
     public void load() {
-        this.register(DEFAULT);
+        this.register(ENABLED);
         this.registerClass();
     }
 
@@ -59,13 +55,13 @@ public abstract class AddonConfig {
             File configFile = new File(addonFolder, this.name + ".yml");
             if (!configFile.exists()) configFile.createNewFile();
 
+
             // Load the config
             this.config = CommentedFileConfiguration.loadConfiguration(configFile);
-            for (ConfigOption option : this.options) {
-
+            for (ConfigOptionType<?> option : this.options) {
                 // If the config contains the path, cache the value
                 if (this.config.contains(option.getPath())) {
-                    option.setValue(new ConfigValue(this.config.get(option.getPath())));
+                    option.setValue(this.config.get(option.getPath()));
                     continue;
                 }
 
@@ -75,12 +71,12 @@ public abstract class AddonConfig {
                         this.config.addPathedComments(option.getPath(), comment);
                     }
 
-                    this.config.addPathedComments(option.getPath(), "Default: " + option.getDefaultValue().value());
+                    this.config.addPathedComments(option.getPath(), "Default: " + option.getDefaultValue());
                 }
 
-                // Set the default valueR
-                this.config.set(option.getPath(), option.getDefaultValue().value());
-                option.setValue(new ConfigValue(option.getDefaultValue()));
+                // Set the default value
+                this.config.set(option.getPath(), option.getDefaultValue());
+                option.setValue(option.getDefaultValue());
             }
 
             this.config.save(configFile);
@@ -88,16 +84,17 @@ public abstract class AddonConfig {
             Bukkit.getLogger().severe("Failed to create config file for addon " + this.name);
         }
     }
+
     /**
      * Register all the options
      *
      * @param option The option to register
      */
-    public final void register(ConfigOption option) {
+    public final void register(ConfigOptionType<?> option) {
         if (this.options.stream().anyMatch(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))) {
             throw new IllegalArgumentException("Option with path " + option.getPath() + " already exists");
         }
-        
+
         this.options.add(option);
     }
 
@@ -105,76 +102,19 @@ public abstract class AddonConfig {
      * Find all the static ConfigOptions in the class and register them
      */
     public final void registerClass() {
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (!field.getType().equals(ConfigOption.class)) continue;
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (!field.canAccess(null)) continue;
 
-            try {
-                ConfigOption option = (ConfigOption) field.get(null);
-                this.register(option);
-            } catch (IllegalAccessException ex) {
-                Bukkit.getLogger().severe("Failed to register ConfigOption in " + this.getClass().getSimpleName());
+                Object type = field.get(null);
+
+                if (type instanceof ConfigOptionType<?> option) {
+                    this.register(option);
+                }
             }
+        } catch (IllegalAccessException ex) {
+            EssentialsPlugin.get().getLogger().severe("Failed to register ConfigOption in " + this.getClass().getSimpleName() + " - " + ex);
         }
-    }
-
-
-    /**
-     * Create a new ConfigOption with a default value
-     *
-     * @param path         The path of the config option
-     * @param defaultValue The default value of the config option
-     */
-    public final void add(String path, Object defaultValue) {
-        this.register(new ConfigOption(path, defaultValue));
-    }
-
-    /**
-     * Create a new ConfigOption with comments
-     *
-     * @param path     The path of the config option
-     * @param comments The comments for the config option
-     */
-    public final void add(String path, Object defaultValue, List<String> comments) {
-        this.register(new ConfigOption(path, defaultValue, comments));
-    }
-
-    /**
-     * Create a new ConfigOption with comments
-     *
-     * @param path     The path of the config option
-     * @param comments The comments for the config option
-     */
-    public final void add(String path, Object defaultValue, String... comments) {
-        this.register(new ConfigOption(path, defaultValue, List.of(comments)));
-    }
-
-    /**
-     * Get a config option by its path
-     *
-     * @param path The path of the config option
-     * @return The config option
-     */
-    @NotNull
-    public final Optional<ConfigOption> get(@Nullable String path) {
-        if (this.config == null || path == null) return Optional.empty();
-
-        return this.options.stream()
-                .filter(option -> option.getPath().equalsIgnoreCase(path))
-                .findFirst();
-    }
-
-    /**
-     * Get a config option by its path
-     *
-     * @param option The config option to get
-     * @return The config option
-     */
-    public final Optional<ConfigOption> get(ConfigOption option) {
-        if (this.config == null || option == null) return Optional.empty();
-
-        return this.options.stream()
-                .filter(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))
-                .findFirst();
     }
 
     /**

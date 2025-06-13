@@ -14,14 +14,16 @@ import dev.rosewood.rosegarden.scheduler.RoseScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 public class EssentialsPlugin extends RosePlugin {
 
-    private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
     private static EssentialsPlugin instance;
 
     public EssentialsPlugin() {
@@ -36,7 +38,7 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void enable() {
-        AddonProvider.register(this); // Register default addons for the plugin
+        AddonProvider.init(); // Register default addons for the plugin
         VaultProvider.get(); // Load the vault provider
         PointsProvider.get();  // Load the points provider
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands); // Update the commands for all online players
@@ -45,9 +47,9 @@ public class EssentialsPlugin extends RosePlugin {
     @Override
     public void reload() {
         super.reload();
-
-        addons.forEach((aClass, addon) -> addon.disable());
-        addons.forEach((aClass, addon) -> addon.load());
+        
+        AddonProvider.addons().forEach((aClass, addon) -> addon.disable());
+        AddonProvider.addons().forEach((aClass, addon) -> addon.load());
 
         // Update the commands for all online players
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
@@ -55,14 +57,13 @@ public class EssentialsPlugin extends RosePlugin {
 
     @Override
     public void disable() {
-        addons.values().forEach(Addon::unload);
+        new ArrayList<>(AddonProvider.addons().values()).forEach(Addon::unload);
     }
 
     @Override
     protected @NotNull List<Class<? extends Manager>> getManagerLoadPriority() {
         return List.of();
     }
-
 
     public static EssentialsPlugin get() {
         return instance;
@@ -71,65 +72,5 @@ public class EssentialsPlugin extends RosePlugin {
     public static RoseScheduler scheduler() {
         return RoseScheduler.getInstance(instance);
     }
-
-    /**
-     * Grab a addon from the map
-     *
-     * @param clazz The class of the addon
-     * @param <T>   The addon type
-     * @return The addon
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends Addon> T addon(Class<T> clazz) {
-        if (addons.containsKey(clazz)) return (T) addons.get(clazz);
-
-        return null;
-    }
-
-    /**
-     * Get the configuration of a addon from the map
-     *
-     * @param addon  The addon to get the config from
-     * @param config The config class
-     * @param <T>    The config type
-     * @return The config
-     */
-    public static <T extends AddonConfig> T config(Class<? extends Addon> addon, Class<T> config) {
-        Addon addonInstance = addons.get(addon);
-        if (addonInstance == null) return null;
-
-        return addonInstance.config(config);
-    }
-
-    /**
-     * Register a new addon to the map
-     *
-     * @param addon The addon to register
-     */
-    public static void registerAddon(Addon addon) {
-        try {
-            addon.load(); // Load the addon
-            addons.put(addon.getClass(), addon);
-        } catch (Exception e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e.getMessage());
-        }
-    }
-
-    /**
-     * Unload a specified addon from the map
-     *
-     * @param addon The addon to unload
-     */
-    public static void unload(Addon addon) {
-        try {
-            addon.enabled(false);
-            addon.unload();
-        } catch (Exception e) {
-            Bukkit.getLogger().severe("Failed to unload the addon: " + addon.name() + " - " + e.getMessage());
-        } finally {
-            addons.remove(addon.getClass());
-        }
-    }
-
 
 }

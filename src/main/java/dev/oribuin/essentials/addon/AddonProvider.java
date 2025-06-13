@@ -3,18 +3,121 @@ package dev.oribuin.essentials.addon;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.home.HomeAddon;
+import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
+import dev.oribuin.essentials.api.Addon;
+import dev.oribuin.essentials.api.config.AddonConfig;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 public class AddonProvider {
+    
+    private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
+    public static final BasicAddon BASIC_ADDON = registerSupplier(BasicAddon::new);
+    public static final HomeAddon HOME_ADDON = registerSupplier(HomeAddon::new);
+    public static final ServerListAddon SERVER_LIST_ADDON = registerSupplier(ServerListAddon::new);
+    public static final TeleportAddon TELEPORT_ADDON = registerSupplier(TeleportAddon::new);
+
+    public static void init() {
+        EssentialsPlugin.get().getLogger().info("Initialised " + AddonProvider.class.getSimpleName() + " into the plugin.");
+    }
+
+    public static Map<Class<? extends Addon>, Addon> addons() {
+        return addons;
+    }
 
     /**
-     * Register all the addons for the plugin to use.
+     * Grab a addon from the map
      *
-     * @param plugin The plugin instance
+     * @param clazz The class of the addon
+     * @param <T>   The addon type
+     *
+     * @return The addon
      */
-    public static void register(EssentialsPlugin plugin) {
-        EssentialsPlugin.registerAddon(new BasicAddon(plugin));
-        EssentialsPlugin.registerAddon(new HomeAddon(plugin));
-        EssentialsPlugin.registerAddon(new TeleportAddon(plugin));
+    @SuppressWarnings("unchecked")
+    public static <T extends Addon> T addon(Class<T> clazz) {
+        if (addons.containsKey(clazz)) return (T) addons.get(clazz);
+
+        return null;
     }
+
+    /**
+     * Get an addon from the name of it
+     *
+     * @param name The name of the addon
+     *
+     * @return The addon if available
+     */
+    public static @Nullable Addon addon(@NotNull String name) {
+        return addons.values().stream()
+                .filter(x -> x.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Get the configuration of a addon from the map
+     *
+     * @param addon  The addon to get the config from
+     * @param config The config class
+     * @param <T>    The config type
+     *
+     * @return The config
+     */
+    public static <T extends AddonConfig> T config(Class<? extends Addon> addon, Class<T> config) {
+        Addon addonInstance = addons.get(addon);
+        if (addonInstance == null) return null;
+
+        return addonInstance.config(config);
+    }
+
+    /**
+     * Register a new addon to the map
+     *
+     * @param supplier The addon to register
+     */
+    public static <T extends Addon> T registerSupplier(Supplier<T> supplier) {
+        return register(supplier.get());
+    }
+
+    /**
+     * Register a new addon to the map
+     *
+     * @param addon The addon to register
+     */
+    public static <T extends Addon> T register(T addon) {
+        EssentialsPlugin.get().getLogger().info("Registering Addon: " + addon.getClass().getSimpleName());
+
+        try {
+            addon.load(); // Load the addon
+            addons.put(addon.getClass(), addon);
+            return addon;
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e);
+            return null;
+        }
+    }
+
+    /**
+     * Unload a specified addon from the map
+     *
+     * @param addon The addon to unload
+     */
+    public static void unload(Addon addon) {
+        try {
+            addon.enabled(false);
+            addon.unload();
+        } catch (Exception e) {
+            EssentialsPlugin.get().getLogger().severe("Failed to unload the addon: " + addon.name() + " - " + e.getMessage());
+        } finally {
+            System.out.println("Removing from map");
+            addons.remove(addon.getClass());
+        }
+    }
+
+
 }

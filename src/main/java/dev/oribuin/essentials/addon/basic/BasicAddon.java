@@ -1,26 +1,18 @@
 package dev.oribuin.essentials.addon.basic;
 
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.addon.basic.command.EnderchestCommand;
+import dev.oribuin.essentials.addon.basic.command.FlyCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
+import dev.oribuin.essentials.addon.basic.command.gamemode.GamemodeCommand;
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.api.Addon;
+import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 
 import java.util.List;
 
 public class BasicAddon extends Addon {
-
-    /**
-     * Create a new instance of the addon
-     *
-     * @param plugin The plugin instance
-     */
-    public BasicAddon(EssentialsPlugin plugin) {
-        super(plugin);
-    }
 
     /**
      * The name of the addon
@@ -38,7 +30,15 @@ public class BasicAddon extends Addon {
     public List<BaseRoseCommand> commands() {
         return List.of(
                 new EnderchestCommand(this.plugin),
-                new PingCommand(this.plugin)
+                new PingCommand(this.plugin),
+                new FlyCommand(this.plugin),
+
+                // Gamemode Commands
+                new GamemodeCommand(this.plugin),
+                new GamemodeCommand.AdventureCommand(this.plugin),
+                new GamemodeCommand.CreativeCommand(this.plugin),
+                new GamemodeCommand.SpectatorCommand(this.plugin),
+                new GamemodeCommand.CreativeCommand(this.plugin)
         );
     }
 

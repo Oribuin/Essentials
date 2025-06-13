@@ -1,4 +1,6 @@
-package dev.oribuin.essentials.api.config;
+package dev.oribuin.essentials.api.config.type;
+
+import dev.oribuin.essentials.api.config.AddonConfig;
 
 public abstract class MessageConfig extends AddonConfig {
     

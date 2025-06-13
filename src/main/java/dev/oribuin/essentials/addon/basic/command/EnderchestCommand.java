@@ -1,5 +1,9 @@
 package dev.oribuin.essentials.addon.basic.command;
 
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.basic.BasicAddon;
+import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -8,9 +12,6 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import org.bukkit.entity.Player;
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.basic.BasicAddon;
-import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 
 public class EnderchestCommand extends BaseRoseCommand {
 
@@ -20,9 +21,6 @@ public class EnderchestCommand extends BaseRoseCommand {
 
     @RoseExecutable
     public void execute(CommandContext context, Player target) {
-        BasicMessages messages = EssentialsPlugin.config(BasicAddon.class, BasicMessages.class);
-        if (messages == null) return;
-
         if (!(context.getSender() instanceof Player commandSender)) return;
 
         // Swap the target if the sender does not have permission to view other player's ping
@@ -43,7 +41,12 @@ public class EnderchestCommand extends BaseRoseCommand {
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("enderchest")
-                .arguments(ArgumentsDefinition.of("target", ArgumentHandlers.PLAYER))
+                .permission("essentials.enderchest")
+                .arguments(
+                        ArgumentsDefinition.builder()
+                                .optional("target", ArgumentHandlers.PLAYER)
+                                .build()
+                )
                 .aliases("ec", "echest")
                 .playerOnly(true)
                 .build();

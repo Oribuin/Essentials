@@ -56,24 +56,17 @@ public class HomeTPCommand extends BaseRoseCommand {
     public void execute(CommandContext context, Home home) {
         Player sender = (Player) context.getSender();
 
-        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
-        if (addon == null || !addon.enabled()) return;
-
-        HomeConfig config = addon.config(HomeConfig.class);
-        HomeMessages messages = addon.config(HomeMessages.class);
-        if (config == null || messages == null) return;
-
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getOr(config, new ArrayList<>()).asStringList();
+        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getValue();
         if (disabledWorlds.contains(home.location().getWorld().getName())) {
             HomeMessages.DISABLED_WORLD.send(sender);
             return;
         }
 
         // Number values are defaulted to 0 when not found
-        int cooldown = HomeConfig.TP_COOLDOWN.get(config).asInt();
-        int teleportDelay = HomeConfig.TP_DELAY.get(config).asInt();
-        double cost = HomeConfig.TP_COST.get(config).asDouble();
+        int cooldown = HomeConfig.TP_COOLDOWN.getValue();
+        int teleportDelay = HomeConfig.TP_DELAY.getValue();
+        double cost = HomeConfig.TP_COST.getValue();
 
         // establish all the placeholders
         StringPlaceholders placeholders = home.placeholders(StringPlaceholders.of(
@@ -97,7 +90,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         }
 
         // Check if a player has confirmed they want to teleport here
-        if (HomeConfig.TP_CONFIRM.get(config).asBoolean() && !sender.hasPermission("essentials.home.bypass.confirm")) {
+        if (HomeConfig.TP_CONFIRM.getValue() && !sender.hasPermission("essentials.home.bypass.confirm")) {
             Home confirmHome = this.confirmation.getIfPresent(sender.getUniqueId());
 
             if (confirmHome == null || !confirmHome.name().equalsIgnoreCase(home.name())) {
@@ -114,7 +107,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
             // Player is still on cooldown :3
             if (timeLeft > 0) {
-                HomeMessages.HOME_COOLDOWN.send(sender, StringPlaceholders.of("time", timeLeft + "s"));
+                HomeMessages.HOME_COOLDOWN.send(sender, "time", timeLeft + "s");
                 return;
             }
 
@@ -134,10 +127,10 @@ public class HomeTPCommand extends BaseRoseCommand {
 
         // Create the tp effects task
         ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.get(config).asBoolean() && teleportDelay > 0) {
+        if (HomeConfig.TP_EFFECTS.getValue() && teleportDelay > 0) {
             // Give the player blindness
             sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
-                    teleportDelay * 20, 4,
+                    (teleportDelay + 1) * 20, 4,
                     false,
                     false,
                     false

@@ -1,4 +1,6 @@
-package dev.oribuin.essentials.api.config;
+package dev.oribuin.essentials.api.config.type;
+
+import dev.oribuin.essentials.api.config.AddonConfig;
 
 public class DefaultConfig extends AddonConfig {
 
@@ -14,7 +16,7 @@ public class DefaultConfig extends AddonConfig {
      */
     @Override
     public void load() {
-        this.register(AddonConfig.DEFAULT);
+        this.register(AddonConfig.ENABLED);
     }
 
 }

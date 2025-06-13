@@ -1,4 +1,4 @@
-name: Essentials
+name: EssentialAddons
 main: dev.oribuin.essentials.EssentialsPlugin
 description: Modular essentials plugin for Paper Servers
 api-version: '1.20'

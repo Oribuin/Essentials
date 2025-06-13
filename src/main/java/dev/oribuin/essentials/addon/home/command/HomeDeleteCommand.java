@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.addon.home.command;
 
+import dev.oribuin.essentials.addon.AddonProvider;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
@@ -24,18 +25,9 @@ public class HomeDeleteCommand extends BaseRoseCommand {
     @RoseExecutable
     public void execute(CommandContext context, Home home) {
         Player sender = (Player) context.getSender();
-
-        HomeAddon addon = EssentialsPlugin.addon(HomeAddon.class);
-        if (addon == null || !addon.enabled()) return;
-
-        HomeConfig config = addon.config(HomeConfig.class);
-        HomeMessages msgConfig = addon.config(HomeMessages.class);
-        if (config == null || msgConfig == null) return;
-
-        // TODO: Check if home exists
-
+        
         // Set the home
-        addon.repository().delete(home);
+        AddonProvider.HOME_ADDON.repository().delete(home);
         HomeMessages.HOME_DELETED.send(sender, home.placeholders());
     }
 

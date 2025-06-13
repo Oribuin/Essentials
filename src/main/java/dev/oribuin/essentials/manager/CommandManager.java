@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.manager;
 
 import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.command.ReloadCommand;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.manager.AbstractCommandManager;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ public class CommandManager extends AbstractCommandManager {
 
     @Override
     public @NotNull List<Function<RosePlugin, BaseRoseCommand>> getRootCommands() {
-        return new ArrayList<>();
+        return List.of(ReloadCommand::new);
     }
 
 }

@@ -8,6 +8,8 @@ import dev.oribuin.essentials.api.database.StatementType;
 import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +23,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
 
     public HomeRepository(DatabaseConnector connector) {
         super(connector, "homes");
-    }
 
-    /**
-     * Create the table for the homes in the database
-     */
-    public void establishTables() {
         StatementProvider.create(StatementType.CREATE_TABLE, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID)
@@ -41,7 +38,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
      *
      * @param owner The owner of the homes
      */
-    public void load(UUID owner) {
+    public void load(@NotNull UUID owner) {
         StatementProvider.create(StatementType.SELECT, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, owner)
@@ -64,7 +61,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
      *
      * @param owner The owner of the homes
      */
-    public void unload(UUID owner) {
+    public void unload(@NotNull UUID owner) {
         this.homes.remove(owner);
     }
 
@@ -73,7 +70,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
      *
      * @param home The home to save
      */
-    public void save(Home home) {
+    public void save(@NotNull Home home) {
         StatementProvider.create(StatementType.INSERT, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, home.owner())
@@ -91,7 +88,7 @@ public class HomeRepository extends ModuleRepository implements Listener {
      *
      * @param home The home to delete
      */
-    public void delete(Home home) {
+    public void delete(@NotNull Home home) {
         StatementProvider.create(StatementType.DELETE, this.connector)
                 .table(this.table)
                 .column("owner", DataTypes.UUID, home.owner())
@@ -118,10 +115,46 @@ public class HomeRepository extends ModuleRepository implements Listener {
      *
      * @return The homes
      */
-    public List<Home> getHomes(UUID owner) {
+    @NotNull
+    public List<Home> getHomes(@Nullable UUID owner) {
         if (owner == null) return new ArrayList<>();
 
         return this.homes.getOrDefault(owner, new ArrayList<>());
+    }
+
+    /**
+     * Get a home from a player by the name of it
+     *
+     * @param owner The owner of the home
+     * @param name  The name of the home
+     *
+     * @return The home if it exists
+     */
+    @Nullable
+    public Home getHome(@Nullable UUID owner, @Nullable String name) {
+        if (owner == null || name == null) return null;
+
+        List<Home> total = this.homes.getOrDefault(owner, new ArrayList<>());
+        return total.stream()
+                .filter(x -> x.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Check if a home by a certain name already exists
+     *
+     * @param owner The owner of the home
+     * @param name  The name of the home
+     *
+     * @return True if exists
+     */
+    public boolean checkExists(@Nullable UUID owner, @Nullable String name) {
+        if (owner == null || name == null) return false;
+
+        return this.homes.getOrDefault(owner, new ArrayList<>())
+                .stream()
+                .anyMatch(x -> x.name().equalsIgnoreCase(name));
     }
 
     /**

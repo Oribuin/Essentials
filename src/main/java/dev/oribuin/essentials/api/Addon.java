@@ -2,7 +2,8 @@ package dev.oribuin.essentials.api;
 
 
 import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.api.config.DefaultConfig;
+import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.api.config.type.DefaultConfig;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.RoseCommandWrapper;
@@ -21,19 +22,17 @@ import java.util.logging.Logger;
 public abstract class Addon implements Listener {
 
     protected final EssentialsPlugin plugin;
+    protected final Map<Class<? extends AddonConfig>, AddonConfig> configs = new HashMap<>();
     protected final Logger logger = Logger.getLogger("ess-" + this.name());
     protected File folder;
-    private final Map<Class<? extends AddonConfig>, AddonConfig> configs = new HashMap<>();
     private List<RoseCommandWrapper> commands;
     private boolean enabled;
 
     /**
      * Create a new instance of the addon
-     *
-     * @param plugin The plugin instance
      */
-    public Addon(EssentialsPlugin plugin) {
-        this.plugin = plugin;
+    public Addon() {
+        this.plugin = EssentialsPlugin.get();
         this.enabled = false;
         this.commands = new ArrayList<>();
     }
@@ -72,7 +71,7 @@ public abstract class Addon implements Listener {
         // Don't register anything if the addon is disabled
         if (!enabled) {
             this.logger.warning("The addon is disabled, skipping loading.");
-            EssentialsPlugin.unload(this);
+            AddonProvider.unload(this);
             return;
         }
 

@@ -26,7 +26,7 @@ public final class VaultProvider implements EconomyPlugin {
      */
     @Override
     public boolean enabled() {
-        return Bukkit.getPluginManager().isPluginEnabled("PlayerPoints") && this.api != null;
+        return Bukkit.getPluginManager().isPluginEnabled("Vault") && this.api != null;
     }
 
     /**

@@ -2,7 +2,6 @@ package dev.oribuin.essentials.addon.teleport;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
@@ -16,16 +15,7 @@ public class TeleportAddon extends Addon {
     private Cache<UUID, UUID> requests = CacheBuilder.newBuilder()
             .expireAfterWrite(2, TimeUnit.SECONDS)
             .build();
-
-    /**
-     * Create a new instance of the addon
-     *
-     * @param plugin The plugin instance
-     */
-    public TeleportAddon(EssentialsPlugin plugin) {
-        super(plugin);
-    }
-
+    
     /**
      * The name of the addon
      * This will be used for logging and the name of the addon.
