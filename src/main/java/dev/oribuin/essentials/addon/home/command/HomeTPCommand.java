@@ -116,7 +116,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         this.confirmation.invalidate(sender.getUniqueId());
 
         // If the player has permission to bypass the delay, skip all effects
-        if (sender.hasPermission("essentials.home.bypass.delay")) {
+        if (sender.hasPermission("essentials.home.bypass.delay") || teleportDelay <= 0) {
             // send the final message
             HomeMessages.HOME_TELEPORT.send(sender, placeholders);
             this.teleport(sender, home, cost, placeholders);
@@ -125,7 +125,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
         // Create the tp effects task
         ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.getValue() && teleportDelay > 0) {
+        if (HomeConfig.TP_EFFECTS.getValue()) {
             // Give the player blindness
             sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
                     (teleportDelay + 1) * 20, 4,

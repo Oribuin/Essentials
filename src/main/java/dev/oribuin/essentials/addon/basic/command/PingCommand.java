@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.util.EssUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -42,11 +43,7 @@ public class PingCommand extends BaseRoseCommand {
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("ping")
                 .permission("essentials.ping")
-                .arguments(
-                        ArgumentsDefinition.builder()
-                                .optional("target", ArgumentHandlers.PLAYER)
-                                .build()
-                )
+                .arguments(EssUtils.createTarget(true))
                 .build();
     }
 

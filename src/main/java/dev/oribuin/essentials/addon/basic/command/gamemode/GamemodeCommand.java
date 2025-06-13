@@ -62,5 +62,5 @@ public class GamemodeCommand extends BaseRoseCommand {
                 )
                 .build();
     }
-    
+
 }

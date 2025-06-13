@@ -1,5 +1,7 @@
 package dev.oribuin.essentials.util;
 
+import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
+import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import io.papermc.paper.registry.RegistryAccess;
 import net.kyori.adventure.text.Component;
@@ -89,5 +91,19 @@ public class EssUtils {
      */
     public static double evaluate(String expression) {
         return new ExpressionBuilder(expression).build().evaluate();
+    }
+
+    /**
+     * Create a default argument definition with a singular target
+     *
+     * @param optional Whether the target should be optional
+     *
+     * @return The command argument definition
+     */
+    public static ArgumentsDefinition createTarget(boolean optional) {
+        ArgumentsDefinition.Builder builder = ArgumentsDefinition.builder();
+        if (optional) builder = builder.optional("target", ArgumentHandlers.PLAYER);
+        else builder = builder.required("target", ArgumentHandlers.PLAYER);
+        return builder.build();
     }
 }

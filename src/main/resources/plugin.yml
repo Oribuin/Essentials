@@ -40,3 +40,16 @@ permissions:
   essentials.home.limit.99:
     description: Allows access to up to 99 homes
     default: op
+  essentials.tpa.bypass.*:
+    description: Allows access to bypass several functionalities
+    default: false
+    children:
+      essentials.tpa.bypass.delay:
+        description: Bypasses delays and animations tpa
+        default: false
+      essentials.tpa.bypass.cost:
+        description: Bypasses costs for tpa
+        default: false
+      essentials.tpa.bypass.unsafe:
+        description: Bypasses the requirement for a tpa to be 'safe'
+        default: false

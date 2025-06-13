@@ -5,7 +5,6 @@ import dev.oribuin.essentials.addon.serverlist.listener.ServerListListener;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.event.Listener;
 import org.bukkit.util.CachedServerIcon;
 
@@ -23,7 +22,7 @@ public class ServerListAddon extends Addon {
     @Override
     public void enable() {
         this.icons.clear();
-        
+
         ServerListConfig.FILES.getValue().forEach(s -> {
             File folder = new File(this.folder, "icons");
             File file = new File(folder, s);
@@ -32,10 +31,9 @@ public class ServerListAddon extends Addon {
                 this.icons.add(Bukkit.loadServerIcon(file));
             } catch (Exception ex) {
                 this.logger.warning("Failed to load icon: " + file.getPath() + " due to " + ex.getMessage());
-                return;
             }
         });
-        
+
         if (!this.icons.isEmpty()) {
             this.logger.info("Loaded a total of: " + this.icons.size() + " into the plugin");
         }
