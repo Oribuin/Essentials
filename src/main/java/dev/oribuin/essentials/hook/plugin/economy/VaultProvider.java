@@ -34,13 +34,14 @@ public final class VaultProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     @Override
     public boolean take(OfflinePlayer player, double amount) {
         if (!this.enabled()) return false;
 
-        return this.api.withdrawPlayer(player,  amount).transactionSuccess();
+        return this.api.withdrawPlayer(player, amount).transactionSuccess();
     }
 
     /**
@@ -48,6 +49,7 @@ public final class VaultProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     @Override
@@ -61,6 +63,7 @@ public final class VaultProvider implements EconomyPlugin {
      * Get the balance of a player
      *
      * @param player The player
+     *
      * @return The balance
      */
     @Override
@@ -75,6 +78,7 @@ public final class VaultProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the player has the amount
      */
     @Override

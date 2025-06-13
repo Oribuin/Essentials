@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.command.impl;
 
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.command.argument.AddonArgumentHandler;

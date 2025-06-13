@@ -16,6 +16,7 @@ public interface EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     boolean take(OfflinePlayer player, double amount);
@@ -25,6 +26,7 @@ public interface EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     boolean give(OfflinePlayer player, double amount);
@@ -34,6 +36,7 @@ public interface EconomyPlugin {
      * Get the balance of a player
      *
      * @param player The player
+     *
      * @return The balance
      */
     double balance(OfflinePlayer player);
@@ -43,6 +46,7 @@ public interface EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the player has the amount
      */
     boolean has(OfflinePlayer player, double amount);

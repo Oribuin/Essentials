@@ -1,7 +1,5 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
@@ -10,7 +8,6 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.entity.Player;
 
 public class PingCommand extends BaseRoseCommand {
@@ -28,7 +25,7 @@ public class PingCommand extends BaseRoseCommand {
 
         // Send the ping message
         if (target != null) {
-            BasicMessages.PING_OTHER.send(context.getSender(), 
+            BasicMessages.PING_OTHER.send(context.getSender(),
                     "ping", target.getPing(),
                     "target", target.getName()
             );
@@ -36,7 +33,7 @@ public class PingCommand extends BaseRoseCommand {
         }
 
         // Send the ping message to the sender
-        BasicMessages.PING_SELF.send(context.getSender(), 
+        BasicMessages.PING_SELF.send(context.getSender(),
                 "ping", context.getSender() instanceof Player player ? player.getPing() : 0
         );
     }

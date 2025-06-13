@@ -2,7 +2,6 @@ package dev.oribuin.essentials;
 
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.hook.plugin.economy.PointsProvider;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.manager.CommandManager;
@@ -14,13 +13,9 @@ import dev.rosewood.rosegarden.scheduler.RoseScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 public class EssentialsPlugin extends RosePlugin {
 
@@ -47,7 +42,7 @@ public class EssentialsPlugin extends RosePlugin {
     @Override
     public void reload() {
         super.reload();
-        
+
         AddonProvider.addons().forEach((aClass, addon) -> addon.disable());
         AddonProvider.addons().forEach((aClass, addon) -> addon.load());
 

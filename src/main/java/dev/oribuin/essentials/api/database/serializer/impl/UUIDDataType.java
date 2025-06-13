@@ -46,5 +46,5 @@ public class UUIDDataType extends DataType<UUID> {
         String result = row.getString(name);
         return result != null ? UUID.fromString(result) : null;
     }
-    
+
 }

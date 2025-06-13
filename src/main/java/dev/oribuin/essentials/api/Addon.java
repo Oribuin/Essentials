@@ -3,8 +3,8 @@ package dev.oribuin.essentials.api;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.api.config.type.DefaultConfig;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.api.config.type.DefaultConfig;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.RoseCommandWrapper;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
@@ -181,7 +181,7 @@ public abstract class Addon implements Listener {
     public Logger logger() {
         return logger;
     }
-    
+
     /**
      * Get the scheduler for the addon
      *

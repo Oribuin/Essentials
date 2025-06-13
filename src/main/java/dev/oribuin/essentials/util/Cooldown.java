@@ -57,5 +57,5 @@ public class Cooldown<T> {
     public void setCooldown(T entry, Duration time) {
         this.cooldown.put(entry, System.currentTimeMillis() + time.toMillis());
     }
-    
+
 }

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class AddonProvider {
-    
+
     private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
     public static final BasicAddon BASIC_ADDON = registerSupplier(BasicAddon::new);
     public static final HomeAddon HOME_ADDON = registerSupplier(HomeAddon::new);

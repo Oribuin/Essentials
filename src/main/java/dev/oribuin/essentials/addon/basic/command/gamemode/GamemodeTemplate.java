@@ -1,7 +1,5 @@
 package dev.oribuin.essentials.addon.basic.command.gamemode;
 
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
@@ -10,7 +8,6 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -38,13 +35,13 @@ public abstract class GamemodeTemplate extends BaseRoseCommand {
         Player focus = target != null ? target : (Player) context.getSender();
         if (target != null) {
             target.setGameMode(gamemode);
-            BasicMessages.CHANGE_GAMEMODE_OTHER.send(context.getSender(), 
+            BasicMessages.CHANGE_GAMEMODE_OTHER.send(context.getSender(),
                     "target", target.getName(),
                     "gamemode", StringUtils.capitalize(gamemode.name().toLowerCase())
             );
         } else {
             focus.setGameMode(gamemode);
-            BasicMessages.CHANGE_GAMEMODE.send(context.getSender(), 
+            BasicMessages.CHANGE_GAMEMODE.send(context.getSender(),
                     "gamemode", StringUtils.capitalize(gamemode.name().toLowerCase())
             );
         }

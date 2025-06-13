@@ -46,5 +46,5 @@ public class NamespaceDataType extends DataType<NamespacedKey> {
         String result = row.getString(name);
         return result != null ? NamespacedKey.fromString(result) : null;
     }
-    
+
 }

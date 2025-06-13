@@ -1,12 +1,12 @@
 package dev.oribuin.essentials.addon.home.event;
 
+import dev.oribuin.essentials.addon.home.model.Home;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
-import dev.oribuin.essentials.addon.home.model.Home;
 
 public class HomeCreateEvent extends PlayerEvent implements Cancellable {
 

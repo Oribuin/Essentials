@@ -1,9 +1,5 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.addon.basic.BasicAddon;
-import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;

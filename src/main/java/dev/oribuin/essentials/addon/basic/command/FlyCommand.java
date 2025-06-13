@@ -27,7 +27,7 @@ public class FlyCommand extends BaseRoseCommand {
         }
 
         Player focus = target != null ? target : (Player) context.getSender();
-        
+
         // Check if world is disabled
         List<String> disabledWorlds = BasicConfig.DISABLED_FLIGHT_WORLDS.getValue();
         if (!disabledWorlds.isEmpty() && disabledWorlds.contains(focus.getWorld().getName())) {

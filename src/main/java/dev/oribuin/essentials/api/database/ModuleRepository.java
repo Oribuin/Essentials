@@ -1,8 +1,8 @@
 package dev.oribuin.essentials.api.database;
 
+import dev.oribuin.essentials.EssentialsPlugin;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
 import org.bukkit.Bukkit;
-import dev.oribuin.essentials.EssentialsPlugin;
 
 public abstract class ModuleRepository {
 

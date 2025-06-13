@@ -1,12 +1,12 @@
 package dev.oribuin.essentials.manager;
 
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.api.database.ModuleRepository;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
 import org.bukkit.Bukkit;
-import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.api.database.ModuleRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -49,6 +49,7 @@ public class DataManager extends AbstractDataManager {
      *
      * @param clazz The class of the repository
      * @param <T>   The repository type
+     *
      * @return The repository
      */
     public static <T extends ModuleRepository> T repository(Class<T> clazz) {

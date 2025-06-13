@@ -18,7 +18,7 @@ public class ItemValue<T> implements Configurable {
     /**
      * Create a new item value with a type
      *
-     * @param def  The default value of the item value
+     * @param def The default value of the item value
      */
     public ItemValue(T def) {
         this.value = def;

@@ -53,5 +53,5 @@ public class MapDataType<K, V> extends DataType<Map<DataType<K>, DataType<V>>> {
 
         return GSON.fromJson(result, MapDataType.class).map;
     }
-    
+
 }

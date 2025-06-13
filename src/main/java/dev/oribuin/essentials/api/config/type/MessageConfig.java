@@ -3,7 +3,7 @@ package dev.oribuin.essentials.api.config.type;
 import dev.oribuin.essentials.api.config.AddonConfig;
 
 public abstract class MessageConfig extends AddonConfig {
-    
+
     /**
      * Create a new instance of the addon config
      */
@@ -18,5 +18,5 @@ public abstract class MessageConfig extends AddonConfig {
     public void load() {
         this.registerClass();
     }
-    
+
 }

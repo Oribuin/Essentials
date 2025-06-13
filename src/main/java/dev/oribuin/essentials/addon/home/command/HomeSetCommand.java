@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.addon.home.command;
 
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
@@ -17,7 +16,6 @@ import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeSetCommand extends BaseRoseCommand {
@@ -29,7 +27,7 @@ public class HomeSetCommand extends BaseRoseCommand {
     @RoseExecutable
     public void execute(CommandContext context, String name) {
         Player sender = (Player) context.getSender();
-        
+
         // Check if the world is disabled
         List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getValue();
         if (disabledWorlds.contains(sender.getWorld().getName())) {
@@ -39,7 +37,7 @@ public class HomeSetCommand extends BaseRoseCommand {
 
         HomeRepository repository = AddonProvider.HOME_ADDON.repository();
         List<Home> current = repository.getHomes(sender.getUniqueId());
-        
+
         // Check if a player has a home by that name already
         if (repository.checkExists(sender.getUniqueId(), name)) {
             HomeMessages.HOME_ALREADY_EXISTS.send(sender);
@@ -56,10 +54,10 @@ public class HomeSetCommand extends BaseRoseCommand {
         // Check for price of setting a home
         double setCost = HomeConfig.SET_COST.getValueOr(0.0);
         if (setCost > 0 && !VaultProvider.get().has(sender, setCost)) {
-             if (!VaultProvider.get().has(sender, setCost)) {
-                 HomeMessages.INSUFFICIENT_FUNDS.send(sender, "cost", setCost);
-                 return;
-             }
+            if (!VaultProvider.get().has(sender, setCost)) {
+                HomeMessages.INSUFFICIENT_FUNDS.send(sender, "cost", setCost);
+                return;
+            }
         }
 
         // Set the home

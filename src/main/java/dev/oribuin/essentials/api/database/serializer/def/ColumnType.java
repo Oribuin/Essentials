@@ -14,7 +14,7 @@ public enum ColumnType {
     UUID("VARCHAR(36)"), // UUID
     ;
 
-    private String realValue;
+    private final String realValue;
 
     ColumnType() {
         this.realValue = this.name();

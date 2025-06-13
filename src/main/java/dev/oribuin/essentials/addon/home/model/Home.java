@@ -33,7 +33,7 @@ public final class Home implements Placeholder {
         UUID owner = DataTypes.UUID.deserialize(row, "owner");
         Location location = DataTypes.LOCATION.deserialize(row, "location");
         if (name == null || owner == null || location == null) return null;
-        
+
         return new Home(name, owner, location);
     }
 

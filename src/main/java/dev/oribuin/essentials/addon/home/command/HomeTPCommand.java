@@ -4,7 +4,6 @@ import com.destroystokyo.paper.ParticleBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
@@ -25,7 +24,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

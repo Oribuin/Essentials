@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.addon.home;
 
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.command.HomeDeleteCommand;
 import dev.oribuin.essentials.addon.home.command.HomeSetCommand;
@@ -47,7 +46,7 @@ public class HomeAddon extends Addon {
             AddonProvider.unload(this);
             return;
         }
-        
+
         // Load Existing Users
         Bukkit.getOnlinePlayers().forEach(player -> this.repository.load(player.getUniqueId()));
     }

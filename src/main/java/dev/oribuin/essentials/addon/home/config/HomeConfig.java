@@ -16,7 +16,7 @@ public class HomeConfig extends AddonConfig {
     public static Option<Double> TP_COST = new Option<>("teleport-cost", 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.home.bypass.cost'");
     public static Option<Boolean> TP_EFFECTS = new Option<>("teleport-effects", true, "Should the teleport effects be enabled?", "Effects will not be triggered if a player has 'essentials.home.bypass.delay'");
     public static Option<Boolean> TP_CONFIRM = new Option<>("teleport-confirm", true, "Should a player be required to confirm they want to teleport to their home?");
-    
+
     // Home Setting Options
     public static Option<Double> SET_COST = new Option<>("set-cost", 0.0, "The cost to set a home.", "This will be overwritten with the permission 'essentials.home.bypass-set-cost'");
 

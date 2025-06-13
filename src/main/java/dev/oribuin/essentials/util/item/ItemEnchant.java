@@ -114,9 +114,9 @@ public final class ItemEnchant implements Configurable {
     @Override
     public String toString() {
         return "ItemEnchant{" +
-                "enchantments=" + enchantments +
-                ", tooltip=" + tooltip +
-                '}';
+               "enchantments=" + enchantments +
+               ", tooltip=" + tooltip +
+               '}';
     }
 
     public Map<Enchantment, Integer> enchantments() {

@@ -31,6 +31,7 @@ public final class PointsProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     @Override
@@ -45,6 +46,7 @@ public final class PointsProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the transaction was successful
      */
     @Override
@@ -58,6 +60,7 @@ public final class PointsProvider implements EconomyPlugin {
      * Get the balance of a player
      *
      * @param player The player
+     *
      * @return The balance
      */
     @Override
@@ -72,6 +75,7 @@ public final class PointsProvider implements EconomyPlugin {
      *
      * @param player The player
      * @param amount The amount
+     *
      * @return If the player has the amount
      */
     @Override

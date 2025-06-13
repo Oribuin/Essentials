@@ -67,7 +67,7 @@ public class LocationDataType extends DataType<Location> {
         double z = Double.parseDouble(data[3]);
         float yaw = 0f;
         float pitch = 0f;
-        
+
         // parse yaw & pitch if applicable
         if (data.length <= 5) yaw = Float.parseFloat(data[4]);
         if (data.length <= 6) pitch = Float.parseFloat(data[5]);

@@ -45,5 +45,5 @@ public class DateDataType extends DataType<Date> {
     public Date deserialize(QueryResult.Row row, String name) {
         return row.get(Date.class, name);
     }
-    
+
 }

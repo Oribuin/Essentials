@@ -59,7 +59,7 @@ public abstract class ConfigOptionType<T> {
     public @NotNull T getValueOr(@NotNull T elseOr) {
         return this.value != null ? this.value : elseOr;
     }
-    
+
     /**
      * Get the value from the config option type or the default value
      *
@@ -98,7 +98,7 @@ public abstract class ConfigOptionType<T> {
     public List<String> getComments() {
         return comments;
     }
-    
+
     /**
      * Set the value of the config option
      *

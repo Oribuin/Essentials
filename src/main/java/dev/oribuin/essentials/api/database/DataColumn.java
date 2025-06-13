@@ -3,7 +3,6 @@ package dev.oribuin.essentials.api.database;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DataColumn<T> {
@@ -44,11 +43,11 @@ public class DataColumn<T> {
     /**
      * Create a new DataColumn instance with a name, type, and value to use
      *
-     * @param name  The name of the column
-     * @param type  The type of the column
-     * @param value The value of the column
+     * @param name     The name of the column
+     * @param type     The type of the column
+     * @param value    The value of the column
      * @param nullable If the column is nullable
-     * @param <T>   The type of the column
+     * @param <T>      The type of the column
      *
      * @return The new DataColumn instance
      */
@@ -72,7 +71,7 @@ public class DataColumn<T> {
      * Deserialize a value from a result set
      *
      * @param result The result set
-     * @param column     The column
+     * @param column The column
      *
      * @throws SQLException If an error occurs while deserializing the value
      */

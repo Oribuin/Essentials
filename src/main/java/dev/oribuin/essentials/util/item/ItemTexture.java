@@ -13,10 +13,11 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 
-@SuppressWarnings({"UnstableApiUsage", "deprecation"})
+@SuppressWarnings({ "UnstableApiUsage", "deprecation" })
 public final class ItemTexture implements Configurable {
 
     private String texture;
+
     /**
      * Define the player head texture of an item
      *

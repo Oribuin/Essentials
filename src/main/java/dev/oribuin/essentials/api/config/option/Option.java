@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class Option<T> extends ConfigOptionType<T> {
-    
+
     /**
      * Create a new ConfigOption with a default value and comments
      *
