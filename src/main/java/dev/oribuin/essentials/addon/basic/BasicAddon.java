@@ -4,6 +4,10 @@ import dev.oribuin.essentials.addon.basic.command.EnderchestCommand;
 import dev.oribuin.essentials.addon.basic.command.FlyCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.GamemodeCommand;
+import dev.oribuin.essentials.addon.basic.command.gamemode.impl.AdventureCommand;
+import dev.oribuin.essentials.addon.basic.command.gamemode.impl.CreativeCommand;
+import dev.oribuin.essentials.addon.basic.command.gamemode.impl.SpectatorCommand;
+import dev.oribuin.essentials.addon.basic.command.gamemode.impl.SurvivalCommand;
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.oribuin.essentials.api.Addon;
@@ -35,10 +39,10 @@ public class BasicAddon extends Addon {
 
                 // Gamemode Commands
                 new GamemodeCommand(this.plugin),
-                new GamemodeCommand.AdventureCommand(this.plugin),
-                new GamemodeCommand.CreativeCommand(this.plugin),
-                new GamemodeCommand.SpectatorCommand(this.plugin),
-                new GamemodeCommand.CreativeCommand(this.plugin)
+                new AdventureCommand(this.plugin),
+                new CreativeCommand(this.plugin),
+                new SpectatorCommand(this.plugin),
+                new SurvivalCommand(this.plugin)
         );
     }
 

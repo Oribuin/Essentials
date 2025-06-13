@@ -62,41 +62,5 @@ public class GamemodeCommand extends BaseRoseCommand {
                 )
                 .build();
     }
-
-    /**
-     * Create a new Creative Gamemode Template Command as a shorthand
-     */
-    public static class CreativeCommand extends GamemodeTemplate {
-        public CreativeCommand(RosePlugin rosePlugin) {
-            super(rosePlugin, GameMode.CREATIVE, "gmc", "creative");
-        }
-    }
-
-    /**
-     * Create a new Survival Gamemode Template Command as a shorthand
-     */
-    public static class SurvivalCommand extends GamemodeTemplate {
-        public SurvivalCommand(RosePlugin rosePlugin) {
-            super(rosePlugin, GameMode.SURVIVAL, "gms", "survival");
-        }
-    }
-
-    /**
-     * Create a new Adventure Gamemode Template Command as a shorthand
-     */
-    public static class AdventureCommand extends GamemodeTemplate {
-        public AdventureCommand(RosePlugin rosePlugin) {
-            super(rosePlugin, GameMode.ADVENTURE, "gma", "adventure");
-        }
-    }
-
-    /**
-     * Create a new Spectator Gamemode Template Command as a shorthand
-     */
-    public static class SpectatorCommand extends GamemodeTemplate {
-        public SpectatorCommand(RosePlugin rosePlugin) {
-            super(rosePlugin, GameMode.SPECTATOR, "gmsp", "spectator");
-        }
-    }
-
+    
 }
