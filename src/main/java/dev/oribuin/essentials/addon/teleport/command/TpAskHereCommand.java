@@ -34,12 +34,16 @@ public class TpAskHereCommand extends BaseRoseCommand {
             return;
         }
 
-        // TODO: Check if sending to self
-
+        // Check if sending to self
+        if (sender.getUniqueId().equals(target.getUniqueId())) {
+            TeleportMessages.TELEPORT_SELF.send(sender);
+            return;
+        }
+        
         // Cancel the current outgoing teleport request
         TeleportRequest outgoing = addon.getOutgoing(sender.getUniqueId());
         if (outgoing != null) {
-            addon.getRequests().remove(outgoing);
+            addon.requests().remove(outgoing);
         }
 
         TeleportRequest request = new TeleportRequest(
@@ -49,14 +53,14 @@ public class TpAskHereCommand extends BaseRoseCommand {
                 sender.getLocation()
         );
 
-        addon.getRequests().add(request);
+        addon.requests().add(request);
         StringPlaceholders placeholders = StringPlaceholders.of("target", target.getName(), "sender", sender.getName());
         TeleportMessages.TELEPORT_ASK_RECEIVED.send(target, placeholders);
         TeleportMessages.TELEPORT_ASK_SENT.send(sender, placeholders);
 
         // Send the timeout message after several seconds
         EssentialsPlugin.scheduler().runTaskLater(() -> {
-            if (addon.getRequests().remove(request)) {
+            if (addon.requests().remove(request)) {
                 TeleportMessages.TELEPORT_TIMEOUT.send(sender, placeholders);
                 TeleportMessages.TELEPORT_TIMEOUT_OTHER.send(target, placeholders);
             }

@@ -4,7 +4,6 @@ import com.destroystokyo.paper.ParticleBuilder;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
-import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
@@ -69,7 +68,7 @@ public class TpAcceptCommand extends BaseRoseCommand {
                 "delay", teleportDelay
         );
 
-        addon.getRequests().remove(incoming);
+        addon.requests().remove(incoming);
 
         Location location = incoming.where() != null ? incoming.where() : target.getLocation();
 
@@ -124,7 +123,7 @@ public class TpAcceptCommand extends BaseRoseCommand {
         // send the final message
         TeleportMessages.TELEPORT_ACCEPT_SELF.send(target, placeholders);
         TeleportMessages.TELEPORT_ACCEPT_OTHER.send(sender, placeholders);
-        
+
         // Teleport the player to the location
         ScheduledTask finalTask = effectTask;
         EssentialsPlugin.scheduler().runTaskLater(() -> {

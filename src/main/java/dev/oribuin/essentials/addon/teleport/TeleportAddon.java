@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.addon.teleport;
 
+import dev.oribuin.essentials.addon.teleport.command.BackCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAcceptCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskHereCommand;
@@ -11,6 +12,14 @@ import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
@@ -28,6 +37,7 @@ public class TeleportAddon extends Addon {
 
     private final List<TeleportRequest> requests = new ArrayList<>();
     private final Map<String, Permission> worldPerms = new HashMap<>();
+    private final Map<UUID, Location> previousLocations = new HashMap<>();
 
     /**
      * When the addon is finished loading and is ready to be used.
@@ -94,6 +104,50 @@ public class TeleportAddon extends Addon {
     }
 
     /**
+     * Cleanup any hanging data left over when the user logs out
+     *
+     * @param event The player quit event
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        // Remove previous location from the target when log out
+        this.previousLocations.remove(player.getUniqueId());
+
+        // Remove any active requests
+        this.requests.removeIf(x -> x.isSender(player.getUniqueId()) || x.isTarget(player.getUniqueId()));
+    }
+
+    /**
+     * Store the player's previous teleport location in /back
+     *
+     * @param event The player teleport event
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onTeleport(PlayerTeleportEvent event) {
+        // Check if the player has access to teleport to the world
+        if (!event.getPlayer().hasPermission(this.getPerm(event.getTo().getWorld().getName()))) {
+            TeleportMessages.DISABLED_WORLD.send(event.getPlayer());
+            event.setCancelled(true);
+            return;
+        }
+
+        // Mark it as a previous location if successful
+        this.previousLocations.put(event.getPlayer().getUniqueId(), event.getFrom());
+    }
+
+    /**
+     * Store the players death location in /back
+     *
+     * @param event The death event
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onDeath(PlayerDeathEvent event) {
+        this.previousLocations.put(event.getPlayer().getUniqueId(), event.getPlayer().getLocation());
+    }
+
+    /**
      * The name of the addon
      * This will be used for logging and the name of the addon.
      */
@@ -111,11 +165,20 @@ public class TeleportAddon extends Addon {
     }
 
     /**
+     * Get all the listeners for the addon
+     */
+    @Override
+    public List<Listener> listeners() {
+        return List.of(this);
+    }
+
+    /**
      * Get all the commands for the addon
      */
     @Override
     public List<BaseRoseCommand> commands() {
         return List.of(
+                new BackCommand(this.plugin),
                 new TpAcceptCommand(this.plugin),
                 new TpAskCommand(this.plugin),
                 new TpAskHereCommand(this.plugin),
@@ -123,7 +186,11 @@ public class TeleportAddon extends Addon {
         );
     }
 
-    public List<TeleportRequest> getRequests() {
+    public List<TeleportRequest> requests() {
         return requests;
+    }
+
+    public Map<UUID, Location> previousLocations() {
+        return previousLocations;
     }
 }

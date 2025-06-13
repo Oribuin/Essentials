@@ -4,7 +4,6 @@ import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
-import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -12,9 +11,7 @@ import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class TpDenyCommand extends BaseRoseCommand {
 
@@ -47,11 +44,11 @@ public class TpDenyCommand extends BaseRoseCommand {
                 "sender", target.getName()
         );
 
-        addon.getRequests().remove(incoming);
+        addon.requests().remove(incoming);
         TeleportMessages.TELEPORT_DENIED_SELF.send(target, placeholders);
         TeleportMessages.TELEPORT_DENIED_OTHER.send(sender, placeholders);
     }
-    
+
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("tpdeny")

@@ -83,11 +83,11 @@ public final class TeleportRequest {
     public long when() {
         return when;
     }
-    
+
     public Location where() {
         return where;
     }
-    
+
     public void where(Location where) {
         this.where = where;
     }
