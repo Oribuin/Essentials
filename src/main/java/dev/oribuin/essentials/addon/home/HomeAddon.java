@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -79,6 +80,14 @@ public class HomeAddon extends Addon {
     @Override
     public List<AddonConfig> configs() {
         return List.of(new HomeConfig(), new HomeMessages());
+    }
+
+    /**
+     * Get all the listeners for the addon
+     */
+    @Override
+    public List<Listener> listeners() {
+        return List.of(this);
     }
 
     /**

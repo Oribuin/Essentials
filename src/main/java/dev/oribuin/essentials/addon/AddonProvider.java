@@ -97,7 +97,8 @@ public class AddonProvider {
             addons.put(addon.getClass(), addon);
             return addon;
         } catch (Exception e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e);
+            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }

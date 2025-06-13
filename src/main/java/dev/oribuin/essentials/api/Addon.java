@@ -76,7 +76,6 @@ public abstract class Addon implements Listener {
         }
 
         // Register all the events
-        this.listeners().add(this);
         this.listeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this.plugin));
 
 

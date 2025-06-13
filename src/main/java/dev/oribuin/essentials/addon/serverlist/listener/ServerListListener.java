@@ -1,27 +1,20 @@
 package dev.oribuin.essentials.addon.serverlist.listener;
 
-import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
+import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.serverlist.config.ServerListConfig;
 import dev.oribuin.essentials.hook.plugin.PAPIProvider;
+import dev.oribuin.essentials.util.EssUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
+import org.bukkit.util.CachedServerIcon;
 
+import javax.swing.*;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class ServerListListener implements Listener {
-
-    private final ServerListAddon addon;
-
-    /**
-     * Construct a new listener with the given addon.
-     *
-     * @param addon The addon instance
-     */
-    public ServerListListener(ServerListAddon addon) {
-        this.addon = addon;
-    }
 
     /**
      * Handle the server list ping event to modify the motd and max players.
@@ -30,15 +23,20 @@ public class ServerListListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onPing(ServerListPingEvent event) {
-        ServerListConfig config = this.addon.config(ServerListConfig.class);
-        if (config == null) return;
-
         event.setMaxPlayers(ServerListConfig.MAX_PLAYERS.getValue());
 
         List<String> motd = ServerListConfig.LINES.getValue();
-        if (motd.isEmpty()) return;
-
-        event.setMotd(PAPIProvider.apply(null, String.join("\n", motd)));
+        if (!motd.isEmpty()) {
+            Component text = EssUtils.kyorify(PAPIProvider.apply(null, String.join("\n<reset><!italic>", motd)));
+            event.motd(text);
+        }
+        
+        List<CachedServerIcon> serverIcons = AddonProvider.SERVER_LIST_ADDON.icons();
+        if (!serverIcons.isEmpty()) {
+            CachedServerIcon random = serverIcons.get((int) (Math.random() * serverIcons.size()));
+            if (random == null) return;
+            event.setServerIcon(random);
+        }
 
         // TODO: Allow for hoverable text in the motd
         // TODO: Allow for custom server icon
