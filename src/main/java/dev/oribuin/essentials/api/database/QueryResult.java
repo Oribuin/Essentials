@@ -3,6 +3,7 @@ package dev.oribuin.essentials.api.database;
 import dev.oribuin.essentials.EssentialsPlugin;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -95,6 +96,21 @@ public class QueryResult {
         }
 
         /**
+         * Parse the value from the object and assume it will be a BigDecimal
+         *
+         * @param name The name of the column
+         *
+         * @return The row value
+         */
+        public BigDecimal getBigDecimal(String name) {
+            Object object = content.get(name);
+            if (object instanceof Number number) {
+                return BigDecimal.valueOf(number.doubleValue());
+            }
+            return BigDecimal.ZERO;
+        }
+
+        /**
          * Parse the value from the object and assume it will be a boolean
          *
          * @param name The name of the column
@@ -117,9 +133,30 @@ public class QueryResult {
             Object object = content.get(name);
             return object instanceof Long result ? result : 0;
         }
+
+        @Override
+        public String toString() {
+            return "Row{" +
+                   "content=" + content +
+                   '}';
+        }
     }
 
     public List<Row> results() {
         return results;
+    }
+    
+    
+    public @Nullable Row first() {
+        if (this.results.isEmpty()) return null;
+        
+        return this.results.get(0);
+    }
+
+    @Override
+    public String toString() {
+        return "QueryResult{" +
+               "results=" + results +
+               '}';
     }
 }

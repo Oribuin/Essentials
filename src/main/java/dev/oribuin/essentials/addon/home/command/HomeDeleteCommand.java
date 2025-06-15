@@ -3,6 +3,7 @@ package dev.oribuin.essentials.addon.home.command;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
+import dev.oribuin.essentials.addon.home.event.HomeDeleteEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -21,6 +22,11 @@ public class HomeDeleteCommand extends BaseRoseCommand {
     @RoseExecutable
     public void execute(CommandContext context, Home home) {
         Player sender = (Player) context.getSender();
+
+        HomeDeleteEvent event = new HomeDeleteEvent(sender, home);
+        event.callEvent();
+        // Check if event was cancelled
+        if (event.isCancelled()) return;
 
         // Set the home
         AddonProvider.HOME_ADDON.repository().delete(home);

@@ -85,7 +85,7 @@ public class DataColumn<T> {
      * @return The constructed column
      */
     public String construct() {
-        return String.format("%s %s %s",
+        return String.format("`%s` %s %s",
                 this.name,
                 this.type.columnType(),
                 this.nullable ? "NULL" : "NOT NULL"

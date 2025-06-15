@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
+import dev.oribuin.essentials.addon.home.event.HomeCreateEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -60,8 +61,13 @@ public class HomeSetCommand extends BaseRoseCommand {
             }
         }
 
-        // Set the home
         Home home = new Home(name.toLowerCase(), sender.getUniqueId(), sender.getLocation().toCenterLocation());
+        HomeCreateEvent event = new HomeCreateEvent(sender, home);
+        event.callEvent();
+        
+        if (event.isCancelled()) return; 
+
+        // Set the home
         repository.save(home);
         HomeMessages.HOME_SET.send(sender, home.placeholders());
     }

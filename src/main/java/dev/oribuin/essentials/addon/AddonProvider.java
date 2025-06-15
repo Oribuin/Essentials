@@ -2,11 +2,13 @@ package dev.oribuin.essentials.addon;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.BasicAddon;
+import dev.oribuin.essentials.addon.economy.EconomyAddon;
 import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.api.config.option.Option;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +20,7 @@ public class AddonProvider {
 
     private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
     public static final BasicAddon BASIC_ADDON = registerSupplier(BasicAddon::new);
+    public static final EconomyAddon ECONOMY_ADDON = registerSupplier(EconomyAddon::new);
     public static final HomeAddon HOME_ADDON = registerSupplier(HomeAddon::new);
     public static final ServerListAddon SERVER_LIST_ADDON = registerSupplier(ServerListAddon::new);
     public static final TeleportAddon TELEPORT_ADDON = registerSupplier(TeleportAddon::new);

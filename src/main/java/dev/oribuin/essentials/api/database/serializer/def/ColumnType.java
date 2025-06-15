@@ -11,6 +11,7 @@ public enum ColumnType {
     LONG, // long
     SHORT, // short
     DATE, // Date
+    BIGDECIMAL("DECIMAL(15,2)"), // Big Decimal
     UUID("VARCHAR(36)"), // UUID
     ;
 

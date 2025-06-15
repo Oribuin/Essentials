@@ -1,6 +1,7 @@
 package dev.oribuin.essentials;
 
 import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.economy.provider.VaultEconomyProvider;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.hook.plugin.economy.PointsProvider;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
@@ -10,8 +11,10 @@ import dev.oribuin.essentials.manager.LocaleManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -29,6 +32,26 @@ public class EssentialsPlugin extends RosePlugin {
         );
 
         instance = this;
+    }
+
+    /**
+     * Load all the basic stuff that needs to be done (mostly just economy)
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        
+        try {
+            Class.forName("net.milkbowl.vault.economy.Economy");
+            this.getServer().getServicesManager().register(
+                    Economy.class,
+                    new VaultEconomyProvider(this),
+                    this,
+                    ServicePriority.Normal
+            );
+        } catch (ClassNotFoundException ex) {
+            // grr
+        }
     }
 
     @Override

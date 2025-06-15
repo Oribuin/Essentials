@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.api.database.serializer.def;
 
 import dev.oribuin.essentials.api.database.serializer.DataType;
+import dev.oribuin.essentials.api.database.serializer.impl.BigDecimalDataType;
 import dev.oribuin.essentials.api.database.serializer.impl.BooleanDataType;
 import dev.oribuin.essentials.api.database.serializer.impl.DateDataType;
 import dev.oribuin.essentials.api.database.serializer.impl.DoubleDataType;
@@ -23,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ public class DataTypes {
     public static final DataType<Short> SHORT = new ShortDataType();
     public static final DataType<String> STRING = new StringDataType();
     public static final DataType<UUID> UUID = new UUIDDataType();
+    public static final DataType<BigDecimal> BIG_DECIMAL = new BigDecimalDataType();
 
     // Spigot DataTypes
     public static final DataType<Location> LOCATION = new LocationDataType();

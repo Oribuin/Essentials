@@ -44,19 +44,36 @@ public class StatementProvider {
         } catch (SQLException ex) {
             EssentialsPlugin.get().getLogger().severe("Failed to establish auto commit: " + ex.getMessage());
         }
-
     }
 
     /**
      * Create a new statement provider with a specific type of statement type
      *
      * @param type The type of statement
+     * @param connector The database connector to use
      *
      * @return The statement provider
      */
     public static StatementProvider create(StatementType type, DatabaseConnector connector) {
         try {
             return new StatementProvider(type, connector.connect());
+        } catch (SQLException ex) {
+            EssentialsPlugin.get().getLogger().severe("There was an issue establishing a ConnectionProvider: " + ex.getMessage());
+            return new StatementProvider(type, null);
+        }
+    }
+
+    /**
+     * Create a new statement provider with a specific type of statement type
+     *
+     * @param type The type of statement
+     * @param repository The module repository using the statement provider
+     *
+     * @return The statement provider
+     */
+    public static StatementProvider create(StatementType type, ModuleRepository repository) {
+        try {
+            return new StatementProvider(type, repository.connector.connect()).table(repository.table);
         } catch (SQLException ex) {
             EssentialsPlugin.get().getLogger().severe("There was an issue establishing a ConnectionProvider: " + ex.getMessage());
             return new StatementProvider(type, null);
@@ -133,7 +150,6 @@ public class StatementProvider {
         }
 
         // Create the table if it does not exist
-
         return CompletableFuture.supplyAsync(() -> switch (this.type) {
             case UPDATE -> this.update();
             case DELETE -> this.delete();
@@ -179,6 +195,8 @@ public class StatementProvider {
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             EssentialsPlugin.get().getLogger().severe("An error occurred while creating the table: " + e.getMessage());
+            EssentialsPlugin.get().getLogger().severe("Full Query: " + statement);
+            
         }
     }
 

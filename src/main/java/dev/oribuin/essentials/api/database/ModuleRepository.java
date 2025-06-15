@@ -17,7 +17,11 @@ public abstract class ModuleRepository {
     /**
      * Unload the repository
      */
-    public abstract void unload();
+    public void unload() {
+        if (this.connector != null) {
+            this.connector.closeConnection();
+        }
+    }
 
     /**
      * Execute a task off the main thread
@@ -25,7 +29,7 @@ public abstract class ModuleRepository {
      * @param runnable The task to execute
      */
     public final void async(Runnable runnable) {
-        Bukkit.getScheduler().runTaskAsynchronously(EssentialsPlugin.get(), runnable);
+        EssentialsPlugin.scheduler().runTaskAsync(runnable);
     }
 
 

@@ -41,8 +41,9 @@ public class TeleportAddon extends Addon {
 
     /**
      * When the addon is finished loading and is ready to be used.
-     */
+    */
     @Override
+    @Deprecated
     public void enable() {
         Bukkit.getWorlds().forEach(world -> {
             String perm = "essentials.teleport." + world.getName().toLowerCase();
