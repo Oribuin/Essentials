@@ -91,12 +91,12 @@ public class VaultEconomyProvider implements Economy {
 
     @Override
     public String currencyNamePlural() {
-        return EconomyConfig.CURRENCY_NAME_PLURAL.getValue();
+        return EconomyConfig.CURRENCY_NAME_PLURAL.value();
     }
 
     @Override
     public String currencyNameSingular() {
-        return EconomyConfig.CURRENCY_SYMBOL.getValue();
+        return EconomyConfig.CURRENCY_SYMBOL.value();
     }
 
     /**
@@ -113,7 +113,7 @@ public class VaultEconomyProvider implements Economy {
         // Create a new account for the user
         AddonProvider.ECONOMY_ADDON.deposit(
                 offlinePlayer.getUniqueId(),
-                EconomyConfig.STARTING_BALANCE.getValue(),
+                EconomyConfig.STARTING_BALANCE.value(),
                 "User Account Created"
         );
         return true;

@@ -63,7 +63,7 @@ public class TpAskCommand extends BaseRoseCommand {
                 TeleportMessages.TELEPORT_TIMEOUT.send(sender, placeholders);
                 TeleportMessages.TELEPORT_TIMEOUT_OTHER.send(target, placeholders);
             }
-        }, TeleportConfig.REQUEST_TIMEOUT.getValue(), TimeUnit.SECONDS);
+        }, TeleportConfig.REQUEST_TIMEOUT.value(), TimeUnit.SECONDS);
     }
 
     @Override

@@ -1,18 +1,18 @@
 package dev.oribuin.essentials.api.database.serializer.def;
 
 public enum ColumnType {
-    BYTE_ARRAY("VARBINARY(2456)"), // byte[]
-    CHAR, // char
-    TEXT, // String
-    BOOLEAN, // boolean
-    INTEGER, // int
-    FLOAT, // float
-    DOUBLE, // double
-    LONG, // long
-    SHORT, // short
-    DATE, // Date
-    BIGDECIMAL("DECIMAL(15,2)"), // Big Decimal
-    UUID("VARCHAR(36)"), // UUID
+    BYTE_ARRAY("VARBINARY(2456)"),
+    CHAR, 
+    TEXT, 
+    BOOLEAN, 
+    INTEGER, 
+    FLOAT, 
+    DOUBLE, 
+    LONG, 
+    SHORT, 
+    DATE, 
+    BIGDECIMAL("DECIMAL(15,2)"),
+    UUID("VARCHAR(36)"),
     ;
 
     private final String realValue;

@@ -62,7 +62,7 @@ public class NumberUtil {
     }
 
     public static void setCachedValues() {
-        String separator = EconomyConfig.CURRENCY_SEPARATOR.getValue();
+        String separator = EconomyConfig.CURRENCY_SEPARATOR.value();
         DecimalFormat decimalFormat = new DecimalFormat();
         DecimalFormatSymbols symbols = decimalFormat.getDecimalFormatSymbols();
         if (!separator.isEmpty()) {
@@ -76,10 +76,10 @@ public class NumberUtil {
         }
 
         suffixes.clear();
-        suffixes.put(1_000L, EconomyConfig.CURRENCY_ABBREV_THOUSANDS.getValue());
-        suffixes.put(1_000_000L, EconomyConfig.CURRENCY_ABBREV_MILLIONS.getValue());
-        suffixes.put(1_000_000_000L, EconomyConfig.CURRENCY_ABBREV_BILLIONS.getValue());
-        decimal = EconomyConfig.CURRENCY_DECIMAL.getValue();
+        suffixes.put(1_000L, EconomyConfig.CURRENCY_ABBREV_THOUSANDS.value());
+        suffixes.put(1_000_000L, EconomyConfig.CURRENCY_ABBREV_MILLIONS.value());
+        suffixes.put(1_000_000_000L, EconomyConfig.CURRENCY_ABBREV_BILLIONS.value());
+        decimal = EconomyConfig.CURRENCY_DECIMAL.value();
     }
 
 }

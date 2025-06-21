@@ -59,8 +59,8 @@ public class TpAcceptCommand extends BaseRoseCommand {
         }
 
         // important values
-        int teleportDelay = TeleportConfig.TP_DELAY.getValue();
-        double cost = TeleportConfig.TP_COST.getValue();
+        int teleportDelay = TeleportConfig.TP_DELAY.value();
+        double cost = TeleportConfig.TP_COST.value();
         StringPlaceholders placeholders = StringPlaceholders.of(
                 "target", target.getName(),
                 "sender", sender.getName(),
@@ -100,7 +100,7 @@ public class TpAcceptCommand extends BaseRoseCommand {
 
         // Create the tp effects task
         ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.getValue()) {
+        if (HomeConfig.TP_EFFECTS.value()) {
             // Give the player blindness
             sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
                     (teleportDelay + 1) * 20, 4,

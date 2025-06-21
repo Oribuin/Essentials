@@ -16,7 +16,7 @@ public class DefaultConfig extends AddonConfig {
      */
     @Override
     public void load() {
-        this.register(AddonConfig.ENABLED);
+        this.register(AddonConfig.ENABLED, "enabled");
     }
 
 }

@@ -47,7 +47,7 @@ public final class TeleportRequest {
      * @return The teleport request
      */
     public boolean hasExpired() {
-        return System.currentTimeMillis() - when > TeleportConfig.REQUEST_TIMEOUT.getValue() * 1000;
+        return System.currentTimeMillis() - when > TeleportConfig.REQUEST_TIMEOUT.value() * 1000;
     }
 
     /**

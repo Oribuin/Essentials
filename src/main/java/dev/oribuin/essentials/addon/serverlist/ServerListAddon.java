@@ -23,7 +23,7 @@ public class ServerListAddon extends Addon {
     public void enable() {
         this.icons.clear();
 
-        ServerListConfig.FILES.getValue().forEach(s -> {
+        ServerListConfig.ICON_IMAGES.value().forEach(s -> {
             File folder = new File(this.folder, "icons");
             File file = new File(folder, s);
 

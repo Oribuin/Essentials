@@ -4,7 +4,6 @@ import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.config.option.ConfigOptionType;
 import dev.oribuin.essentials.api.config.option.Option;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.BOOLEAN;
+
 @SuppressWarnings("unused")
 public abstract class AddonConfig {
 
-    public static final Option<Boolean> ENABLED = new Option<>("enabled", true, "Should the addon and all of it's features be enabled?");
+    public static final Option<Boolean> ENABLED = new Option<>(
+            BOOLEAN,
+            true,
+            "Should the addon and all of it's featured be enabled?"
+    );
 
     private final String name;
     protected List<ConfigOptionType<?>> options;
@@ -34,7 +39,7 @@ public abstract class AddonConfig {
      * Load the configuration for the addon
      */
     public void load() {
-        this.register(ENABLED);
+        this.register(ENABLED, "enabled");
         this.registerClass();
     }
 
@@ -56,35 +61,24 @@ public abstract class AddonConfig {
             File configFile = new File(addonFolder, this.name + ".yml");
             if (!configFile.exists()) configFile.createNewFile();
 
-
             // Load the config
             this.config = CommentedFileConfiguration.loadConfiguration(configFile);
             for (ConfigOptionType<?> option : this.options) {
-                if (option.getPath() == null) continue; // Ignore anything with no path 
+                if (option.path() == null) continue; // Ignore anything with no path 
 
                 // If the config contains the path, cache the value
-                if (this.config.contains(option.getPath())) {
-                    option.setValue(this.config.get(option.getPath()));
+                if (this.config.contains(option.path())) {
+                    option.read(this.config);
                     continue;
                 }
 
-                // Add comments to the config
-                if (!option.getComments().isEmpty()) {
-                    for (String comment : option.getComments()) {
-                        this.config.addPathedComments(option.getPath(), comment);
-                    }
-
-                    this.config.addPathedComments(option.getPath(), "Default: " + option.getDefaultValue());
-                }
-
-                // Set the default value
-                this.config.set(option.getPath(), option.getDefaultValue());
-                option.setValue(option.getDefaultValue());
+                // Set the default value, this will also write any available 
+                option.write(this.config);
             }
 
             this.config.save(configFile);
-        } catch (IOException ex) {
-            Bukkit.getLogger().severe("Failed to create config file for addon " + this.name);
+        } catch (Exception ex) {
+            EssentialsPlugin.get().getLogger().severe("Failed to create config file for addon [" + name + "]: " + ex.getMessage());
         }
     }
 
@@ -103,16 +97,16 @@ public abstract class AddonConfig {
      * @param option The option to register
      */
     public final void register(ConfigOptionType<?> option, String def) {
-        String path = option.getPath() != null ? option.getPath() : def;
+        String path = option.path() != null ? option.path() : def;
         if (path == null) {
             throw new IllegalArgumentException("Option [" + option + "] does not have a defined path");
         }
-
+        
         if (this.options.stream().anyMatch(this.testPath(path))) {
             throw new IllegalArgumentException("Option with path " + path + " already exists");
         }
 
-        option.setPath(path);
+        option.path(path);
         this.options.add(option);
     }
 
@@ -158,7 +152,10 @@ public abstract class AddonConfig {
     }
 
     private Predicate<ConfigOptionType<?>> testPath(String path) {
-        return type -> type.getPath() != null && type.getPath().equalsIgnoreCase(path);
+        return type -> {
+            String typePath = type.path();
+            return typePath == null || typePath.equalsIgnoreCase(path);
+        };
     }
 
 }

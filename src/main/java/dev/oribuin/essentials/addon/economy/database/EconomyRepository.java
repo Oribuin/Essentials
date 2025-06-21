@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.addon.economy.database;
 
+import com.google.common.cache.CacheBuilder;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
 import dev.oribuin.essentials.api.database.ModuleRepository;
 import dev.oribuin.essentials.api.database.QueryResult;

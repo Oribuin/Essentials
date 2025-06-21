@@ -5,9 +5,11 @@ import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.economy.EconomyAddon;
 import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
+import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.api.config.option.ConfigOptionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +24,7 @@ public class AddonProvider {
     public static final EconomyAddon ECONOMY_ADDON = registerSupplier(EconomyAddon::new);
     public static final HomeAddon HOME_ADDON = registerSupplier(HomeAddon::new);
     public static final ServerListAddon SERVER_LIST_ADDON = registerSupplier(ServerListAddon::new);
+    public static final SpawnAddon SPAWN_ADDON = registerSupplier(SpawnAddon::new);
     public static final TeleportAddon TELEPORT_ADDON = registerSupplier(TeleportAddon::new);
 
     public static void init() {
@@ -59,22 +62,6 @@ public class AddonProvider {
                 .filter(x -> x.name().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * Get the configuration of a addon from the map
-     *
-     * @param addon  The addon to get the config from
-     * @param config The config class
-     * @param <T>    The config type
-     *
-     * @return The config
-     */
-    public static <T extends AddonConfig> T config(Class<? extends Addon> addon, Class<T> config) {
-        Addon addonInstance = addons.get(addon);
-        if (addonInstance == null) return null;
-
-        return addonInstance.config(config);
     }
 
     /**

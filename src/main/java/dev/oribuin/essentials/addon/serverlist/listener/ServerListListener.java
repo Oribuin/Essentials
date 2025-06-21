@@ -22,9 +22,9 @@ public class ServerListListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onPing(ServerListPingEvent event) {
-        event.setMaxPlayers(ServerListConfig.MAX_PLAYERS.getValue());
+        event.setMaxPlayers(ServerListConfig.MAX_PLAYERS.value());
 
-        List<String> motd = ServerListConfig.LINES.getValue();
+        List<String> motd = ServerListConfig.LINES.value();
         if (!motd.isEmpty()) {
             Component text = EssUtils.kyorify(PAPIProvider.apply(null, String.join("\n<reset><!italic>", motd)));
             event.motd(text);

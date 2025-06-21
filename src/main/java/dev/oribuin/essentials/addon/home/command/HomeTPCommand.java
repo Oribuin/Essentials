@@ -55,16 +55,16 @@ public class HomeTPCommand extends BaseRoseCommand {
         Player sender = (Player) context.getSender();
 
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getValue();
+        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.value();
         if (disabledWorlds.contains(home.location().getWorld().getName())) {
             HomeMessages.DISABLED_WORLD.send(sender);
             return;
         }
 
         // Number values are defaulted to 0 when not found
-        int cooldown = HomeConfig.TP_COOLDOWN.getValue();
-        int teleportDelay = HomeConfig.TP_DELAY.getValue();
-        double cost = HomeConfig.TP_COST.getValue();
+        int cooldown = HomeConfig.TP_COOLDOWN.value();
+        int teleportDelay = HomeConfig.TP_DELAY.value();
+        double cost = HomeConfig.TP_COST.value();
 
         // establish all the placeholders
         StringPlaceholders placeholders = home.placeholders(StringPlaceholders.of(
@@ -88,7 +88,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         }
 
         // Check if a player has confirmed they want to teleport here
-        if (HomeConfig.TP_CONFIRM.getValue() && !sender.hasPermission("essentials.home.bypass.confirm")) {
+        if (HomeConfig.TP_CONFIRM.value() && !sender.hasPermission("essentials.home.bypass.confirm")) {
             Home confirmHome = this.confirmation.getIfPresent(sender.getUniqueId());
 
             if (confirmHome == null || !confirmHome.name().equalsIgnoreCase(home.name())) {
@@ -125,7 +125,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
         // Create the tp effects task
         ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.getValue()) {
+        if (HomeConfig.TP_EFFECTS.value()) {
             // Give the player blindness
             sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
                     (teleportDelay + 1) * 20, 4,

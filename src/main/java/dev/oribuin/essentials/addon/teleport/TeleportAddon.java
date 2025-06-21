@@ -128,7 +128,7 @@ public class TeleportAddon extends Addon {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onTeleport(PlayerTeleportEvent event) {
         // Check if the player has access to teleport to the world
-        if (TeleportConfig.DISABLE_INACCESSIBLE_TELEPORT.getValue() && !event.getPlayer().hasPermission(this.getPerm(event.getTo().getWorld().getName()))) {
+        if (TeleportConfig.DISABLE_INACCESSIBLE_TELEPORT.value() && !event.getPlayer().hasPermission(this.getPerm(event.getTo().getWorld().getName()))) {
             TeleportMessages.DISABLED_WORLD.send(event.getPlayer());
             event.setCancelled(true);
             return;

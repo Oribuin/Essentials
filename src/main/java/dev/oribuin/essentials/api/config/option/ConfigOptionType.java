@@ -1,153 +1,169 @@
 package dev.oribuin.essentials.api.config.option;
 
+import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
+import dev.rosewood.rosegarden.config.RoseSettingSerializer;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ConfigOptionType<T> {
 
+    protected final @NotNull RoseSettingSerializer<T> serializer;
     protected final @NotNull T defaultValue;
-    protected final @NotNull List<String> comments;
+    protected final List<String> comments;
     protected @Nullable String path;
     protected @Nullable T value;
-
+    
     /**
-     * Create a new ConfigOption with a default value and comments
+     * Create a new config option with a specified serializer, default value and any available comments
      *
-     * @param path         The path of the config option
-     * @param defaultValue The default value of the config option
-     * @param comments     The comments for the config option
+     * @param path         The path to the config option
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
+     * @param comments     The comments if available
      */
-    public ConfigOptionType(@Nullable String path, @NotNull T defaultValue, @NotNull List<String> comments) {
+    public ConfigOptionType(
+            @Nullable String path,
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue,
+            @NotNull List<String> comments
+    ) {
         this.path = path;
+        this.serializer = serializer;
         this.defaultValue = defaultValue;
-        this.value = defaultValue;
         this.comments = comments;
     }
 
     /**
-     * Create a new ConfigOption with a default value and comments
+     * Create a new config option with a specified serializer, default value and any available comments
      *
-     * @param path         The path of the config option
-     * @param defaultValue The default value of the config option
-     * @param comments     The comments for the config option
+     * @param path         The path to the config option
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
+     * @param comments     The comments if available
      */
-    public ConfigOptionType(@NotNull String path, @NotNull T defaultValue, String... comments) {
+    public ConfigOptionType(
+            @Nullable String path,
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue,
+            @NotNull String... comments
+    ) {
         this.path = path;
+        this.serializer = serializer;
         this.defaultValue = defaultValue;
         this.comments = List.of(comments);
     }
 
     /**
-     * Create a new ConfigOption with a default value and comments
+     * Create a new config option with a specified serializer, default value
      *
-     * @param defaultValue The default value of the config option
-     * @param comments     The comments for the config option
+     * @param path         The path to the config option
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
      */
-    public ConfigOptionType(@NotNull T defaultValue, @NotNull List<String> comments) {
-        this.defaultValue = defaultValue;
-        this.value = defaultValue;
-        this.comments = comments;
+    public ConfigOptionType(
+            @Nullable String path,
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue
+    ) {
+        this(path, serializer, defaultValue, new ArrayList<>());
     }
 
     /**
-     * Create a new ConfigOption with a default value and comments
+     * Create a new config option with a specified serializer, default value and any available comments
      *
-     * @param defaultValue The default value of the config option
-     * @param comments     The comments for the config option
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
+     * @param comments     The comments if available
      */
-    public ConfigOptionType(@NotNull T defaultValue, String... comments) {
-        this.defaultValue = defaultValue;
-        this.comments = List.of(comments);
+    public ConfigOptionType(
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue,
+            @NotNull List<String> comments
+    ) {
+        this(null, serializer, defaultValue, comments);
     }
 
     /**
-     * Create a new ConfigOption with a default value
+     * Create a new config option with a specified serializer, default value and any available comments
      *
-     * @param path         The path of the config option
-     * @param defaultValue The default value of the config option
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
+     * @param comments     The comments if available
      */
-    public ConfigOptionType(@Nullable String path, @NotNull T defaultValue) {
-        this(path, defaultValue, List.of());
+    public ConfigOptionType(
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue,
+            @NotNull String... comments
+    ) {
+        this(null, serializer, defaultValue, comments);
     }
 
     /**
-     * Get the value from the config option type or the default value
+     * Create a new config option with a specified serializer, default value and any available comments
      *
-     * @param elseOr The default value to load
-     *
-     * @return The value
+     * @param serializer   The config serializer
+     * @param defaultValue The default values to use
      */
-    public @NotNull T getValueOr(@NotNull T elseOr) {
-        return this.value != null ? this.value : elseOr;
+    public ConfigOptionType(
+            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull T defaultValue
+    ) {
+        this(null, serializer, defaultValue, new ArrayList<>());
     }
 
     /**
-     * Get the value from the config option type or the default value
+     * Load the config option from a config
      *
-     * @return The value
+     * @param section The configuration section to load from
      */
-    public @NotNull T getValue() {
+    public void read(CommentedConfigurationSection section) {
+        if (this.path == null) return;
+
+        T value = this.serializer.read(section, this.path);
+        this.value = value != null ? value : this.defaultValue;
+    }
+
+    /**
+     * Write a config option to the config path
+     *
+     * @param section The section to write it to
+     */
+    public void write(CommentedConfigurationSection section) {
+        if (this.path == null) return;
+
+        String[] comments = this.comments.toArray(new String[0]);
+        this.serializer.write(section, this.path, this.defaultValue, comments);
+    }
+
+    public @NotNull RoseSettingSerializer<T> serializer() {
+        return this.serializer;
+    }
+
+    public @NotNull T defaultValue() {
+        return this.defaultValue;
+    }
+
+    public List<String> comments() {
+        return this.comments;
+    }
+
+    public @Nullable String path() {
+        return this.path;
+    }
+
+    public void path(@Nullable String path) {
+        this.path = path;
+    }
+
+    public @NotNull T value() {
         return this.value != null ? this.value : this.defaultValue;
     }
 
-    /**
-     * Get the path to the config option
-     *
-     * @return The path of the config option
-     */
-    @Nullable
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * Set the path to the config option
-     *
-     * @param path The new path
-     */
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Get the default value of the config option
-     *
-     * @return The default value of the config option
-     */
-    @NotNull
-    public T getDefaultValue() {
-        return defaultValue;
-    }
-
-    /**
-     * Get the comments for the config option
-     *
-     * @return The comments for the config option
-     */
-    @NotNull
-    public List<String> getComments() {
-        return comments;
-    }
-
-    /**
-     * Set the value of the config option
-     *
-     * @param value The value of the config option
-     */
-    @SuppressWarnings("unchecked")
-    public void setValue(@Nullable Object value) {
-        this.value = (T) value;
-    }
-
-    @Override
-    public String toString() {
-        return "ConfigOptionType{" +
-               "defaultValue=" + defaultValue +
-               ", comments=" + comments +
-               ", path='" + path + '\'' +
-               ", value=" + value +
-               '}';
+    public void value(@Nullable T value) {
+        this.value = value;
     }
 }

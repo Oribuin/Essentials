@@ -95,23 +95,7 @@ public abstract class Addon implements Listener {
 
         this.disable();
     }
-
-    /**
-     * Get a configuration file from the addon
-     *
-     * @param clazz The class of the configuration file
-     * @param <T>   The type of the configuration file
-     *
-     * @return The configuration file
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends AddonConfig> T config(Class<T> clazz) {
-        if (!this.configs.containsKey(clazz))
-            return null;
-
-        return (T) this.configs.get(clazz);
-    }
-
+    
     /**
      * The name of the addon
      * This will be used for logging and the name of the addon.

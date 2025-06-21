@@ -30,7 +30,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         Player sender = (Player) context.getSender();
 
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.getValue();
+        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.value();
         if (disabledWorlds.contains(sender.getWorld().getName())) {
             HomeMessages.DISABLED_WORLD.send(sender);
             return;
@@ -53,7 +53,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         }
 
         // Check for price of setting a home
-        double setCost = HomeConfig.SET_COST.getValueOr(0.0);
+        double setCost = HomeConfig.SET_COST.value();
         if (setCost > 0 && !VaultProvider.get().has(sender, setCost)) {
             if (!VaultProvider.get().has(sender, setCost)) {
                 HomeMessages.INSUFFICIENT_FUNDS.send(sender, "cost", setCost);
