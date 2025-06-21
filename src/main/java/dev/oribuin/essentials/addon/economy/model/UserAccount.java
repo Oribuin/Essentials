@@ -43,9 +43,9 @@ public class UserAccount {
      */
     public static UserAccount construct(QueryResult.Row row) {
         if (row == null) return null;
-        
+
         UUID uuid = DataTypes.UUID.deserialize(row, "user");
-        BigDecimal amount = DataTypes.BIG_DECIMAL.deserialize(row,  "amount");
+        BigDecimal amount = DataTypes.BIG_DECIMAL.deserialize(row, "amount");
         long lastUpdated = DataTypes.LONG.deserialize(row, "last_updated");
 
         return new UserAccount(uuid, amount, lastUpdated);

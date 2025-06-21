@@ -39,9 +39,11 @@ dependencies {
 
     // External Plugins
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     compileOnly("org.black_ixx:playerpoints:3.2.6")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
+        exclude(group = "org.bukkit", module = "*")
+    }
 }
 
 tasks {

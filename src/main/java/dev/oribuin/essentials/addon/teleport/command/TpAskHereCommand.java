@@ -39,7 +39,7 @@ public class TpAskHereCommand extends BaseRoseCommand {
             TeleportMessages.TELEPORT_SELF.send(sender);
             return;
         }
-        
+
         // Cancel the current outgoing teleport request
         TeleportRequest outgoing = addon.getOutgoing(sender.getUniqueId());
         if (outgoing != null) {

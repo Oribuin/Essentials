@@ -8,7 +8,6 @@ import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.Option;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

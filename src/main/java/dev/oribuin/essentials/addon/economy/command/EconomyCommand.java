@@ -35,7 +35,7 @@ public class EconomyCommand extends BaseRoseCommand {
         UUID user = target != null ? target.getUniqueId() : ((Player) context.getSender()).getUniqueId();
         sender.sendMessage("Loading User Balance");
 
-        
+
         repository.getOrLoad(user).thenAccept(balance -> sender.sendMessage(String.format(
                 "User[%s] balance[%s] time_since_update[%ss]",
                 user, balance.amount(), (System.currentTimeMillis() - balance.lastUpdated()) / 1000

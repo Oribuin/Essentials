@@ -4,6 +4,7 @@ import dev.oribuin.essentials.util.EssUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +18,7 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default value of the config option
      * @param comments     The comments for the config option
      */
-    public Message(@NotNull String path, @NotNull String defaultValue, @NotNull List<String> comments) {
+    public Message(@Nullable String path, @NotNull String defaultValue, @NotNull List<String> comments) {
         super(path, defaultValue, comments);
     }
 
@@ -28,7 +29,7 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default value of the config option
      * @param comments     The comments for the config option
      */
-    public Message(@NotNull String path, @NotNull String defaultValue, String... comments) {
+    public Message(@Nullable String path, @NotNull String defaultValue, String... comments) {
         super(path, defaultValue, comments);
     }
 
@@ -38,8 +39,18 @@ public class Message extends ConfigOptionType<String> {
      * @param path         The path of the config option
      * @param defaultValue The default value of the config option
      */
-    public Message(@NotNull String path, @NotNull String defaultValue) {
+    public Message(@Nullable String path, @NotNull String defaultValue) {
         super(path, defaultValue);
+    }
+
+    /**
+     * Create a new ConfigOption with a default value
+     *
+     * @param defaultValue The default value of the config option
+     * @param comments     Any comments that exist
+     */
+    public static Message of(@NotNull String defaultValue, String... comments) {
+        return new Message(null, defaultValue, comments);
     }
 
     /**

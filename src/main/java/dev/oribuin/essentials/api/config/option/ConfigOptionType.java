@@ -7,9 +7,9 @@ import java.util.List;
 
 public abstract class ConfigOptionType<T> {
 
-    protected final @NotNull String path;
     protected final @NotNull T defaultValue;
     protected final @NotNull List<String> comments;
+    protected @Nullable String path;
     protected @Nullable T value;
 
     /**
@@ -19,7 +19,7 @@ public abstract class ConfigOptionType<T> {
      * @param defaultValue The default value of the config option
      * @param comments     The comments for the config option
      */
-    public ConfigOptionType(@NotNull String path, @NotNull T defaultValue, @NotNull List<String> comments) {
+    public ConfigOptionType(@Nullable String path, @NotNull T defaultValue, @NotNull List<String> comments) {
         this.path = path;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -40,12 +40,35 @@ public abstract class ConfigOptionType<T> {
     }
 
     /**
+     * Create a new ConfigOption with a default value and comments
+     *
+     * @param defaultValue The default value of the config option
+     * @param comments     The comments for the config option
+     */
+    public ConfigOptionType(@NotNull T defaultValue, @NotNull List<String> comments) {
+        this.defaultValue = defaultValue;
+        this.value = defaultValue;
+        this.comments = comments;
+    }
+
+    /**
+     * Create a new ConfigOption with a default value and comments
+     *
+     * @param defaultValue The default value of the config option
+     * @param comments     The comments for the config option
+     */
+    public ConfigOptionType(@NotNull T defaultValue, String... comments) {
+        this.defaultValue = defaultValue;
+        this.comments = List.of(comments);
+    }
+
+    /**
      * Create a new ConfigOption with a default value
      *
      * @param path         The path of the config option
      * @param defaultValue The default value of the config option
      */
-    public ConfigOptionType(@NotNull String path, @NotNull T defaultValue) {
+    public ConfigOptionType(@Nullable String path, @NotNull T defaultValue) {
         this(path, defaultValue, List.of());
     }
 
@@ -70,13 +93,22 @@ public abstract class ConfigOptionType<T> {
     }
 
     /**
-     * Create a new ConfigOption with comments
+     * Get the path to the config option
      *
      * @return The path of the config option
      */
-    @NotNull
+    @Nullable
     public String getPath() {
         return path;
+    }
+
+    /**
+     * Set the path to the config option
+     *
+     * @param path The new path
+     */
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**
@@ -109,4 +141,13 @@ public abstract class ConfigOptionType<T> {
         this.value = (T) value;
     }
 
+    @Override
+    public String toString() {
+        return "ConfigOptionType{" +
+               "defaultValue=" + defaultValue +
+               ", comments=" + comments +
+               ", path='" + path + '\'' +
+               ", value=" + value +
+               '}';
+    }
 }

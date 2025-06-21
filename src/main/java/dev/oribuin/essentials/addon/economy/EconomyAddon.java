@@ -51,7 +51,7 @@ public class EconomyAddon extends Addon {
             AddonProvider.unload(this);
             return;
         }
-        
+
         // Register Vault as an economy provider
         RegisteredServiceProvider<Economy> provider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
         if (provider == null || !provider.getPlugin().getName().equalsIgnoreCase(this.plugin.getName())) {
@@ -59,7 +59,7 @@ public class EconomyAddon extends Addon {
             AddonProvider.unload(this);
             return;
         }
-            
+
         NumberUtil.setCachedValues();
         Bukkit.getOnlinePlayers().forEach(x -> this.repository.loadBalance(x.getUniqueId()));
     }
@@ -87,13 +87,13 @@ public class EconomyAddon extends Addon {
         BigDecimal newBalance = userAccount.amount().add(amount);
         Transaction transaction = new Transaction(
                 target,
-                source, 
-                newBalance, 
-                amount, 
-                before, 
+                source,
+                newBalance,
+                amount,
+                before,
                 System.currentTimeMillis()
         );
-        
+
         userAccount.amount(newBalance);
         this.repository.saveAccount(userAccount);
         this.transactions.save(transaction);

@@ -49,7 +49,7 @@ public class StatementProvider {
     /**
      * Create a new statement provider with a specific type of statement type
      *
-     * @param type The type of statement
+     * @param type      The type of statement
      * @param connector The database connector to use
      *
      * @return The statement provider
@@ -66,7 +66,7 @@ public class StatementProvider {
     /**
      * Create a new statement provider with a specific type of statement type
      *
-     * @param type The type of statement
+     * @param type       The type of statement
      * @param repository The module repository using the statement provider
      *
      * @return The statement provider
@@ -196,7 +196,7 @@ public class StatementProvider {
         } catch (Exception e) {
             EssentialsPlugin.get().getLogger().severe("An error occurred while creating the table: " + e.getMessage());
             EssentialsPlugin.get().getLogger().severe("Full Query: " + statement);
-            
+
         }
     }
 

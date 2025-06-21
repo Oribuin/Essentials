@@ -22,7 +22,7 @@ public class Transaction {
     /**
      * Create a new economy transaction for the plugin
      *
-     * @param user     The player who made the transaction
+     * @param user    The player who made the transaction
      * @param source  The plugin source that made the transaction
      * @param current The current balance of the user (post transaction)
      * @param change  The amount of money that was added/removed
@@ -41,12 +41,12 @@ public class Transaction {
     /**
      * Create a new economy transaction for the plugin
      *
-     * @param user     The player who made the transaction
+     * @param user    The player who made the transaction
      * @param source  The plugin source that made the transaction
      * @param current The current balance of the user (post transaction)
      * @param change  The amount of money that was added/removed
-     * @param before The amount of money they had before the transaction
-     * @param when When the transaction was made 
+     * @param before  The amount of money they had before the transaction
+     * @param when    When the transaction was made
      */
     public Transaction(@Nullable UUID user, @NotNull String source, @NotNull BigDecimal current, @NotNull BigDecimal change, @NotNull BigDecimal before, long when) {
         this.user = user;

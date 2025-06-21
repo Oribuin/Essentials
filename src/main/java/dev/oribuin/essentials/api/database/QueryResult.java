@@ -145,11 +145,11 @@ public class QueryResult {
     public List<Row> results() {
         return results;
     }
-    
-    
+
+
     public @Nullable Row first() {
         if (this.results.isEmpty()) return null;
-        
+
         return this.results.get(0);
     }
 

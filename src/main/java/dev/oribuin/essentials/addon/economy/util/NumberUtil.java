@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.addon.economy.util;
 
-import dev.oribuin.essentials.addon.economy.EconomyAddon;
 import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 
 import java.text.DecimalFormat;
@@ -21,6 +20,7 @@ public class NumberUtil {
      * Formats a number from 1100 to 1,100
      *
      * @param points The points value to format
+     *
      * @return The formatted shorthand value
      */
     public static String formatPoints(double points) {
@@ -45,6 +45,7 @@ public class NumberUtil {
      * Adapted from <a href="https://stackoverflow.com/questions/4753251/how-to-go-about-formatting-1200-to-1-2k-in-java"></a>
      *
      * @param points The points value to format
+     *
      * @return The formatted shorthand value
      */
     public static String formatPointsShorthand(long points) {
@@ -80,5 +81,5 @@ public class NumberUtil {
         suffixes.put(1_000_000_000L, EconomyConfig.CURRENCY_ABBREV_BILLIONS.getValue());
         decimal = EconomyConfig.CURRENCY_DECIMAL.getValue();
     }
-    
+
 }

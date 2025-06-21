@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.util.CachedServerIcon;
 
-import javax.swing.*;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -30,7 +29,7 @@ public class ServerListListener implements Listener {
             Component text = EssUtils.kyorify(PAPIProvider.apply(null, String.join("\n<reset><!italic>", motd)));
             event.motd(text);
         }
-        
+
         List<CachedServerIcon> serverIcons = AddonProvider.SERVER_LIST_ADDON.icons();
         if (!serverIcons.isEmpty()) {
             CachedServerIcon random = serverIcons.get((int) (Math.random() * serverIcons.size()));

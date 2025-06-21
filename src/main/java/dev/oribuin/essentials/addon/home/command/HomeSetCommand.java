@@ -64,8 +64,8 @@ public class HomeSetCommand extends BaseRoseCommand {
         Home home = new Home(name.toLowerCase(), sender.getUniqueId(), sender.getLocation().toCenterLocation());
         HomeCreateEvent event = new HomeCreateEvent(sender, home);
         event.callEvent();
-        
-        if (event.isCancelled()) return; 
+
+        if (event.isCancelled()) return;
 
         // Set the home
         repository.save(home);

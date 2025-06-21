@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public abstract class AddonConfig {
@@ -59,6 +60,8 @@ public abstract class AddonConfig {
             // Load the config
             this.config = CommentedFileConfiguration.loadConfiguration(configFile);
             for (ConfigOptionType<?> option : this.options) {
+                if (option.getPath() == null) continue; // Ignore anything with no path 
+
                 // If the config contains the path, cache the value
                 if (this.config.contains(option.getPath())) {
                     option.setValue(this.config.get(option.getPath()));
@@ -86,15 +89,30 @@ public abstract class AddonConfig {
     }
 
     /**
-     * Register all the options
+     * Register an option into the config with option provided path
      *
      * @param option The option to register
      */
     public final void register(ConfigOptionType<?> option) {
-        if (this.options.stream().anyMatch(opt -> opt.getPath().equalsIgnoreCase(option.getPath()))) {
-            throw new IllegalArgumentException("Option with path " + option.getPath() + " already exists");
+        this.register(option, null);
+    }
+
+    /**
+     * Register an option into the config with a default path if none exists
+     *
+     * @param option The option to register
+     */
+    public final void register(ConfigOptionType<?> option, String def) {
+        String path = option.getPath() != null ? option.getPath() : def;
+        if (path == null) {
+            throw new IllegalArgumentException("Option [" + option + "] does not have a defined path");
         }
 
+        if (this.options.stream().anyMatch(this.testPath(path))) {
+            throw new IllegalArgumentException("Option with path " + path + " already exists");
+        }
+
+        option.setPath(path);
         this.options.add(option);
     }
 
@@ -107,14 +125,27 @@ public abstract class AddonConfig {
                 if (!field.canAccess(null)) continue;
 
                 Object type = field.get(null);
+                String path = this.fieldToPath(field.getName());
 
                 if (type instanceof ConfigOptionType<?> option) {
-                    this.register(option);
+                    this.register(option, path);
                 }
             }
         } catch (IllegalAccessException ex) {
             EssentialsPlugin.get().getLogger().severe("Failed to register ConfigOption in " + this.getClass().getSimpleName() + " - " + ex);
         }
+    }
+
+    /**
+     * Convert the field name to a config available path
+     * This could be changed to be more dynamic (allowing easily defined config options but eo\lwhrio)
+     *
+     * @param fieldName The field name to convert
+     *
+     * @return The string that got converted
+     */
+    private String fieldToPath(String fieldName) {
+        return fieldName.toLowerCase().replaceAll("_", "-");
     }
 
     /**
@@ -124,6 +155,10 @@ public abstract class AddonConfig {
      */
     public CommentedFileConfiguration getFile() {
         return this.config;
+    }
+
+    private Predicate<ConfigOptionType<?>> testPath(String path) {
+        return type -> type.getPath() != null && type.getPath().equalsIgnoreCase(path);
     }
 
 }

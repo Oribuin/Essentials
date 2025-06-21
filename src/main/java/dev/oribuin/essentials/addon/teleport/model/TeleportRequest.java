@@ -9,7 +9,7 @@ import java.util.UUID;
  * Create a new Teleport Request to handle the
  */
 public final class TeleportRequest {
-    
+
     private final UUID sender;
     private final UUID target;
     private final long when;

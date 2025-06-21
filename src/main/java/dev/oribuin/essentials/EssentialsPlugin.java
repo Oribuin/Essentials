@@ -40,7 +40,7 @@ public class EssentialsPlugin extends RosePlugin {
     @Override
     public void onLoad() {
         super.onLoad();
-        
+
         try {
             Class.forName("net.milkbowl.vault.economy.Economy");
             this.getServer().getServicesManager().register(
@@ -60,6 +60,7 @@ public class EssentialsPlugin extends RosePlugin {
         VaultProvider.get(); // Load the vault provider
         PointsProvider.get();  // Load the points provider
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands); // Update the commands for all online players
+
     }
 
     @Override
