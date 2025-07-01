@@ -3,7 +3,7 @@ package dev.oribuin.essentials.addon.teleport.config;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.api.config.option.Option;
 
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.*;
+import static dev.rosewood.rosegarden.config.SettingSerializers.*;
 
 public class TeleportConfig extends AddonConfig {
 

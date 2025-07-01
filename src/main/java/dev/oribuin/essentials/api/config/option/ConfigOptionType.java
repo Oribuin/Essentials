@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.api.config.option;
 
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
-import dev.rosewood.rosegarden.config.RoseSettingSerializer;
+import dev.rosewood.rosegarden.config.SettingSerializer;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class ConfigOptionType<T> {
 
-    protected final @NotNull RoseSettingSerializer<T> serializer;
+    protected final @NotNull SettingSerializer<T> serializer;
     protected final @NotNull T defaultValue;
     protected final List<String> comments;
     protected @Nullable String path;
@@ -27,7 +27,7 @@ public abstract class ConfigOptionType<T> {
      */
     public ConfigOptionType(
             @Nullable String path,
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue,
             @NotNull List<String> comments
     ) {
@@ -47,7 +47,7 @@ public abstract class ConfigOptionType<T> {
      */
     public ConfigOptionType(
             @Nullable String path,
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue,
             @NotNull String... comments
     ) {
@@ -66,7 +66,7 @@ public abstract class ConfigOptionType<T> {
      */
     public ConfigOptionType(
             @Nullable String path,
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue
     ) {
         this(path, serializer, defaultValue, new ArrayList<>());
@@ -80,7 +80,7 @@ public abstract class ConfigOptionType<T> {
      * @param comments     The comments if available
      */
     public ConfigOptionType(
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue,
             @NotNull List<String> comments
     ) {
@@ -95,7 +95,7 @@ public abstract class ConfigOptionType<T> {
      * @param comments     The comments if available
      */
     public ConfigOptionType(
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue,
             @NotNull String... comments
     ) {
@@ -109,7 +109,7 @@ public abstract class ConfigOptionType<T> {
      * @param defaultValue The default values to use
      */
     public ConfigOptionType(
-            @NotNull RoseSettingSerializer<T> serializer,
+            @NotNull SettingSerializer<T> serializer,
             @NotNull T defaultValue
     ) {
         this(null, serializer, defaultValue, new ArrayList<>());
@@ -139,7 +139,7 @@ public abstract class ConfigOptionType<T> {
         this.serializer.write(section, this.path, this.defaultValue, comments);
     }
 
-    public @NotNull RoseSettingSerializer<T> serializer() {
+    public @NotNull SettingSerializer<T> serializer() {
         return this.serializer;
     }
 

@@ -1,37 +1,26 @@
 package dev.oribuin.essentials.api.config;
 
+import dev.oribuin.essentials.util.FinePosition;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.RoseSetting;
-import dev.rosewood.rosegarden.config.RoseSettingSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import dev.rosewood.rosegarden.config.SettingField;
+import dev.rosewood.rosegarden.config.SettingSerializer;
+import dev.rosewood.rosegarden.config.SettingSerializers;
+import org.bukkit.persistence.PersistentDataType;
+
+import javax.naming.InitialContext;
 
 /**
  * Utility Class for custom rose setting serializers
  */
 public class EssentialsSerializers {
-
-    public static final RoseSettingSerializer<Location> LOCATION = new RoseSettingSerializer<>() {
-        @Override
-        public Location read(CommentedConfigurationSection section, String key) {
-            CommentedConfigurationSection locationSection = section.getConfigurationSection(key);
-            if (locationSection == null) return null;
-            String world = locationSection.getString("world", "world"); // default
-
-            return new Location(
-                    Bukkit.getWorld(world),
-                    locationSection.getDouble("x"),
-                    locationSection.getDouble("y"),
-                    locationSection.getDouble("z")
-            );
-        }
-
-        @Override
-        public void write(CommentedConfigurationSection config, RoseSetting<Location> setting, Location value) {
-            config.set("world", value.getWorld().getName());
-            config.set("x", value.getX());
-            config.set("y", value.getY());
-            config.set("z", value.getZ());
-        }
-    };
+    
+    public static final SettingSerializer<FinePosition> POSITION = SettingSerializers.ofRecord(FinePosition.class, instance -> instance.group(
+            SettingField.of("world", SettingSerializers.STRING, FinePosition::world),
+            SettingField.of("x", SettingSerializers.DOUBLE, FinePosition::x),
+            SettingField.of("y", SettingSerializers.DOUBLE, FinePosition::y),
+            SettingField.of("z", SettingSerializers.DOUBLE, FinePosition::z),
+            SettingField.of("yaw", SettingSerializers.FLOAT, FinePosition::yaw),
+            SettingField.of("pitch", SettingSerializers.FLOAT, FinePosition::pitch)
+    ).apply(instance, FinePosition::new));
 }

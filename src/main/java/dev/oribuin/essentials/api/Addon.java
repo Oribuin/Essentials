@@ -8,9 +8,12 @@ import dev.oribuin.essentials.api.config.type.DefaultConfig;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.RoseCommandWrapper;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
+import io.papermc.paper.plugin.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,6 +80,13 @@ public abstract class Addon implements Listener {
 
         // Register all the events
         this.listeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this.plugin));
+        this.permissions().forEach(permission -> {
+            PluginManager manager = this.plugin.getServer().getPluginManager();
+            Permission loaded = manager.getPermission(permission.getName());
+            if (loaded == null) {
+                manager.addPermission(permission);
+            }
+        });
 
         // Register all the commands
         this.commands = this.commands().stream().map(baseRoseCommand -> new RoseCommandWrapper(this.plugin, baseRoseCommand)).toList();
@@ -134,6 +144,10 @@ public abstract class Addon implements Listener {
      * Get all the listeners for the addon
      */
     public List<Listener> listeners() {
+        return new ArrayList<>();
+    }
+    
+    public List<Permission> permissions() {
         return new ArrayList<>();
     }
 

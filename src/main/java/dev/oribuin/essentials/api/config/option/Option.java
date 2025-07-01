@@ -1,6 +1,6 @@
 package dev.oribuin.essentials.api.config.option;
 
-import dev.rosewood.rosegarden.config.RoseSettingSerializer;
+import dev.rosewood.rosegarden.config.SettingSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +16,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Option(@Nullable String path, @NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull List<String> comments) {
+    public Option(@Nullable String path, @NotNull SettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull List<String> comments) {
         super(path, serializer, defaultValue, comments);
     }
 
@@ -28,7 +28,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Option(@Nullable String path, @NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull String... comments) {
+    public Option(@Nullable String path, @NotNull SettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull String... comments) {
         super(path, serializer, defaultValue, comments);
     }
 
@@ -39,7 +39,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param serializer   The config serializer
      * @param defaultValue The default values to use
      */
-    public Option(@Nullable String path, @NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue) {
+    public Option(@Nullable String path, @NotNull SettingSerializer<T> serializer, @NotNull T defaultValue) {
         super(path, serializer, defaultValue);
     }
 
@@ -50,7 +50,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Option(@NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull List<String> comments) {
+    public Option(@NotNull SettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull List<String> comments) {
         super(serializer, defaultValue, comments);
     }
 
@@ -61,7 +61,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Option(@NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull String... comments) {
+    public Option(@NotNull SettingSerializer<T> serializer, @NotNull T defaultValue, @NotNull String... comments) {
         super(serializer, defaultValue, comments);
     }
 
@@ -71,7 +71,7 @@ public class Option<T> extends ConfigOptionType<T> {
      * @param serializer   The config serializer
      * @param defaultValue The default values to use
      */
-    public Option(@NotNull RoseSettingSerializer<T> serializer, @NotNull T defaultValue) {
+    public Option(@NotNull SettingSerializer<T> serializer, @NotNull T defaultValue) {
         super(serializer, defaultValue);
     }
     

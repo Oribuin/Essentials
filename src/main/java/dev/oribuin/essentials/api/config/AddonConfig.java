@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.api.config;
 
+import com.google.common.eventbus.DeadEvent;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.config.option.ConfigOptionType;
 import dev.oribuin.essentials.api.config.option.Option;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.BOOLEAN;
+import static dev.rosewood.rosegarden.config.SettingSerializers.*;
 
 @SuppressWarnings("unused")
 public abstract class AddonConfig {
@@ -79,6 +80,7 @@ public abstract class AddonConfig {
             this.config.save(configFile);
         } catch (Exception ex) {
             EssentialsPlugin.get().getLogger().severe("Failed to create config file for addon [" + name + "]: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 

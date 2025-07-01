@@ -5,8 +5,8 @@ import dev.oribuin.essentials.api.config.option.Option;
 
 import java.util.List;
 
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.DOUBLE;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.STRING;
+import static dev.rosewood.rosegarden.config.SettingSerializers.DOUBLE;
+import static dev.rosewood.rosegarden.config.SettingSerializers.STRING;
 
 public class EconomyConfig extends AddonConfig {
 
