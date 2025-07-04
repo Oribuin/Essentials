@@ -2,7 +2,6 @@ package dev.oribuin.essentials.api.config.option;
 
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.SettingSerializer;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +15,7 @@ public abstract class ConfigOptionType<T> {
     protected final List<String> comments;
     protected @Nullable String path;
     protected @Nullable T value;
-    
+
     /**
      * Create a new config option with a specified serializer, default value and any available comments
      *

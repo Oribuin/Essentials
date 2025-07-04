@@ -8,7 +8,6 @@ import dev.oribuin.essentials.api.config.type.DefaultConfig;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.RoseCommandWrapper;
 import dev.rosewood.rosegarden.scheduler.RoseScheduler;
-import io.papermc.paper.plugin.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -105,7 +104,7 @@ public abstract class Addon implements Listener {
 
         this.disable();
     }
-    
+
     /**
      * The name of the addon
      * This will be used for logging and the name of the addon.
@@ -146,7 +145,7 @@ public abstract class Addon implements Listener {
     public List<Listener> listeners() {
         return new ArrayList<>();
     }
-    
+
     public List<Permission> permissions() {
         return new ArrayList<>();
     }

@@ -9,6 +9,8 @@ import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
 
 public class SpawnConfig extends AddonConfig {
 
+    public static Option<Boolean> TP_EFFECTS = new Option<>(BOOLEAN, true, "Should the teleport effects be enabled?", "Effects will not be triggered if a player has 'essentials.spawn.bypass.delay'");
+    public static Option<Boolean> TP_CONFIRM = new Option<>(BOOLEAN, true, "Should a player be required to confirm they want to teleport to spawn?");
     public static final Option<Boolean> USE_MOTD = new Option<>(BOOLEAN, true, "Should a message be sent to players when the join the server?");
     public static final Option<Boolean> USE_NEWBIE_SPAWN = new Option<>(BOOLEAN, false, "Should new players go to their own spawn point");
     public static final Option<Boolean> SPAWN_ON_RESPAWN = new Option<>(BOOLEAN, false, "Should players be teleported to spawn when they die?");

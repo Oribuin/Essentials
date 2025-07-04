@@ -111,12 +111,11 @@ public class VaultEconomyProvider implements Economy {
         if (this.hasAccount(offlinePlayer)) return false;
 
         // Create a new account for the user
-        AddonProvider.ECONOMY_ADDON.deposit(
+        return AddonProvider.ECONOMY_ADDON.deposit(
                 offlinePlayer.getUniqueId(),
                 EconomyConfig.STARTING_BALANCE.value(),
                 "User Account Created"
-        );
-        return true;
+        ) != null;
     }
 
     /**
@@ -378,7 +377,19 @@ public class VaultEconomyProvider implements Economy {
      */
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, double amount) {
-        Transaction transaction = AddonProvider.ECONOMY_ADDON.deposit(offlinePlayer.getUniqueId(), BigDecimal.valueOf(-amount), "Vault Economy Provider");
+        Transaction transaction = AddonProvider.ECONOMY_ADDON.deposit(
+                offlinePlayer.getUniqueId(),
+                BigDecimal.valueOf(-amount),
+                "Vault Economy Provider"
+        );
+
+        if (transaction == null) return new EconomyResponse(
+                0,
+                0,
+                EconomyResponse.ResponseType.FAILURE,
+                "Unknown Account"
+        );
+
         return transaction.toResponse(true);
     }
 
@@ -456,6 +467,13 @@ public class VaultEconomyProvider implements Economy {
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer offlinePlayer, double amount) {
         Transaction transaction = AddonProvider.ECONOMY_ADDON.deposit(offlinePlayer.getUniqueId(), BigDecimal.valueOf(amount), "Vault Economy Provider");
+        if (transaction == null) return new EconomyResponse(
+                0,
+                0,
+                EconomyResponse.ResponseType.FAILURE,
+                "Unknown Account"
+        );
+
         return transaction.toResponse(true);
     }
 

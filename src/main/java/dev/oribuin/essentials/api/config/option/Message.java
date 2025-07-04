@@ -1,18 +1,15 @@
 package dev.oribuin.essentials.api.config.option;
 
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.config.SettingSerializers;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-public class Message extends ConfigOptionType<String> {
+public class Message extends ConfigOptionType<TextMessage> {
 
     /**
      * Create a new config option with a specified serializer, default value and any available comments
@@ -21,8 +18,8 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Message(@Nullable String path, @NotNull String defaultValue, @NotNull List<String> comments) {
-        super(path, SettingSerializers.STRING, defaultValue, comments);
+    public Message(@Nullable String path, @NotNull TextMessage defaultValue, @NotNull List<String> comments) {
+        super(path, TextMessage.SERIALIZER, defaultValue, comments);
     }
 
     /**
@@ -32,8 +29,8 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Message(@Nullable String path, @NotNull String defaultValue, @NotNull String... comments) {
-        super(path, SettingSerializers.STRING, defaultValue, comments);
+    public Message(@Nullable String path, @NotNull TextMessage defaultValue, @NotNull String... comments) {
+        super(path, TextMessage.SERIALIZER, defaultValue, comments);
     }
 
     /**
@@ -42,8 +39,8 @@ public class Message extends ConfigOptionType<String> {
      * @param path         The path to the config option
      * @param defaultValue The default values to use
      */
-    public Message(@Nullable String path, @NotNull String defaultValue) {
-        super(path, SettingSerializers.STRING, defaultValue);
+    public Message(@Nullable String path, @NotNull TextMessage defaultValue) {
+        super(path, TextMessage.SERIALIZER, defaultValue);
     }
 
     /**
@@ -52,8 +49,8 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Message(@NotNull String defaultValue, @NotNull List<String> comments) {
-        super(SettingSerializers.STRING, defaultValue, comments);
+    public Message(@NotNull TextMessage defaultValue, @NotNull List<String> comments) {
+        super(TextMessage.SERIALIZER, defaultValue, comments);
     }
 
     /**
@@ -62,8 +59,8 @@ public class Message extends ConfigOptionType<String> {
      * @param defaultValue The default values to use
      * @param comments     The comments if available
      */
-    public Message(@NotNull String defaultValue, @NotNull String... comments) {
-        super(SettingSerializers.STRING, defaultValue, comments);
+    public Message(@NotNull TextMessage defaultValue, @NotNull String... comments) {
+        super(TextMessage.SERIALIZER, defaultValue, comments);
     }
 
     /**
@@ -71,89 +68,117 @@ public class Message extends ConfigOptionType<String> {
      *
      * @param defaultValue The default values to use
      */
-    public Message(@NotNull String defaultValue) {
-        super(SettingSerializers.STRING, defaultValue);
+    public Message(@NotNull TextMessage defaultValue) {
+        super(TextMessage.SERIALIZER, defaultValue);
     }
 
     /**
-     * Send a message from the config to a CommandSender
+     * Send a message to player
      *
-     * @param sender       The CommandSender to send the message to
-     * @param placeholders The placeholders to apply to the message
+     * @param audience The audience to send the message to
      */
-    public final void send(Audience sender, StringPlaceholders placeholders) {
-        // String parsed = placeholders.apply(PlaceholderAPIHook.applyPlaceholders(sender instanceof Player player ? player : null, message));
-        // maybe async not necessary, but minimessage is not very optimised
-        CompletableFuture.runAsync(() -> sender.sendMessage(EssUtils.kyorify(placeholders.apply(this.value))));
+    public void send(Audience audience) {
+        this.send(audience, null, StringPlaceholders.empty());
+    }
+
+    /**
+     * Send a message to players with
+     *
+     * @param audience The audience to send the message to
+     * @param target   The placeholderapi target
+     */
+    public void send(Audience audience, Player target) {
+        this.send(audience, target, StringPlaceholders.empty());
+    }
+
+    /**
+     * Send a message to players with
+     *
+     * @param audience     The audience to send the message to
+     * @param placeholders The plugin defined placeholders
+     */
+    public void send(Audience audience, StringPlaceholders placeholders) {
+        this.send(audience, null, placeholders);
+    }
+
+    /**
+     * Send a message to players with
+     *
+     * @param audience     The audience to send the message to
+     * @param placeholders The plugin defined placeholders
+     */
+    public void send(Audience audience, Object... placeholders) {
+        (this.value != null ? this.value : this.defaultValue).send(audience, placeholders);
+    }
+
+    /**
+     * Send a message to players with
+     *
+     * @param audience     The audience to send the message to
+     * @param target       The placeholderapi target
+     * @param placeholders The plugin defined placeholders
+     */
+    public void send(Audience audience, Player target, Object... placeholders) {
+        (this.value != null ? this.value : this.defaultValue).send(audience, target, placeholders);
     }
 
 
     /**
-     * Send a message from the config to a CommandSender which is parsed through PlaceholderAPI
+     * Send a message to players with
      *
-     * @param audience     The CommandSender to send the message to
-     * @param target       The player who the placeholders apply to
-     * @param placeholders The placeholders to apply to the message
+     * @param audience     The audience to send the message to
+     * @param target       The placeholderapi target
+     * @param placeholders The plugin defined placeholders
      */
-    public final void sendPapi(Audience audience, Player target, StringPlaceholders placeholders) {
-        String parsed = placeholders.apply(PlaceholderAPIHook.applyPlaceholders(target, this.value));
-
-        // maybe async not necessary, but minimessage is not very optimised
-        CompletableFuture.runAsync(() -> audience.sendMessage(EssUtils.kyorify(parsed)));
+    public void send(Audience audience, Player target, StringPlaceholders placeholders) {
+        (this.value != null ? this.value : this.defaultValue).send(audience, target, placeholders);
     }
 
     /**
-     * Send a message from the config to a CommandSender
+     * Parse a message through the plugin and automatically decide whether placeholderapi should be involved
      *
-     * @param sender       The CommandSender to send the message to
-     * @param placeholders The placeholders to apply to the message
-     */
-    public final void send(Audience sender, Object... placeholders) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder();
-        for (int i = 0; i < placeholders.length; i += 2) {
-            if (placeholders[i] instanceof String placeholder) {
-                Object value = placeholders[i + 1];
-                builder.add(placeholder, value);
-            }
-        }
-
-        this.send(sender, builder.build());
-    }
-    
-    /**
-     * Send a message from the config to a CommandSender
+     * @param message      The message being sent
+     * @param target       The target of the placeholderapi values if available
+     * @param placeholders Any possible Placeholders
      *
-     * @param audience       The CommandSender to send the message to
-     * @param placeholders The placeholders to apply to the message
+     * @return The formatted message
      */
-    public final void sendPapi(Audience audience, Player target, Object... placeholders) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder();
-        for (int i = 0; i < placeholders.length; i += 2) {
-            if (placeholders[i] instanceof String placeholder) {
-                Object value = placeholders[i + 1];
-                builder.add(placeholder, value);
-            }
-        }
-
-        this.sendPapi(audience, target, builder.build());
+    public Component parse(String message, Player target, StringPlaceholders placeholders) {
+        return (this.value != null ? this.value : this.defaultValue).parse(message, target, placeholders);
     }
 
     /**
-     * Send a message from the config to a CommandSender using a config option
+     * Parse a message through the plugin and automatically decide whether placeholderapi should be involved
      *
-     * @param sender The CommandSender to send the message to
-     */
-    public final void send(Audience sender) {
-        this.send(sender, StringPlaceholders.empty());
-    }
-    
-    /**
-     * Send a message from the config to a CommandSender using a config option
+     * @param message The message being sent
+     * @param target  The target of the placeholderapi values if available
      *
-     * @param sender The CommandSender to send the message to
+     * @return The formatted message
      */
-    public final void sendPapi(Audience sender, Player target) {
-        this.sendPapi(sender, target, StringPlaceholders.empty());
+    public Component parse(String message, Player target) {
+        return (this.value != null ? this.value : this.defaultValue).parse(message, target);
     }
 
+    /**
+     * Parse a message through the plugin
+     *
+     * @param message      The message being sent
+     * @param placeholders Any possible Placeholders
+     *
+     * @return The formatted message
+     */
+    public Component parse(String message, StringPlaceholders placeholders) {
+        return (this.value != null ? this.value : this.defaultValue).parse(message, placeholders);
+    }
+
+    /**
+     * Parse a message through the plugin
+     *
+     * @param message The message being sent
+     *
+     * @return The formatted message
+     */
+    public Component parse(String message) {
+        return (this.value != null ? this.value : this.defaultValue).parse(message);
+    }
 }

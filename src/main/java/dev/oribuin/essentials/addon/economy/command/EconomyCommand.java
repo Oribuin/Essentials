@@ -4,6 +4,7 @@ import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.economy.command.impl.AddBalanceCommand;
 import dev.oribuin.essentials.addon.economy.command.impl.SetBalanceCommand;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
+import dev.oribuin.essentials.addon.economy.model.UserAccount;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -36,10 +37,11 @@ public class EconomyCommand extends BaseRoseCommand {
         sender.sendMessage("Loading User Balance");
 
 
-        repository.getOrLoad(user).thenAccept(balance -> sender.sendMessage(String.format(
+        UserAccount balance = repository.getBalance(user);
+         sender.sendMessage(String.format(
                 "User[%s] balance[%s] time_since_update[%ss]",
                 user, balance.amount(), (System.currentTimeMillis() - balance.lastUpdated()) / 1000
-        )));
+        ));
     }
 
     @Override

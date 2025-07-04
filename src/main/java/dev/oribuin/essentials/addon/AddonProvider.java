@@ -8,8 +8,6 @@ import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.ConfigOptionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,7 +80,6 @@ public class AddonProvider {
         EssentialsPlugin.get().getLogger().info("Registering Addon: " + addon.getClass().getSimpleName());
 
         try {
-            addon.load(); // Load the addon
             addons.put(addon.getClass(), addon);
             return addon;
         } catch (Exception e) {

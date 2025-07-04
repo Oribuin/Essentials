@@ -3,6 +3,7 @@ package dev.oribuin.essentials.api.database;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.database.serializer.DataType;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -135,22 +136,20 @@ public class StatementProvider {
         return this;
     }
 
-    /**
-     * Create a new statement provider with a specific type of statement type
-     */
-    public CompletableFuture<QueryResult> execute() {
+    @Nullable
+    public QueryResult executeSync() throws NullPointerException {
         // Make sure the table is not null before executing the statement
         if (this.table == null) {
-            return CompletableFuture.failedFuture(new NullPointerException("Table does not exist"));
+            throw new NullPointerException("Table does not exist");
         }
 
         // Make sure the connection is not null before executing the statement
         if (this.connection == null) {
-            return CompletableFuture.failedFuture(new NullPointerException("Connection for " + this.table + " type [" + this.type + "] does not exist"));
+            throw new NullPointerException("Connection for " + this.table + " type [" + this.type + "] does not exist");
         }
 
         // Create the table if it does not exist
-        return CompletableFuture.supplyAsync(() -> switch (this.type) {
+        return switch (this.type) {
             case UPDATE -> this.update();
             case DELETE -> this.delete();
             case INSERT -> this.insert();
@@ -164,6 +163,20 @@ public class StatementProvider {
             case CREATE_TABLE -> {
                 this.createTable();
                 yield null;
+            }
+        };
+    }
+
+    /**
+     * Create a new statement provider with a specific type of statement type
+     */
+    public CompletableFuture<QueryResult> execute() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return this.executeSync();
+            } catch (NullPointerException ex) {
+                EssentialsPlugin.get().getLogger().severe("Failed to execute SQL Statement: " + ex.getMessage());
+                return null;
             }
         });
     }

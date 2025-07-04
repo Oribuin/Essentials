@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.addon.economy.command.impl;
 
 import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -11,6 +12,8 @@ import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
+
 public class AddBalanceCommand extends BaseRoseCommand {
 
     public AddBalanceCommand(RosePlugin rosePlugin) {
@@ -20,15 +23,12 @@ public class AddBalanceCommand extends BaseRoseCommand {
     @RoseExecutable
     public void execute(CommandContext context, Player target, Double amount) {
         CommandSender sender = context.getSender();
-        if (amount < 0) {
-            sender.sendMessage("Cannot set balance into the negatives");
-            return;
-        }
-
         sender.sendMessage("Adding User Balance");
 
-        String source = "user [%s] adding to target %s[%s] amount[%s] via[%s]";
-        AddonProvider.ECONOMY_ADDON.deposit(target.getUniqueId(), amount, String.format(source,
+        EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
+        String source = "user[%s] adding to target %s[%s] amount[%s] via[%s]";
+
+        repository.offset(target.getUniqueId(), BigDecimal.valueOf(amount), String.format(source,
                 sender.getName(),
                 target.getName(),
                 target.getUniqueId(),

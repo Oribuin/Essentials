@@ -74,5 +74,5 @@ public class Option<T> extends ConfigOptionType<T> {
     public Option(@NotNull SettingSerializer<T> serializer, @NotNull T defaultValue) {
         super(serializer, defaultValue);
     }
-    
+
 }

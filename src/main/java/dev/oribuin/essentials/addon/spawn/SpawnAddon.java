@@ -4,7 +4,9 @@ import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +21,7 @@ import org.bukkit.permissions.PermissionDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpawnAddon extends Addon implements Listener {
+public class SpawnAddon extends Addon {
 
     public static Permission SILENT_JOIN_PERMISSION = new Permission("essentials.join.silent", PermissionDefault.FALSE);
     public static Permission SILENT_LEAVE_PERMISSION = new Permission("essentials.leave.silent", PermissionDefault.FALSE);
@@ -61,12 +63,12 @@ public class SpawnAddon extends Addon implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
-
         Player player = event.getPlayer();
+        event.joinMessage(null);
 
         // Send the motd to the player after 1s
         if (SpawnConfig.USE_MOTD.value()) {
-            SpawnMessages.MOTD.sendPapi(player, player);
+            SpawnMessages.MOTD.value().send(player, player);
         }
 
         // Run the first join stuff :3
@@ -78,9 +80,9 @@ public class SpawnAddon extends Addon implements Listener {
 
             // Send the first join message to the server
             if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-                SpawnMessages.FIRST_JOIN_MESSAGE.sendPapi(this.messageAudience(), player,
+                SpawnMessages.FIRST_JOIN_MESSAGE.send(this.messageAudience(), player, StringPlaceholders.of(
                         "total_players", Bukkit.getOfflinePlayers().length
-                );
+                ));
             }
 
             return;
@@ -88,9 +90,9 @@ public class SpawnAddon extends Addon implements Listener {
 
         // Send the join message to the server
         if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-            SpawnMessages.JOIN_MESSAGE.sendPapi(this.messageAudience(), player,
+            SpawnMessages.JOIN_MESSAGE.send(this.messageAudience(), player, StringPlaceholders.of(
                     "total_players", Bukkit.getOfflinePlayers().length
-            );
+            ));
         }
 
         // Teleport the player to spawn on login (if enabled)
@@ -106,8 +108,9 @@ public class SpawnAddon extends Addon implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
+        event.quitMessage(null);
         if (!event.getPlayer().hasPermission(SILENT_LEAVE_PERMISSION)) {
-            SpawnMessages.LEAVE_MESSAGE.sendPapi(this.messageAudience(), event.getPlayer());
+            SpawnMessages.LEAVE_MESSAGE.send(this.messageAudience(), event.getPlayer());
         }
     }
 

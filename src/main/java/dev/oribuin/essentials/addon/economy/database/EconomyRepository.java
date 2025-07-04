@@ -1,6 +1,11 @@
 package dev.oribuin.essentials.addon.economy.database;
 
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
+import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
 import dev.oribuin.essentials.api.database.ModuleRepository;
 import dev.oribuin.essentials.api.database.QueryResult;
@@ -8,17 +13,29 @@ import dev.oribuin.essentials.api.database.StatementProvider;
 import dev.oribuin.essentials.api.database.StatementType;
 import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
+import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class EconomyRepository extends ModuleRepository implements Listener {
 
-    private final Map<UUID, UserAccount> userBalances = new ConcurrentHashMap<>();
+    private final LoadingCache<UUID, UserAccount> accountCache;
+    private final Map<UUID, Deque<Transaction>> pendingTransactions;
+    private ScheduledTask updateTask;
 
     /**
      * Create a new economy repository to store all the user accounts
@@ -36,6 +53,75 @@ public class EconomyRepository extends ModuleRepository implements Listener {
                 .column("last_updated", DataTypes.LONG)
                 .primary("user")
                 .execute();
+
+        this.pendingTransactions = new ConcurrentHashMap<>();
+        this.accountCache = CacheBuilder.newBuilder()
+                .concurrencyLevel(2)
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .refreshAfterWrite(EconomyConfig.CACHE_DURATION.value(), TimeUnit.SECONDS)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public @NotNull UserAccount load(@NotNull UUID key) {
+                        return EconomyRepository.this.getSync(key);
+                    }
+                });
+
+        this.updateTask = EssentialsPlugin.scheduler().runTaskTimerAsync(this::update, 1L, 1L, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Unload the repository
+     */
+    @Override
+    public void unload() {
+        if (this.updateTask != null) {
+            this.updateTask.cancel();
+            this.updateTask = null;
+        }
+
+        this.update();
+        this.accountCache.invalidateAll();
+        this.pendingTransactions.clear();
+        super.unload();
+    }
+
+    /**
+     * Push any pending account changes to the database
+     */
+    private void update() {
+        Map<UUID, Deque<Transaction>> processing;
+        synchronized (this.pendingTransactions) {
+            if (this.pendingTransactions.isEmpty()) return;
+
+            processing = new HashMap<>(this.pendingTransactions);
+            this.pendingTransactions.clear();
+        }
+
+        this.push(processing);
+    }
+
+    /**
+     * Push all the pending transactions into the database
+     *
+     * @param processing The transactions to push
+     */
+    private void push(Map<UUID, Deque<Transaction>> processing) {
+        // do this part manually because i dont feel like editing statementprovider :3
+        this.async(() -> this.connector.connect(connection -> {
+            String query = "REPLACE INTO " + this.table + " (user, amount, last_updated) VALUES (?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                for (Map.Entry<UUID, Deque<Transaction>> entry : processing.entrySet()) {
+                    for (Transaction transaction : entry.getValue()) {
+                        statement.setString(1, entry.getKey().toString());
+                        statement.setBigDecimal(2, transaction.current());
+                        statement.setLong(3, System.currentTimeMillis());
+                        statement.addBatch();
+                    }
+                }
+
+                statement.executeBatch();
+            }
+        }));
     }
 
     /**
@@ -46,61 +132,151 @@ public class EconomyRepository extends ModuleRepository implements Listener {
      * @return The account retrieved from the cache
      */
     public @NotNull UserAccount getBalance(@NotNull UUID owner) {
-        return this.userBalances.getOrDefault(owner, new UserAccount(owner));
+        UserAccount account = new UserAccount(owner, EconomyConfig.STARTING_BALANCE.value());
+        try {
+            account = this.accountCache.get(owner);
+        } catch (ExecutionException ignored) {
+        }
+
+        Deque<Transaction> pending = this.pendingTransactions.get(owner);
+        if (pending != null) {
+            BigDecimal current = account.amount();
+            for (Transaction transaction : pending) {
+                current = current.add(transaction.change());
+            }
+
+            account.amount(current);
+        }
+
+        return account;
     }
 
     /**
-     * Get the users account from their uuid or load it from the database
+     * Get a users current balance synchronously, quite unsafe which is why it's private
      *
-     * @param owner The owner to load
+     * @param owner The owner of the bank balance
      *
-     * @return The owner to load
+     * @return The user account if available
      */
-    public @NotNull CompletableFuture<UserAccount> getOrLoad(@NotNull UUID owner) {
-        UserAccount account = this.userBalances.get(owner);
-        if (account == null) return this.loadBalance(owner);
-        return CompletableFuture.supplyAsync(() -> account);
+    private @NotNull UserAccount getSync(@NotNull UUID owner) {
+        QueryResult result = StatementProvider.create(StatementType.SELECT, this.connector)
+                .table(this.table)
+                .column("user", DataTypes.UUID, owner)
+                .executeSync();
+
+        UserAccount account = new UserAccount(owner, EconomyConfig.STARTING_BALANCE.value());
+
+        if (result != null) {
+            QueryResult.Row row = result.first();
+            if (row != null) account = UserAccount.construct(row);
+        }
+
+        return account;
     }
 
     /**
-     * Load a user's account from the database
+     * Refresh a large list of targets from the database
+     *
+     * @param targets The targets to refresh
+     */
+    public void refreshBatch(@NotNull List<UUID> targets) {
+        // we do this in regular sql because my ass cannot be bothered!!!
+        this.async(() -> this.connector.connect(connection -> {
+            String select = "SELECT * FROM " + this.table + " WHERE user = ?";
+            for (UUID target : targets) {
+                try (PreparedStatement statement = connection.prepareStatement(select)) {
+                    statement.setString(1, target.toString());
+
+                    ResultSet resultSet = statement.executeQuery();
+                    if (resultSet.next()) {
+                        BigDecimal amount = resultSet.getBigDecimal("amount");
+                        long lastUpdate = resultSet.getLong("last_updated");
+                        this.accountCache.put(target, new UserAccount(target, amount, lastUpdate));
+                    }
+                }
+            }
+        }));
+
+    }
+
+    /**
+     * Refresh a users current point balance
+     *
+     * @param owner The owner of the account
+     */
+    public void refresh(@NotNull UUID owner) {
+        this.async(() -> this.accountCache.put(owner, this.getSync(owner)));
+    }
+
+    /**
+     * Get all the pending transactions for the user
      *
      * @param owner The owner of the account
      *
-     * @return The account if available
+     * @return Any pending transactions
      */
-    public @NotNull CompletableFuture<UserAccount> loadBalance(@NotNull UUID owner) {
-        return StatementProvider.create(StatementType.SELECT, this.connector)
-                .table(this.table)
-                .column("user", DataTypes.UUID, owner)
-                .execute()
-                .thenApply(queryResult -> {
-                    UserAccount account = new UserAccount(owner);
-
-                    if (queryResult != null) {
-                        QueryResult.Row row = queryResult.first();
-                        if (row != null) account = UserAccount.construct(row);
-                    }
-
-                    this.userBalances.put(owner, account);
-                    return account;
-                });
+    public Deque<Transaction> pending(@NotNull UUID owner) {
+        return this.pendingTransactions.computeIfAbsent(owner, x -> new ConcurrentLinkedDeque<>());
     }
 
     /**
-     * Save a user's account into the database
+     * Publish a new transaction into the transaction queue
      *
-     * @param account The account to save
+     * @param owner       The owner of the account
+     * @param transaction The transaction being made
      */
-    public void saveAccount(UserAccount account) {
-        account.lastUpdated(System.currentTimeMillis());
+    public boolean publishChange(@NotNull UUID owner, Transaction transaction) {
+        if (transaction.current().doubleValue() < 0) return false; // no negatives
 
-        StatementProvider.create(StatementType.INSERT, this)
-                .column("user", DataTypes.UUID, account.player())
-                .column("amount", DataTypes.BIG_DECIMAL, account.amount())
-                .column("last_updated", DataTypes.LONG, account.lastUpdated())
-                .execute()
-                .thenRun(() -> this.userBalances.put(account.player(), account));
+        this.pending(owner).add(transaction);
+        return true;
     }
+
+    /**
+     * Publish a new transaction into the transaction queue
+     *
+     * @param target The target account
+     * @param amount The transaction being made
+     *
+     * @return true if the value could be set
+     */
+    public boolean set(@NotNull UUID target, BigDecimal amount, String source) {
+        if (amount.doubleValue() < 0) return false;
+
+        UserAccount account = this.getBalance(target);
+        BigDecimal current = account.amount();
+        account.amount(amount);
+
+        Transaction transaction = new Transaction(target, source, amount, amount);
+        transaction.before(current);
+        return this.publishChange(target, transaction);
+    }
+
+    /**
+     * Publish a new transaction into the transaction queue
+     *
+     * @param target The target account
+     * @param amount The transaction being made
+     *
+     * @return the transaction being made if possible
+     */
+    @Nullable
+    public Transaction offset(@NotNull UUID target, BigDecimal amount, String source) {
+        UserAccount userAccount = this.getBalance(target);
+        BigDecimal before = userAccount.amount();
+        BigDecimal newBalance = userAccount.amount().add(amount);
+        Transaction transaction = new Transaction(
+                target,
+                source,
+                newBalance,
+                amount,
+                before,
+                System.currentTimeMillis()
+        );
+
+        userAccount.amount(newBalance);
+        return this.publishChange(target, transaction) ? transaction : null;
+    }
+
 
 }

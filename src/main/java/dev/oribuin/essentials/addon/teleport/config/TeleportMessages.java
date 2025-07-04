@@ -1,43 +1,44 @@
 package dev.oribuin.essentials.addon.teleport.config;
 
 import dev.oribuin.essentials.api.config.option.Message;
+import dev.oribuin.essentials.api.config.option.TextMessage;
 import dev.oribuin.essentials.api.config.type.MessageConfig;
 
 public class TeleportMessages extends MessageConfig {
 
     private static final String PREFIX = "<#bc7dff><b>Teleport</b> <gray>| <white>";
 
-    public static Message DISABLED_WORLD = new Message(PREFIX + "You are not allowed to teleport to the world.");
-    public static Message TELEPORT_INVALID = new Message(PREFIX + "This teleport request is no longer valid/doesn't exist");
-    public static Message TELEPORT_TIMEOUT = new Message(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has timed out.");
-    public static Message TELEPORT_TIMEOUT_OTHER = new Message(PREFIX + "The teleport request from [<#bc7dff>%sender%<white>] has timed out.");
-    public static Message TELEPORT_FAILED = new Message(PREFIX + "Your teleport request was not successful. Please contact an admin about this.");
-    public static Message TELEPORT_COST = new Message(PREFIX + "It cost you [<#bc7dff>$%cost%<white>] to teleport to [<#bc7dff>%target%<white>]");
-    public static Message TELEPORT_UNSAFE = new Message(PREFIX + "The teleport location is not safe, this request has been cancelled.");
-    public static Message INSUFFICIENT_FUNDS = new Message(PREFIX + "You do not have enough money to accept this teleport");
-    public static Message TELEPORT_SELF = new Message(PREFIX + "You cannot send a teleport request to yourself");
+    public static Message DISABLED_WORLD = TextMessage.ofConfig(PREFIX + "You are not allowed to teleport to the world.");
+    public static Message TELEPORT_INVALID = TextMessage.ofConfig(PREFIX + "This teleport request is no longer valid/doesn't exist");
+    public static Message TELEPORT_TIMEOUT = TextMessage.ofConfig(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has timed out.");
+    public static Message TELEPORT_TIMEOUT_OTHER = TextMessage.ofConfig(PREFIX + "The teleport request from [<#bc7dff>%sender%<white>] has timed out.");
+    public static Message TELEPORT_FAILED = TextMessage.ofConfig(PREFIX + "Your teleport request was not successful. Please contact an admin about this.");
+    public static Message TELEPORT_COST = TextMessage.ofConfig(PREFIX + "It cost you [<#bc7dff>$%cost%<white>] to teleport to [<#bc7dff>%target%<white>]");
+    public static Message TELEPORT_UNSAFE = TextMessage.ofConfig(PREFIX + "The teleport location is not safe, this request has been cancelled.");
+    public static Message INSUFFICIENT_FUNDS = TextMessage.ofConfig(PREFIX + "You do not have enough money to accept this teleport");
+    public static Message TELEPORT_SELF = TextMessage.ofConfig(PREFIX + "You cannot send a teleport request to yourself");
 
     // Back Command
-    public static Message TELEPORT_BACK = new Message(PREFIX + "You have teleported back to your previous location");
-    public static Message TELEPORT_BACK_INVALID = new Message(PREFIX + "You do not have a location you previously teleported from");
+    public static Message TELEPORT_BACK = TextMessage.ofConfig(PREFIX + "You have teleported back to your previous location");
+    public static Message TELEPORT_BACK_INVALID = TextMessage.ofConfig(PREFIX + "You do not have a location you previously teleported from");
 
     // Teleport Accept Messages
-    public static Message TELEPORT_ACCEPT_SELF = new Message(PREFIX + "You have accepted the request from [<#bc7dff>%sender%<white>]");
-    public static Message TELEPORT_ACCEPT_OTHER = new Message(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has been accepted.");
+    public static Message TELEPORT_ACCEPT_SELF = TextMessage.ofConfig(PREFIX + "You have accepted the request from [<#bc7dff>%sender%<white>]");
+    public static Message TELEPORT_ACCEPT_OTHER = TextMessage.ofConfig(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has been accepted.");
 
     // Teleport Deny Messages
-    public static Message TELEPORT_DENIED_SELF = new Message(PREFIX + "You have denied the request from [<#bc7dff>%sender%<white>]");
-    public static Message TELEPORT_DENIED_OTHER = new Message(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has been denied.");
+    public static Message TELEPORT_DENIED_SELF = TextMessage.ofConfig(PREFIX + "You have denied the request from [<#bc7dff>%sender%<white>]");
+    public static Message TELEPORT_DENIED_OTHER = TextMessage.ofConfig(PREFIX + "Your teleport request to [<#bc7dff>%target%<white>] has been denied.");
 
     // Teleport Ask Messages
-    public static Message TELEPORT_ASK_RECEIVED = new Message("""
+    public static Message TELEPORT_ASK_RECEIVED = TextMessage.ofConfig("""
             
             <#bc7dff><b>Teleport</b> <gray>| <white>[<#bc7dff>%sender%<white>] wants to teleport to you.<reset>
             <#bc7dff><b>Teleport</b> <gray>| <white>
             <#bc7dff><b>Teleport</b> <gray>| <white><#0cf036><click:suggest_command:'/tpaccept'>[Accept]</click> <dark_gray>| <#f00c0c><click:suggest_command:'/tpdeny'>[Deny]</click>
                        \s""");
 
-    public static Message TELEPORT_ASK_SENT = new Message("""
+    public static Message TELEPORT_ASK_SENT = TextMessage.ofConfig("""
             
             <#bc7dff><b>Teleport</b> <gray>| <white>You have requested to teleport to [<#bc7dff>%target%<white>]
             <#bc7dff><b>Teleport</b> <gray>| <white>

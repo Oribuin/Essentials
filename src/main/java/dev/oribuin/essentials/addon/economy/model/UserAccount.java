@@ -35,6 +35,27 @@ public class UserAccount {
     }
 
     /**
+     * Create a new user balance instance within the plugin
+     *
+     * @param player The player who owns the money
+     * @param amount The starting balance of the account
+     */
+    public UserAccount(UUID player, BigDecimal amount) {
+        this(player, amount, 0);
+    }
+
+    /**
+     * Create a new user balance instance within the plugin
+     *
+     * @param player The player who owns the money
+     * @param amount The starting balance of the account
+     */
+    public UserAccount(UUID player, double amount) {
+        this(player, BigDecimal.valueOf(amount), 0);
+    }
+
+
+    /**
      * Construct a new user balance from a result set within the database
      *
      * @param row The row to pull the data from

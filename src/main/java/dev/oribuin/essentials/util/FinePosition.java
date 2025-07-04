@@ -13,8 +13,8 @@ public final class FinePosition {
     private final double x;
     private final double y;
     private final double z;
-    private float yaw;
-    private float pitch;
+    private final float yaw;
+    private final float pitch;
 
     /**
      * @param world The world name
@@ -30,6 +30,7 @@ public final class FinePosition {
         this.yaw = yaw;
         this.pitch = pitch;
     }
+
     /**
      * @param world The world name
      * @param x     The x position

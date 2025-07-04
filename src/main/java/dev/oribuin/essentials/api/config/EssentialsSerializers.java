@@ -1,20 +1,15 @@
 package dev.oribuin.essentials.api.config;
 
 import dev.oribuin.essentials.util.FinePosition;
-import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
-import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.config.SettingField;
 import dev.rosewood.rosegarden.config.SettingSerializer;
 import dev.rosewood.rosegarden.config.SettingSerializers;
-import org.bukkit.persistence.PersistentDataType;
-
-import javax.naming.InitialContext;
 
 /**
  * Utility Class for custom rose setting serializers
  */
 public class EssentialsSerializers {
-    
+
     public static final SettingSerializer<FinePosition> POSITION = SettingSerializers.ofRecord(FinePosition.class, instance -> instance.group(
             SettingField.of("world", SettingSerializers.STRING, FinePosition::world),
             SettingField.of("x", SettingSerializers.DOUBLE, FinePosition::x),

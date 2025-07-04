@@ -1,19 +1,17 @@
 package dev.oribuin.essentials.api.config;
 
-import com.google.common.eventbus.DeadEvent;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.api.config.option.ConfigOptionType;
 import dev.oribuin.essentials.api.config.option.Option;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static dev.rosewood.rosegarden.config.SettingSerializers.*;
+import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
 
 @SuppressWarnings("unused")
 public abstract class AddonConfig {
@@ -80,7 +78,6 @@ public abstract class AddonConfig {
             this.config.save(configFile);
         } catch (Exception ex) {
             EssentialsPlugin.get().getLogger().severe("Failed to create config file for addon [" + name + "]: " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 
@@ -103,7 +100,7 @@ public abstract class AddonConfig {
         if (path == null) {
             throw new IllegalArgumentException("Option [" + option + "] does not have a defined path");
         }
-        
+
         if (this.options.stream().anyMatch(this.testPath(path))) {
             throw new IllegalArgumentException("Option with path " + path + " already exists");
         }

@@ -30,12 +30,19 @@ public class SetBalanceCommand extends BaseRoseCommand {
 
         sender.sendMessage("Setting User Balance");
         EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
+        String source = "user[%s] set target %s[%s] amount[%s] via[%s]";
 
-        repository.getOrLoad(target.getUniqueId()).thenAccept(balance -> {
-            balance.amount(BigDecimal.valueOf(amount));
-            repository.saveAccount(balance);
-            sender.sendMessage("Saved User Balance");
-        });
+        repository.set(
+                target.getUniqueId(), 
+                BigDecimal.valueOf(amount),
+                String.format(source,
+                        sender.getName(),
+                        target.getName(),
+                        target.getUniqueId(),
+                        amount,
+                        "Command"
+                )
+        );
     }
 
     @Override

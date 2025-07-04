@@ -12,13 +12,16 @@ import dev.oribuin.essentials.manager.DataManager;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,7 +47,7 @@ public class EconomyAddon extends Addon {
     @Override
     public void enable() {
         this.repository = DataManager.create(EconomyRepository.class);
-        this.transactions = DataManager.create(TransactionRepository.class);
+//        this.transactions = DataManager.create(TransactionRepository.class);
 
         if (this.repository == null) {
             this.logger.severe("The EconomyRepository is null, this addon will not work correctly");
@@ -61,7 +64,8 @@ public class EconomyAddon extends Addon {
         }
 
         NumberUtil.setCachedValues();
-        Bukkit.getOnlinePlayers().forEach(x -> this.repository.loadBalance(x.getUniqueId()));
+        
+        this.repository.refreshBatch(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList());
     }
 
     /**
@@ -80,24 +84,12 @@ public class EconomyAddon extends Addon {
      * @param target The user to deposit the money into
      * @param amount The amount to deposit (negatives to take away)
      * @param source The source that is taking away the money
+     *               
+     * @return The appropriate transaction if available
      */
+    @Nullable
     public Transaction deposit(@NotNull UUID target, @NotNull BigDecimal amount, @NotNull String source) {
-        UserAccount userAccount = this.repository.getBalance(target);
-        BigDecimal before = userAccount.amount();
-        BigDecimal newBalance = userAccount.amount().add(amount);
-        Transaction transaction = new Transaction(
-                target,
-                source,
-                newBalance,
-                amount,
-                before,
-                System.currentTimeMillis()
-        );
-
-        userAccount.amount(newBalance);
-        this.repository.saveAccount(userAccount);
-        this.transactions.save(transaction);
-        return transaction;
+        return this.repository.offset(target, amount, source);
     }
 
     /**
@@ -120,15 +112,10 @@ public class EconomyAddon extends Addon {
      * Load all the homes for a player from the database
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
-        this.repository.loadBalance(event.getPlayer().getUniqueId());
-    }
-
-    /**
-     * Remove all the homes for a player from the cache
-     */
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onJoin(AsyncPlayerPreLoginEvent event) {
+        if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+            this.repository.refresh(event.getUniqueId());
+        }
     }
 
     public EconomyRepository repository() {

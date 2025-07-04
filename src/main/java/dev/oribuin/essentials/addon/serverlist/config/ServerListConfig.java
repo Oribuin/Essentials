@@ -4,7 +4,9 @@ import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.oribuin.essentials.api.config.option.Option;
 
 import java.util.List;
-import static dev.rosewood.rosegarden.config.SettingSerializers.*;
+
+import static dev.rosewood.rosegarden.config.SettingSerializers.INTEGER;
+import static dev.rosewood.rosegarden.config.SettingSerializers.STRING_LIST;
 
 public class ServerListConfig extends AddonConfig {
 
