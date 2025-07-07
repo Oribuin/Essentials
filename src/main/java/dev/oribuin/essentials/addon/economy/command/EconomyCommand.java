@@ -2,20 +2,29 @@ package dev.oribuin.essentials.addon.economy.command;
 
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.economy.command.impl.AddBalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.impl.PayCommand;
 import dev.oribuin.essentials.addon.economy.command.impl.SetBalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.impl.TakeBalanceCommand;
+import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
+import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.api.Placeholder;
+import dev.oribuin.essentials.api.config.option.Message;
+import dev.oribuin.essentials.command.argument.UserArgumentHandler;
+import dev.oribuin.essentials.util.EssUtils;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Currency;
 import java.util.UUID;
 
 public class EconomyCommand extends BaseRoseCommand {
@@ -32,16 +41,20 @@ public class EconomyCommand extends BaseRoseCommand {
         }
 
         EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
-        CommandSender sender = context.getSender();
-        UUID user = target != null ? target.getUniqueId() : ((Player) context.getSender()).getUniqueId();
-        sender.sendMessage("Loading User Balance");
-
-
-        UserAccount balance = repository.getBalance(user);
-         sender.sendMessage(String.format(
-                "User[%s] balance[%s] time_since_update[%ss]",
-                user, balance.amount(), (System.currentTimeMillis() - balance.lastUpdated()) / 1000
-        ));
+        
+        // send the targets balance
+        if (target != null && context.getSender().hasPermission("essentials.economy.use.other")) {
+            UserAccount account = repository.getBalance(target.getUniqueId());
+            EconomyMessages.TARGET_BALANCE.send(context.getSender(), "target", target.getName(), "balance", NumberUtil.format(account.amount()));
+            return;
+        }
+        
+        // send the senders balance 
+        if (context.getSender() instanceof Player player) {
+            UserAccount account = repository.getBalance(player.getUniqueId());
+            StringPlaceholders placeholders = StringPlaceholders.of("balance", NumberUtil.format(account.amount()));
+            EconomyMessages.CURRENT_BALANCE.send(player, placeholders);
+        }
     }
 
     @Override
@@ -51,10 +64,14 @@ public class EconomyCommand extends BaseRoseCommand {
                 .permission("essentials.economy.use")
                 .arguments(
                         ArgumentsDefinition.builder()
-                                .optional("target", ArgumentHandlers.OFFLINE_PLAYER)
-                                .optionalSub(new SetBalanceCommand(this.rosePlugin), new AddBalanceCommand(this.rosePlugin))
+                                .optional("target", new UserArgumentHandler())
+                                .optionalSub(
+                                        new AddBalanceCommand(this.rosePlugin),
+                                        new PayCommand(this.rosePlugin),
+                                        new SetBalanceCommand(this.rosePlugin),
+                                        new TakeBalanceCommand(this.rosePlugin)
+                                )
                 )
-                //                .arguments(this.sub(new SetBalanceCommand(this.rosePlugin)))
                 .build();
     }
 

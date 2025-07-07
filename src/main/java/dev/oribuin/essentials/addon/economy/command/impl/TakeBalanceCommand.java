@@ -3,6 +3,7 @@ package dev.oribuin.essentials.addon.economy.command.impl;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
+import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
 import dev.oribuin.essentials.command.argument.UserArgumentHandler;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -13,56 +14,54 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 
-public class SetBalanceCommand extends BaseRoseCommand {
+public class TakeBalanceCommand extends BaseRoseCommand {
 
-    public SetBalanceCommand(RosePlugin rosePlugin) {
+    public TakeBalanceCommand(RosePlugin rosePlugin) {
         super(rosePlugin);
     }
 
     @RoseExecutable
-    public void execute(CommandContext context, Player target, Double amount) {
+    public void execute(CommandContext context, OfflinePlayer target, Double amount) {
         CommandSender sender = context.getSender();
-        // don't allow to set negative amounts
+        EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
+
+        // don't allow to take negative amounts (which is just withdrawing but use eco add for that weirdo)
         if (amount <= 0) {
             EconomyMessages.NO_NEGATIVES.send(sender, StringPlaceholders.of("amount", NumberUtil.format(amount)));
             return;
         }
 
-        EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
-        String source = "user[%s] set target %s[%s] amount[%s] via[%s]";
-
-        boolean result = repository.set(
+        // Give the money to the target
+        String source = "user[%s] removing from target %s[%s] amount[%s] via[%s]";
+        Transaction transaction = repository.offset(target.getUniqueId(), BigDecimal.valueOf(-amount), String.format(source,
+                sender.getName(),
+                target.getName(),
                 target.getUniqueId(),
-                BigDecimal.valueOf(amount),
-                String.format(source,
-                        sender.getName(),
-                        target.getName(),
-                        target.getUniqueId(),
-                        NumberUtil.format(amount),
-                        "Command"
-                )
-        );
+                NumberUtil.format(amount),
+                "Command"
+        ));
+
         // check if transaction has failed
-        if (!result) {
+        if (transaction == null) {
             EconomyMessages.TRANSACTION_FAILED.send(sender);
             return;
         }
 
-        EconomyMessages.SET_BALANCE.send(sender, StringPlaceholders.of(
+        EconomyMessages.REMOVED_BALANCE.send(sender, StringPlaceholders.of(
                 "amount", NumberUtil.format(amount),
-                "balance", NumberUtil.format(amount)
+                "balance", NumberUtil.format(transaction.current())
         ));
     }
 
     @Override
     protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("set")
-                .permission("essentials.economy.set")
+        return CommandInfo.builder("take")
+                .permission("essentials.economy.take")
                 .playerOnly(false)
                 .arguments(this.createArgumentsDefinition())
                 .build();

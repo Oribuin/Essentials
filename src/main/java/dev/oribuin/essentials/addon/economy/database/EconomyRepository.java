@@ -226,8 +226,6 @@ public class EconomyRepository extends ModuleRepository implements Listener {
      * @param transaction The transaction being made
      */
     public boolean publishChange(@NotNull UUID owner, Transaction transaction) {
-        if (transaction.current().doubleValue() < 0) return false; // no negatives
-
         this.pending(owner).add(transaction);
         return true;
     }

@@ -18,7 +18,7 @@ public class EconomyConfig extends AddonConfig {
     public static Option<String> CURRENCY_ABBREV_THOUSANDS = new Option<>("abbreviations.thousands", STRING, "k");
     public static Option<String> CURRENCY_ABBREV_MILLIONS = new Option<>("abbreviations.millions", STRING, "m");
     public static Option<String> CURRENCY_ABBREV_BILLIONS = new Option<>("abbreviations.billions", STRING, "b");
-
+    public static Option<Boolean> PAY_CONFIRM = new Option<>("confirm-payment-toggle", BOOLEAN, true);
     /**
      * Create a new instance of the addon config
      */

@@ -86,7 +86,7 @@ public class VaultEconomyProvider implements Economy {
 
     @Override
     public String format(double v) {
-        return NumberUtil.formatPoints(v);
+        return NumberUtil.format(v);
     }
 
     @Override

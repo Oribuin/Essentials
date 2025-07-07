@@ -2,10 +2,10 @@ package dev.oribuin.essentials.addon.economy;
 
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.economy.command.EconomyCommand;
+import dev.oribuin.essentials.addon.economy.command.impl.PayCommand;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.database.TransactionRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
-import dev.oribuin.essentials.addon.economy.model.UserAccount;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.manager.DataManager;
@@ -17,8 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +45,7 @@ public class EconomyAddon extends Addon {
     @Override
     public void enable() {
         this.repository = DataManager.create(EconomyRepository.class);
-//        this.transactions = DataManager.create(TransactionRepository.class);
+        //        this.transactions = DataManager.create(TransactionRepository.class);
 
         if (this.repository == null) {
             this.logger.severe("The EconomyRepository is null, this addon will not work correctly");
@@ -64,7 +62,7 @@ public class EconomyAddon extends Addon {
         }
 
         NumberUtil.setCachedValues();
-        
+
         this.repository.refreshBatch(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList());
     }
 
@@ -84,7 +82,7 @@ public class EconomyAddon extends Addon {
      * @param target The user to deposit the money into
      * @param amount The amount to deposit (negatives to take away)
      * @param source The source that is taking away the money
-     *               
+     *
      * @return The appropriate transaction if available
      */
     @Nullable
@@ -97,7 +95,7 @@ public class EconomyAddon extends Addon {
      */
     @Override
     public List<BaseRoseCommand> commands() {
-        return List.of(new EconomyCommand(this.plugin));
+        return List.of(new EconomyCommand(this.plugin), new PayCommand(this.plugin));
     }
 
     /**

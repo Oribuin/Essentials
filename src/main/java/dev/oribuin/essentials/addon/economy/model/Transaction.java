@@ -107,6 +107,18 @@ public class Transaction {
         );
     }
 
+    @Override
+    public String toString() {
+        return "Transaction{" +
+               "user=" + user +
+               ", source='" + source + '\'' +
+               ", current=" + current +
+               ", change=" + change +
+               ", before=" + before +
+               ", when=" + when +
+               '}';
+    }
+
     public @Nullable UUID user() {
         return user;
     }

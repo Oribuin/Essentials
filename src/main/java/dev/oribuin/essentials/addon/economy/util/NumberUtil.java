@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.economy.util;
 
 import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -19,16 +20,26 @@ public class NumberUtil {
     /**
      * Formats a number from 1100 to 1,100
      *
-     * @param points The points value to format
+     * @param amount The amount value to format
      *
      * @return The formatted shorthand value
      */
-    public static String formatPoints(double points) {
+    public static String format(double amount) {
         if (formatter != null) {
-            return formatter.format(points);
+            return formatter.format(amount);
         } else {
-            return String.valueOf(points);
+            return String.valueOf(amount);
         }
+    }
+    /**
+     * Formats a number from 1100 to 1,100
+     *
+     * @param bigDecimal The amount value to format
+     *
+     * @return The formatted shorthand value
+     */
+    public static String format(BigDecimal bigDecimal) {
+        return format(bigDecimal.doubleValue());
     }
 
     /**
