@@ -6,7 +6,6 @@ import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
