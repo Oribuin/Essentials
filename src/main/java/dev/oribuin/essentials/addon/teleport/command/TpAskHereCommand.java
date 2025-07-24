@@ -7,6 +7,7 @@ import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
 import dev.oribuin.essentials.util.EssUtils;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -54,7 +55,7 @@ public class TpAskHereCommand extends BaseRoseCommand {
         );
 
         addon.requests().add(request);
-        StringPlaceholders placeholders = StringPlaceholders.of("target", target.getName(), "sender", sender.getName());
+        StringPlaceholders placeholders = Placeholders.of("target", target.getName(), "sender", sender.getName());
         TeleportMessages.TELEPORT_ASK_RECEIVED.send(target, placeholders);
         TeleportMessages.TELEPORT_ASK_SENT.send(sender, placeholders);
 

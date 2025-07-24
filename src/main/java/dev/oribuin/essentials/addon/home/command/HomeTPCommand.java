@@ -9,6 +9,8 @@ import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
+import dev.oribuin.essentials.util.EssUtils;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -24,6 +26,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,15 +65,15 @@ public class HomeTPCommand extends BaseRoseCommand {
         }
 
         // Number values are defaulted to 0 when not found
-        int cooldown = HomeConfig.TP_COOLDOWN.value();
-        int teleportDelay = HomeConfig.TP_DELAY.value();
+        Duration cooldown = HomeConfig.TP_COOLDOWN.value();
+        Duration teleportDelay = HomeConfig.TP_DELAY.value();
         double cost = HomeConfig.TP_COST.value();
 
         // establish all the placeholders
-        StringPlaceholders placeholders = home.placeholders(StringPlaceholders.of(
+        StringPlaceholders placeholders = home.placeholders(Placeholders.of(
                 "cost", cost,
-                "delay", teleportDelay,
-                "cooldown", cooldown
+                "delay", EssUtils.fromDuration(teleportDelay),
+                "cooldown", EssUtils.fromDuration(cooldown)
         ));
 
         if (!home.isSafe() && !sender.hasPermission("essentials.home.bypass.unsafe")) {
@@ -99,9 +102,9 @@ public class HomeTPCommand extends BaseRoseCommand {
         }
 
         // Check if the player is on cooldown, ignore cooldown if they have a specific perm (disabled default)
-        if (cooldown > 0 && !sender.hasPermission("essentials.home.bypass.cooldown")) {
+        if (!cooldown.isZero() && !sender.hasPermission("essentials.home.bypass.cooldown")) {
             long lastTeleport = this.cooldowns.getOrDefault(sender.getUniqueId(), 0L);
-            long timeLeft = (lastTeleport + (cooldown * 1000L) - System.currentTimeMillis()) / 1000L;
+            long timeLeft = (lastTeleport + cooldown.toMillis() - System.currentTimeMillis()) / 1000L;
 
             // Player is still on cooldown :3
             if (timeLeft > 0) {
@@ -116,7 +119,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         this.confirmation.invalidate(sender.getUniqueId());
 
         // If the player has permission to bypass the delay, skip all effects
-        if (sender.hasPermission("essentials.home.bypass.delay") || teleportDelay <= 0) {
+        if (sender.hasPermission("essentials.home.bypass.delay") || !teleportDelay.isZero()) {
             // send the final message
             HomeMessages.HOME_TELEPORT.send(sender, placeholders);
             this.teleport(sender, home, cost, placeholders);
@@ -128,7 +131,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         if (HomeConfig.TP_EFFECTS.value()) {
             // Give the player blindness
             sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
-                    (teleportDelay + 1) * 20, 4,
+                    (int) ((teleportDelay.toSeconds() + 1) * 20), 4,
                     false,
                     false,
                     false
@@ -154,7 +157,7 @@ public class HomeTPCommand extends BaseRoseCommand {
             if (finalTask != null) finalTask.cancel();
 
             this.teleport(sender, home, cost, placeholders);
-        }, teleportDelay, TimeUnit.SECONDS);
+        }, teleportDelay.toSeconds(), TimeUnit.SECONDS);
     }
 
     /**

@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.manager;
 
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.AbstractLocaleManager;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -86,7 +87,7 @@ public class LocaleManager extends AbstractLocaleManager {
             return;
 
         if (placeholders == null)
-            placeholders = StringPlaceholders.empty();
+            placeholders = Placeholders.empty();
 
         this.handleMessage(sender, HexUtils.colorify(this.parsePlaceholders(sender, placeholders.apply(message))));
     }
@@ -103,7 +104,7 @@ public class LocaleManager extends AbstractLocaleManager {
             return;
 
         if (placeholders == null)
-            placeholders = StringPlaceholders.empty();
+            placeholders = Placeholders.empty();
 
         for (String message : messages) {
             this.handleMessage(sender, HexUtils.colorify(this.parsePlaceholders(sender, placeholders.apply(message))));
@@ -125,7 +126,7 @@ public class LocaleManager extends AbstractLocaleManager {
             return "";
 
         if (placeholders == null)
-            placeholders = StringPlaceholders.empty();
+            placeholders = Placeholders.empty();
 
         return HexUtils.colorify(this.parsePlaceholders(sender, placeholders.apply(message)));
     }
@@ -145,7 +146,7 @@ public class LocaleManager extends AbstractLocaleManager {
             return List.of();
 
         if (placeholders == null)
-            placeholders = StringPlaceholders.empty();
+            placeholders = Placeholders.empty();
 
         List<String> formattedMessages = new ArrayList<>();
         for (String message : messages) {

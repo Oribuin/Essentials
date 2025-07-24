@@ -2,6 +2,7 @@ package dev.oribuin.essentials.api.config.option;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.util.EssUtils;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.config.SettingField;
 import dev.rosewood.rosegarden.config.SettingSerializer;
 import dev.rosewood.rosegarden.config.SettingSerializers;
@@ -145,7 +146,7 @@ public class TextMessage {
      * @param audience The audience to send the message to
      */
     public void send(Audience audience) {
-        this.send(audience, null, StringPlaceholders.empty());
+        this.send(audience, null, Placeholders.empty());
     }
 
     /**
@@ -155,7 +156,7 @@ public class TextMessage {
      * @param target   The placeholderapi target
      */
     public void send(Audience audience, Player target) {
-        this.send(audience, target, StringPlaceholders.empty());
+        this.send(audience, target, Placeholders.empty());
     }
 
     /**
@@ -186,7 +187,7 @@ public class TextMessage {
      * @param placeholders The plugin defined placeholders
      */
     public void send(Audience audience, Player target, Object... placeholders) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder();
+        StringPlaceholders.Builder builder = Placeholders.builder();
         for (int i = 0; i < placeholders.length; i += 2) {
             if (placeholders[i] instanceof String placeholder) {
                 Object value = placeholders[i + 1];
@@ -248,7 +249,7 @@ public class TextMessage {
      */
     public Component parse(String message, Player target, StringPlaceholders placeholders) {
         if (message == null) return Component.empty();
-        if (placeholders == null) placeholders = StringPlaceholders.empty();
+        if (placeholders == null) placeholders = Placeholders.empty();
 
         boolean usePapi = this.placeholderapi != null ? this.placeholderapi : false;
 
@@ -266,7 +267,7 @@ public class TextMessage {
      * @return The formatted message
      */
     public Component parse(String message, Player target) {
-        return this.parse(message, target, StringPlaceholders.empty());
+        return this.parse(message, target, Placeholders.empty());
     }
 
     /**
@@ -289,7 +290,7 @@ public class TextMessage {
      * @return The formatted message
      */
     public Component parse(String message) {
-        return this.parse(message, null, StringPlaceholders.empty());
+        return this.parse(message, null, Placeholders.empty());
     }
 
     public @Nullable String message() {

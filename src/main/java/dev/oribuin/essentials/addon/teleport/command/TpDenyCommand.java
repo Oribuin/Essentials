@@ -4,6 +4,7 @@ import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -39,7 +40,7 @@ public class TpDenyCommand extends BaseRoseCommand {
         }
 
         // important values
-        StringPlaceholders placeholders = StringPlaceholders.of(
+        StringPlaceholders placeholders = Placeholders.of(
                 "target", target.getName(),
                 "sender", target.getName()
         );

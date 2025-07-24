@@ -6,6 +6,7 @@ import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
 import dev.oribuin.essentials.command.argument.UserArgumentHandler;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -13,7 +14,6 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
@@ -32,7 +32,7 @@ public class TakeBalanceCommand extends BaseRoseCommand {
 
         // don't allow to take negative amounts (which is just withdrawing but use eco add for that weirdo)
         if (amount <= 0) {
-            EconomyMessages.NO_NEGATIVES.send(sender, StringPlaceholders.of("amount", NumberUtil.format(amount)));
+            EconomyMessages.NO_NEGATIVES.send(sender, Placeholders.of("amount", NumberUtil.format(amount)));
             return;
         }
 
@@ -52,7 +52,7 @@ public class TakeBalanceCommand extends BaseRoseCommand {
             return;
         }
 
-        EconomyMessages.REMOVED_BALANCE.send(sender, StringPlaceholders.of(
+        EconomyMessages.REMOVED_BALANCE.send(sender, Placeholders.of(
                 "amount", NumberUtil.format(amount),
                 "balance", NumberUtil.format(transaction.current())
         ));

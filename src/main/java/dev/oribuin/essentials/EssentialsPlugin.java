@@ -18,6 +18,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EssentialsPlugin extends RosePlugin {
@@ -66,9 +67,9 @@ public class EssentialsPlugin extends RosePlugin {
     @Override
     public void reload() {
         super.reload();
-
-        AddonProvider.addons().forEach((aClass, addon) -> addon.disable());
-        AddonProvider.addons().forEach((aClass, addon) -> addon.load());
+        
+        new HashMap<>(AddonProvider.addons()).forEach((aClass, addon) -> addon.disable());
+        new HashMap<>(AddonProvider.addons()).forEach((aClass, addon) -> addon.load());
 
         // Update the commands for all online players
         Bukkit.getOnlinePlayers().forEach(Player::updateCommands);

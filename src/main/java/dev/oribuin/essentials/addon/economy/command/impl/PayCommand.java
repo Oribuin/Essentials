@@ -8,6 +8,7 @@ import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -39,7 +40,7 @@ public class PayCommand extends BaseRoseCommand {
 
         // don't allow to add negative amounts (which is just withdrawing but use eco take for that weirdo)
         if (amount <= 0) {
-            EconomyMessages.NO_NEGATIVES.send(sender, StringPlaceholders.of("amount", NumberUtil.format(amount)));
+            EconomyMessages.NO_NEGATIVES.send(sender, Placeholders.of("amount", NumberUtil.format(amount)));
             return;
         }
 
@@ -54,7 +55,7 @@ public class PayCommand extends BaseRoseCommand {
 
             if (result == null) {
                 this.confirmation.put(sender.getUniqueId(), true);
-                EconomyMessages.CONFIRM_COMMAND.send(sender, StringPlaceholders.of(
+                EconomyMessages.CONFIRM_COMMAND.send(sender, Placeholders.of(
                         "amount", NumberUtil.format(amount),
                         "player", target.getName()
                 ));
@@ -65,7 +66,7 @@ public class PayCommand extends BaseRoseCommand {
         // make sure they have enough
         double balance = repository.getBalance(sender.getUniqueId()).amount().doubleValue();
         if (balance < amount) {
-            EconomyMessages.NOT_ENOUGH.send(sender, StringPlaceholders.of(
+            EconomyMessages.NOT_ENOUGH.send(sender, Placeholders.of(
                     "amount", NumberUtil.format(amount),
                     "balance", NumberUtil.format(balance),
                     "required", NumberUtil.format(amount - balance)
@@ -96,7 +97,7 @@ public class PayCommand extends BaseRoseCommand {
             return;
         }
 
-        StringPlaceholders placeholders = StringPlaceholders.of(
+        StringPlaceholders placeholders = Placeholders.of(
                 "amount", NumberUtil.format(amount),
                 "balance_player", NumberUtil.format(paymentSent.current()),
                 "balance_target", NumberUtil.format(paymentReceived.change()),

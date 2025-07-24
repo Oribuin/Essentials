@@ -9,10 +9,8 @@ import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
-import dev.oribuin.essentials.api.Placeholder;
-import dev.oribuin.essentials.api.config.option.Message;
 import dev.oribuin.essentials.command.argument.UserArgumentHandler;
-import dev.oribuin.essentials.util.EssUtils;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
@@ -21,11 +19,7 @@ import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Currency;
-import java.util.UUID;
 
 public class EconomyCommand extends BaseRoseCommand {
 
@@ -41,18 +35,18 @@ public class EconomyCommand extends BaseRoseCommand {
         }
 
         EconomyRepository repository = AddonProvider.ECONOMY_ADDON.repository();
-        
+
         // send the targets balance
         if (target != null && context.getSender().hasPermission("essentials.economy.use.other")) {
             UserAccount account = repository.getBalance(target.getUniqueId());
             EconomyMessages.TARGET_BALANCE.send(context.getSender(), "target", target.getName(), "balance", NumberUtil.format(account.amount()));
             return;
         }
-        
+
         // send the senders balance 
         if (context.getSender() instanceof Player player) {
             UserAccount account = repository.getBalance(player.getUniqueId());
-            StringPlaceholders placeholders = StringPlaceholders.of("balance", NumberUtil.format(account.amount()));
+            StringPlaceholders placeholders = Placeholders.of("balance", NumberUtil.format(account.amount()));
             EconomyMessages.CURRENT_BALANCE.send(player, placeholders);
         }
     }

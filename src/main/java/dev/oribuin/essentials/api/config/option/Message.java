@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.api.config.option;
 
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -78,7 +79,7 @@ public class Message extends ConfigOptionType<TextMessage> {
      * @param audience The audience to send the message to
      */
     public void send(Audience audience) {
-        this.send(audience, null, StringPlaceholders.empty());
+        this.send(audience, null, Placeholders.empty());
     }
 
     /**
@@ -88,7 +89,7 @@ public class Message extends ConfigOptionType<TextMessage> {
      * @param target   The placeholderapi target
      */
     public void send(Audience audience, Player target) {
-        this.send(audience, target, StringPlaceholders.empty());
+        this.send(audience, target, Placeholders.empty());
     }
 
     /**

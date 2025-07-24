@@ -1,5 +1,6 @@
 package dev.oribuin.essentials.api;
 
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 
 public interface Placeholder {
@@ -10,7 +11,7 @@ public interface Placeholder {
      * @return The compiled string placeholders
      */
     default StringPlaceholders placeholders() {
-        return StringPlaceholders.empty();
+        return Placeholders.empty();
     }
 
     /**
@@ -21,7 +22,7 @@ public interface Placeholder {
      * @return A compiled {@link StringPlaceholders}
      */
     default StringPlaceholders placeholders(StringPlaceholders... toAppend) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder();
+        StringPlaceholders.Builder builder = Placeholders.builder();
         builder.addAll(this.placeholders());
 
         // Append any new StringPlaceholders into the new builder

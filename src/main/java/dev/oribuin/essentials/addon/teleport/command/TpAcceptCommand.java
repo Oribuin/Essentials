@@ -10,6 +10,7 @@ import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -61,7 +62,7 @@ public class TpAcceptCommand extends BaseRoseCommand {
         // important values
         int teleportDelay = TeleportConfig.TP_DELAY.value();
         double cost = TeleportConfig.TP_COST.value();
-        StringPlaceholders placeholders = StringPlaceholders.of(
+        StringPlaceholders placeholders = Placeholders.of(
                 "target", target.getName(),
                 "sender", sender.getName(),
                 "cost", cost,

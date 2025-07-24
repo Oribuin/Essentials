@@ -25,6 +25,7 @@ public abstract class AddonConfig {
     private final String name;
     protected List<ConfigOptionType<?>> options;
     protected CommentedFileConfiguration config;
+    protected File file;
 
     /**
      * Create a new instance of the addon config
@@ -42,6 +43,13 @@ public abstract class AddonConfig {
         this.registerClass();
     }
 
+    public void save() {
+        if (this.file == null) return;
+
+        this.options.forEach(type -> type.write(config));
+        config.save(file);
+    }
+
     /**
      * Load this config inside the addon folder
      *
@@ -50,6 +58,7 @@ public abstract class AddonConfig {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void reload(File addonFolder) {
         // Clear the options and config
+        this.file = addonFolder;
         this.options = new ArrayList<>();
         this.config = null;
 

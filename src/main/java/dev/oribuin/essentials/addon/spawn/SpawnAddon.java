@@ -1,10 +1,13 @@
 package dev.oribuin.essentials.addon.spawn;
 
+import dev.oribuin.essentials.addon.spawn.command.SetSpawnCommand;
+import dev.oribuin.essentials.addon.spawn.command.SpawnCommand;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import dev.oribuin.essentials.util.Placeholders;
+import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,6 +27,7 @@ public class SpawnAddon extends Addon {
 
     public static Permission SILENT_JOIN_PERMISSION = new Permission("essentials.join.silent", PermissionDefault.FALSE);
     public static Permission SILENT_LEAVE_PERMISSION = new Permission("essentials.leave.silent", PermissionDefault.FALSE);
+    private final SpawnConfig config = new SpawnConfig();
 
     /**
      * The name of the addon
@@ -35,11 +39,19 @@ public class SpawnAddon extends Addon {
     }
 
     /**
+     * Get all the commands for the addon
+     */
+    @Override
+    public List<BaseRoseCommand> commands() {
+        return List.of(new SetSpawnCommand(this.plugin), new SpawnCommand(this.plugin));
+    }
+
+    /**
      * Get all the configuration files for the addon
      */
     @Override
     public List<AddonConfig> configs() {
-        return List.of(new SpawnConfig(), new SpawnMessages());
+        return List.of(this.config, new SpawnMessages());
     }
 
     /**
@@ -79,7 +91,7 @@ public class SpawnAddon extends Addon {
 
             // Send the first join message to the server
             if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-                SpawnMessages.FIRST_JOIN_MESSAGE.send(this.messageAudience(), player, StringPlaceholders.of(
+                SpawnMessages.FIRST_JOIN_MESSAGE.send(this.messageAudience(), player, Placeholders.of(
                         "total_players", Bukkit.getOfflinePlayers().length
                 ));
             }
@@ -89,7 +101,7 @@ public class SpawnAddon extends Addon {
 
         // Send the join message to the server
         if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-            SpawnMessages.JOIN_MESSAGE.send(this.messageAudience(), player, StringPlaceholders.of(
+            SpawnMessages.JOIN_MESSAGE.send(this.messageAudience(), player, Placeholders.of(
                     "total_players", Bukkit.getOfflinePlayers().length
             ));
         }
@@ -132,4 +144,7 @@ public class SpawnAddon extends Addon {
         return Audience.audience(audiences);
     }
 
+    public SpawnConfig config() {
+        return config;
+    }
 }

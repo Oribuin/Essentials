@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
 import dev.oribuin.essentials.command.argument.UserArgumentHandler;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -12,7 +13,6 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -29,7 +29,7 @@ public class SetBalanceCommand extends BaseRoseCommand {
         CommandSender sender = context.getSender();
         // don't allow to set negative amounts
         if (amount <= 0) {
-            EconomyMessages.NO_NEGATIVES.send(sender, StringPlaceholders.of("amount", NumberUtil.format(amount)));
+            EconomyMessages.NO_NEGATIVES.send(sender, Placeholders.of("amount", NumberUtil.format(amount)));
             return;
         }
 
@@ -53,7 +53,7 @@ public class SetBalanceCommand extends BaseRoseCommand {
             return;
         }
 
-        EconomyMessages.SET_BALANCE.send(sender, StringPlaceholders.of(
+        EconomyMessages.SET_BALANCE.send(sender, Placeholders.of(
                 "amount", NumberUtil.format(amount),
                 "balance", NumberUtil.format(amount)
         ));

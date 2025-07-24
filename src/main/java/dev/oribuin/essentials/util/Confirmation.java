@@ -13,7 +13,7 @@ public class Confirmation<T> {
 
     private final Map<T, ConfirmTask> confirmed;
     private final Duration time; // The time until it times out 
-    private Consumer<T> timeout; // Functionality if not timed out 
+    private final Consumer<T> timeout; // Functionality if not timed out 
 
     /**
      * Create a new confirmation page for the user
@@ -26,37 +26,37 @@ public class Confirmation<T> {
         this.timeout = timeout;
         this.confirmed = new HashMap<>();
     }
-    
+
     /**
      * Create a new confirmation page for the user
      *
-     * @param time    The time until the confirmation expires
+     * @param time The time until the confirmation expires
      */
     public Confirmation(Duration time) {
         this(time, t -> {});
     }
-    
+
     /**
      * Create a new confirmation page for the user
      *
      * @param time    The number unit for the duration
-     * @param unit The unit of measurement for the duration
+     * @param unit    The unit of measurement for the duration
      * @param timeout The functionality when the confirmation has expired
      */
     public Confirmation(int time, TimeUnit unit, Consumer<T> timeout) {
         this(Duration.ofMillis(unit.toMillis(time)), timeout);
     }
-    
+
     /**
      * Create a new confirmation page for the user
      *
-     * @param time    The number unit for the duration
+     * @param time The number unit for the duration
      * @param unit The unit of measurement for the duration
      */
     public Confirmation(int time, TimeUnit unit) {
         this(Duration.ofMillis(unit.toMillis(time)));
     }
-    
+
     /**
      * Create a timeout task for the user when they're done
      *

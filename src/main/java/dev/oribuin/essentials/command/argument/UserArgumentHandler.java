@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.command.argument;
 
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.InputIterator;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ public class UserArgumentHandler extends ArgumentHandler<OfflinePlayer> {
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(input);
         if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
-            throw new HandledArgumentException("argument-handler-player", StringPlaceholders.of("input", input));
+            throw new HandledArgumentException("argument-handler-player", Placeholders.of("input", input));
         }
 
         return offlinePlayer;
@@ -44,8 +44,8 @@ public class UserArgumentHandler extends ArgumentHandler<OfflinePlayer> {
         if (commandContext.getSender() instanceof Player player) {
             players.removeIf(x -> !player.canSee(x));
         }
-        
+
         return players.stream().map(Player::getName).toList();
     }
-    
+
 }

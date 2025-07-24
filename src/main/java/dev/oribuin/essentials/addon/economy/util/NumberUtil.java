@@ -31,6 +31,7 @@ public class NumberUtil {
             return String.valueOf(amount);
         }
     }
+
     /**
      * Formats a number from 1100 to 1,100
      *

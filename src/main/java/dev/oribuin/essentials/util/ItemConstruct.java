@@ -84,7 +84,7 @@ public class ItemConstruct implements Configurable {
      * @return The itemstack
      */
     public ItemStack build() {
-        return this.build(StringPlaceholders.empty());
+        return this.build(Placeholders.empty());
     }
 
     /**
@@ -92,7 +92,7 @@ public class ItemConstruct implements Configurable {
      * <p>
      * Uses Paper's {@link DataComponentTypes} to apply the values to the itemstack instead of the traditional {@link ItemMeta}
      * <p>
-     * Usage: ItemConstruct.of(Material.STONE).name("Hello World").build(StringPlaceholders.of("name", "Oribuin").build());
+     * Usage: ItemConstruct.of(Material.STONE).name("Hello World").build(Placeholders.of("name", "Oribuin").build());
      *
      * @param placeholders The {@link StringPlaceholders} to apply to the itemstack
      *

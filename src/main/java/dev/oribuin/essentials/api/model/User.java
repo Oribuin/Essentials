@@ -1,17 +1,16 @@
 package dev.oribuin.essentials.api.model;
 
 import net.kyori.adventure.audience.Audience;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public class User implements Audience {
-    
+
     private final UUID uuid;
     private String name;
     private long firstJoin;
-    
+
     /**
      * Create a new cached user for the database
      *

@@ -3,6 +3,7 @@ package dev.oribuin.essentials.addon.home.model;
 import dev.oribuin.essentials.api.Placeholder;
 import dev.oribuin.essentials.api.database.QueryResult;
 import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
+import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -74,7 +75,7 @@ public final class Home implements Placeholder {
      */
     @Override
     public StringPlaceholders placeholders() {
-        return StringPlaceholders.builder()
+        return Placeholders.builder()
                 .add("home", this.name)
                 .add("location", String.format("%s, %s, %s @ %s", this.location.x(), this.location.y(), this.location.z(), this.location.getWorld().getName()))
                 .add("owner-uuid", this.owner) // TODO: add %owner% = owner name

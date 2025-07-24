@@ -11,9 +11,14 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.NamespacedKey;
 
+import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EssUtils {
+
+    private static final Pattern DURATION_PATTERN = Pattern.compile("(([1-9][0-9]+|[1-9])[dhms])");
 
     public static ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
     public static RegistryAccess REGISTRY = RegistryAccess.registryAccess();
@@ -105,5 +110,47 @@ public class EssUtils {
         if (optional) builder = builder.optional("target", ArgumentHandlers.PLAYER);
         else builder = builder.required("target", ArgumentHandlers.PLAYER);
         return builder.build();
+    }
+
+    /**
+     * Convert a string into a duration
+     *
+     * @param value The value to parse into a duration
+     *
+     * @return The duration if available
+     */
+    public static Duration asDuration(String value) {
+        if (value == null) return Duration.ZERO;
+        
+        Matcher matcher = DURATION_PATTERN.matcher(value.toLowerCase());
+        Duration duration = Duration.ZERO;
+
+        while (matcher.find()) {
+            String group = matcher.group();
+            String timeUnit = String.valueOf(group.charAt(group.length() - 1));
+            int timeValue = Integer.parseInt(group.substring(0, group.length() - 1));
+            switch (timeUnit) {
+                case "d" -> duration = duration.plusDays(timeValue);
+                case "h" -> duration = duration.plusHours(timeValue);
+                case "m" -> duration = duration.plusMinutes(timeValue);
+                case "s" -> duration = duration.plusSeconds(timeValue);
+                default -> {
+                    // does nothing :3
+                }
+            }
+        }
+
+        return duration;
+    }
+
+    /**
+     * Convert a duration value into a String
+     *
+     * @param duration The value
+     *
+     * @return The duration in a readable format
+     */
+    public static String fromDuration(Duration duration) {
+        return duration.toString().substring(2);
     }
 }
