@@ -18,7 +18,7 @@ public class HomeConfig extends AddonConfig {
     public static Option<Duration> TP_DELAY = new Option<>(DURATION, Duration.ofSeconds(5), "The delay in seconds before teleporting to a home.", "This will be overwritten with the permission 'essentials.home.bypass.delay'");
     public static Option<Duration> TP_COOLDOWN = new Option<>(DURATION, Duration.ofSeconds(30), "The cooldown in seconds between teleporting to homes.", "This will be overwritten with the permission 'essentials.home.bypass.cooldown'");
     public static Option<Double> TP_COST = new Option<>(DOUBLE, 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.home.bypass.cost'");
-    public static Option<Boolean> TP_EFFECTS = new Option<>(BOOLEAN, true, "Should the teleport effects be enabled?", "Effects will not be triggered if a player has 'essentials.home.bypass.delay'");
+    public static Option<Boolean> TP_BAR = new Option<>(BOOLEAN, true, "Should the plugin display a bar counting until the player teleports (Requires tp-delay to be above 0)");
     public static Option<Boolean> TP_CONFIRM = new Option<>(BOOLEAN, true, "Should a player be required to confirm they want to teleport to their home?");
 
     // Home Setting Options

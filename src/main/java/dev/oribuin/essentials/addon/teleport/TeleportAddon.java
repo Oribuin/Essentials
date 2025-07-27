@@ -96,10 +96,11 @@ public class TeleportAddon extends Addon {
      *
      * @return The teleport request if available
      */
-    public @Nullable TeleportRequest getIncoming(@NotNull UUID target) {
+    public @Nullable TeleportRequest getIncoming(@NotNull UUID target, @Nullable Player priority) {
         return this.requests.stream()
                 .sorted(Comparator.comparingLong(TeleportRequest::when).reversed())
                 .filter(x -> x.isTarget(target) && !x.hasExpired())
+                .filter(x -> priority == null || x.isSender(priority.getUniqueId()))
                 .findFirst()
                 .orElse(null);
     }

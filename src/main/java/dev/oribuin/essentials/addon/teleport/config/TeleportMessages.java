@@ -4,6 +4,8 @@ import dev.oribuin.essentials.api.config.option.Message;
 import dev.oribuin.essentials.api.config.option.TextMessage;
 import dev.oribuin.essentials.api.config.type.MessageConfig;
 
+import java.util.List;
+
 public class TeleportMessages extends MessageConfig {
 
     private static final String PREFIX = "<#bc7dff><b>Teleport</b> <gray>| <white>";
@@ -17,6 +19,7 @@ public class TeleportMessages extends MessageConfig {
     public static Message TELEPORT_UNSAFE = TextMessage.ofConfig(PREFIX + "The teleport location is not safe, this request has been cancelled.");
     public static Message INSUFFICIENT_FUNDS = TextMessage.ofConfig(PREFIX + "You do not have enough money to accept this teleport");
     public static Message TELEPORT_SELF = TextMessage.ofConfig(PREFIX + "You cannot send a teleport request to yourself");
+    public static Message TELEPORT_COOLDOWN = TextMessage.ofConfig(PREFIX + "You must wait <#bc7dff><time> <white>before you can request another teleport.", List.of("The message sent when a player tries to teleport to another player while on cooldown."));
 
     // Back Command
     public static Message TELEPORT_BACK = TextMessage.ofConfig(PREFIX + "You have teleported back to your previous location");

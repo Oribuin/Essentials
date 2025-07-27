@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.addon.home.command;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.oribuin.essentials.EssentialsPlugin;
@@ -8,6 +7,7 @@ import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.util.EssUtils;
 import dev.oribuin.essentials.util.Placeholders;
@@ -20,11 +20,9 @@ import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -126,36 +124,27 @@ public class HomeTPCommand extends BaseRoseCommand {
             return;
         }
 
-        // Create the tp effects task
-        ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.value()) {
-            // Give the player blindness
-            sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
-                    (int) ((teleportDelay.toSeconds() + 1) * 20), 4,
-                    false,
-                    false,
-                    false
-            ));
+        // Create the teleportation timer bar 
+        ScheduledTask task = null;
+        if (HomeConfig.TP_BAR.value()) {
+            long start = System.currentTimeMillis();
 
-            ParticleBuilder particle = new ParticleBuilder(Particle.WITCH)
-                    .count(10)
-                    .offset(0.5, 0.5, 0.5)
-                    .extra(0.1);
-
-            effectTask = EssentialsPlugin.scheduler().runTaskTimerAsync(() ->
-                            particle.location(sender.getLocation()).spawn(),
-                    0, 250, TimeUnit.MILLISECONDS
-            );
+            task = EssentialsPlugin.scheduler().runTaskTimerAsync(() -> sender.sendActionBar(
+                    EssUtils.createTimerBar(teleportDelay.toMillis(), System.currentTimeMillis() - start)
+            ), 0, 500, TimeUnit.MILLISECONDS);
         }
 
         // send the final message
         HomeMessages.HOME_TELEPORT.send(sender, placeholders);
 
         // Teleport the player to the location
-        ScheduledTask finalTask = effectTask;
+        ScheduledTask finalTask = task;
         EssentialsPlugin.scheduler().runTaskLater(() -> {
-            if (finalTask != null) finalTask.cancel();
-
+            if (finalTask != null) {
+                finalTask.cancel();
+                sender.sendActionBar(EssUtils.TIMER_FINISHED);
+            }
+            
             this.teleport(sender, home, cost, placeholders);
         }, teleportDelay.toSeconds(), TimeUnit.SECONDS);
     }

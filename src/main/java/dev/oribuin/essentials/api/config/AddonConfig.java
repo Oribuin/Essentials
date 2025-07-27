@@ -7,8 +7,8 @@ import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
@@ -23,7 +23,7 @@ public abstract class AddonConfig {
     );
 
     private final String name;
-    protected List<ConfigOptionType<?>> options;
+    protected Map<String, ConfigOptionType<?>> options;
     protected CommentedFileConfiguration config;
     protected File file;
 
@@ -32,7 +32,7 @@ public abstract class AddonConfig {
      */
     public AddonConfig(String name) {
         this.name = name;
-        this.options = new ArrayList<>();
+        this.options = new HashMap<>();
     }
 
     /**
@@ -44,10 +44,19 @@ public abstract class AddonConfig {
     }
 
     public void save() {
-        if (this.file == null) return;
+        if (this.file == null || this.config == null) return;
 
-        this.options.forEach(type -> type.write(config));
-        config.save(file);
+        this.options.forEach((path, type) -> type.write(this.config));
+        this.config.save(this.file);
+    }
+
+    /**
+     * Update a config option with a new type
+     *
+     * @param type The type to update
+     */
+    public void update(ConfigOptionType<?> type) {
+        this.options.put(type.path(), type);
     }
 
     /**
@@ -58,20 +67,18 @@ public abstract class AddonConfig {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void reload(File addonFolder) {
         // Clear the options and config
-        this.file = addonFolder;
-        this.options = new ArrayList<>();
+        this.options = new HashMap<>();
         this.config = null;
 
         // Load the config values from the addon
         this.load();
-
         try {
-            File configFile = new File(addonFolder, this.name + ".yml");
-            if (!configFile.exists()) configFile.createNewFile();
+            this.file = new File(addonFolder, this.name + ".yml");
+            if (!this.file.exists()) this.file.createNewFile();
 
             // Load the config
-            this.config = CommentedFileConfiguration.loadConfiguration(configFile);
-            for (ConfigOptionType<?> option : this.options) {
+            this.config = CommentedFileConfiguration.loadConfiguration(this.file);
+            for (ConfigOptionType<?> option : this.options.values()) {
                 if (option.path() == null) continue; // Ignore anything with no path 
 
                 // If the config contains the path, cache the value
@@ -84,10 +91,20 @@ public abstract class AddonConfig {
                 option.write(this.config);
             }
 
-            this.config.save(configFile);
+            this.config.save(this.file);
         } catch (Exception ex) {
             EssentialsPlugin.get().getLogger().severe("Failed to create config file for addon [" + name + "]: " + ex.getMessage());
         }
+    }
+
+    /**
+     * Reload the plugin from the cached file
+     */
+    public void reload() {
+        this.options.clear();
+        this.config = null;
+        this.load();
+        this.save();
     }
 
     /**
@@ -110,12 +127,12 @@ public abstract class AddonConfig {
             throw new IllegalArgumentException("Option [" + option + "] does not have a defined path");
         }
 
-        if (this.options.stream().anyMatch(this.testPath(path))) {
+        if (this.options.containsKey(path)) {
             throw new IllegalArgumentException("Option with path " + path + " already exists");
         }
 
         option.path(path);
-        this.options.add(option);
+        this.options.put(path, option);
     }
 
     /**

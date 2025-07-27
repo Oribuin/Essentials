@@ -101,7 +101,6 @@ public class AddonProvider {
         } catch (Exception e) {
             EssentialsPlugin.get().getLogger().severe("Failed to unload the addon: " + addon.name() + " - " + e.getMessage());
         } finally {
-            System.out.println("Removing from map");
             addons.remove(addon.getClass());
         }
     }

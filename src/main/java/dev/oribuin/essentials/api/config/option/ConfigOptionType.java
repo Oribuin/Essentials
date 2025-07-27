@@ -135,7 +135,7 @@ public abstract class ConfigOptionType<T> {
         if (this.path == null) return;
 
         String[] comments = this.comments.toArray(new String[0]);
-        this.serializer.write(section, this.path, this.defaultValue, comments);
+        this.serializer.write(section, this.path, this.value(), comments);
     }
 
     public @NotNull SettingSerializer<T> serializer() {

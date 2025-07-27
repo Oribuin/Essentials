@@ -24,6 +24,7 @@ public class EssUtils {
     public static RegistryAccess REGISTRY = RegistryAccess.registryAccess();
     public static MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     public static LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
+    public static final Component TIMER_FINISHED = kyorify("<#3bf731><bold>" + "|".repeat(20));
 
     public EssUtils() {
         throw new IllegalStateException("FishUtil is a utility class and cannot be instantiated.");
@@ -111,6 +112,28 @@ public class EssUtils {
         else builder = builder.required("target", ArgumentHandlers.PLAYER);
         return builder.build();
     }
+    
+    
+    /**
+     * Create a timer bar message counting down until something is ready
+     *
+     * @param total   The total length of the timer
+     * @param current The progress of the timer
+     * @return The resulting message
+     */
+    public static Component createTimerBar(long total, long current) {
+        if (current >= total) {
+            return kyorify("<#3bf731><bold>" + "|".repeat(20));
+        }
+
+        double percentLeft = (double) current / total;
+        int textLength = 20;
+        int redLength = (int) (textLength - (textLength * percentLeft));
+        String redZone = "<#d62822><bold>" + "|".repeat(redLength) + "<reset>";
+        String orangeZone = "<#f58516><bold>" + "|".repeat(textLength - redLength);
+        return kyorify(redZone + orangeZone);
+    }
+    
 
     /**
      * Convert a string into a duration
@@ -153,4 +176,5 @@ public class EssUtils {
     public static String fromDuration(Duration duration) {
         return duration.toString().substring(2);
     }
+    
 }

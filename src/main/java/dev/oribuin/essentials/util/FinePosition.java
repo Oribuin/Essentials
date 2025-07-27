@@ -86,13 +86,22 @@ public final class FinePosition {
                 loc.getWorld().getName(),
                 loc.getX(),
                 loc.getY(),
-                loc.getZ()
+                loc.getZ(),
+                loc.getYaw(),
+                loc.getPitch()
         );
     }
 
     @Override
     public String toString() {
-        return String.format("%s, %d, %d, %d", this.world, this.x, this.y, this.z);
+        return "FinePosition{" +
+               "world='" + world + '\'' +
+               ", x=" + x +
+               ", y=" + y +
+               ", z=" + z +
+               ", yaw=" + yaw +
+               ", pitch=" + pitch +
+               '}';
     }
 
     public String world() {return world;}

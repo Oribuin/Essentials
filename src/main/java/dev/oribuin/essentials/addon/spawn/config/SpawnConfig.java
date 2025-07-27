@@ -11,11 +11,15 @@ import java.time.Duration;
 import static dev.oribuin.essentials.api.config.EssentialsSerializers.DURATION;
 import static dev.oribuin.essentials.api.config.EssentialsSerializers.POSITION;
 import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
+import static dev.rosewood.rosegarden.config.SettingSerializers.DOUBLE;
 
 public class SpawnConfig extends AddonConfig {
 
     public static Option<Boolean> TP_CONFIRM = new Option<>(BOOLEAN, true, "Should a player be required to confirm they want to teleport to spawn?");
+    public static Option<Double> TP_COST = new Option<>(DOUBLE, 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.spawn.bypass.cost'");
+    public static Option<Boolean> TP_BAR = new Option<>(BOOLEAN, true, "Should the plugin display a bar counting until the player teleports (Requires tp-delay to be above 0)");
     public static Option<Duration> TP_DELAY = new Option<>(DURATION, Duration.ofSeconds(5), "The time it will take  for a player to teleport (Requires TP Effects)");
+    public static Option<Duration> TP_COOLDOWN = new Option<>(DURATION, Duration.ofSeconds(30), "The cooldown between teleporting to spawn.", "This will be overwritten with the permission 'essentials.spawn.bypass.cooldown'");
     public static final Option<Boolean> USE_MOTD = new Option<>(BOOLEAN, true, "Should a message be sent to players when the join the server?");
     public static final Option<Boolean> USE_NEWBIE_SPAWN = new Option<>(BOOLEAN, false, "Should new players go to their own spawn point");
     public static final Option<Boolean> SPAWN_ON_RESPAWN = new Option<>(BOOLEAN, false, "Should players be teleported to spawn when they die?");

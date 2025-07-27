@@ -1,17 +1,19 @@
 package dev.oribuin.essentials.addon.teleport.command;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
+import dev.oribuin.essentials.util.EssUtils;
 import dev.oribuin.essentials.util.Placeholders;
 import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
+import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
@@ -20,12 +22,10 @@ import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class TpAcceptCommand extends BaseRoseCommand {
@@ -35,43 +35,43 @@ public class TpAcceptCommand extends BaseRoseCommand {
     }
 
     @RoseExecutable
-    public void execute(CommandContext context) {
+    public void execute(CommandContext context, Player target) {
         TeleportAddon addon = AddonProvider.TELEPORT_ADDON;
-        Player target = (Player) context.getSender(); // a bit confusing but target = person accepting the teleport request to them
+        Player commandSender = (Player) context.getSender(); // a bit confusing but target = person accepting the teleport request to them
 
         // Cancel the current outgoing teleport request
-        TeleportRequest incoming = addon.getIncoming(target.getUniqueId());
+        TeleportRequest incoming = addon.getIncoming(commandSender.getUniqueId(), target);
         if (incoming == null) {
-            TeleportMessages.TELEPORT_INVALID.send(target);
+            TeleportMessages.TELEPORT_INVALID.send(commandSender);
             return;
         }
 
         // Check if the player has access to teleport to the world
         Player sender = Bukkit.getPlayer(incoming.sender());
         if (sender == null || !sender.isOnline()) {
-            TeleportMessages.TELEPORT_INVALID.send(target);
+            TeleportMessages.TELEPORT_INVALID.send(commandSender);
             return;
         }
 
         // Check if the sender is allowed to teleport to the player
-        if (!sender.hasPermission(addon.getPerm(target.getWorld().getName()))) {
-            TeleportMessages.DISABLED_WORLD.send(target);
+        if (!sender.hasPermission(addon.getPerm(commandSender.getWorld().getName()))) {
+            TeleportMessages.DISABLED_WORLD.send(commandSender);
             return;
         }
 
         // important values
-        int teleportDelay = TeleportConfig.TP_DELAY.value();
+        Duration teleportDelay = TeleportConfig.TP_DELAY.value();
         double cost = TeleportConfig.TP_COST.value();
         StringPlaceholders placeholders = Placeholders.of(
-                "target", target.getName(),
+                "target", commandSender.getName(),
                 "sender", sender.getName(),
                 "cost", cost,
-                "delay", teleportDelay
+                "delay", EssUtils.fromDuration(teleportDelay)
         );
 
         addon.requests().remove(incoming);
 
-        Location location = incoming.where() != null ? incoming.where() : target.getLocation();
+        Location location = incoming.where() != null ? incoming.where() : commandSender.getLocation();
 
         // Check if the location is safe to teleport to TODO //  Implement FinePosition#isSafe or something to that effect
         if (!Home.isSafe(location) && !sender.hasPermission("essentials.tpa.bypass.unsafe")) {
@@ -89,9 +89,9 @@ public class TpAcceptCommand extends BaseRoseCommand {
         }
 
         // If the player has permission to bypass the delay, skip all effects
-        if (sender.hasPermission("essentials.tpa.bypass.delay") || teleportDelay <= 0) {
+        if (sender.hasPermission("essentials.tpa.bypass.delay") || teleportDelay.isZero()) {
             // send the final message
-            TeleportMessages.TELEPORT_ACCEPT_SELF.send(target, placeholders);
+            TeleportMessages.TELEPORT_ACCEPT_SELF.send(commandSender, placeholders);
             TeleportMessages.TELEPORT_ACCEPT_OTHER.send(sender, placeholders);
 
             // TELEPORT EFFECTS WOOO!!!!!!!!!!!
@@ -101,37 +101,28 @@ public class TpAcceptCommand extends BaseRoseCommand {
 
         // Create the tp effects task
         ScheduledTask effectTask = null;
-        if (HomeConfig.TP_EFFECTS.value()) {
-            // Give the player blindness
-            sender.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
-                    (teleportDelay + 1) * 20, 4,
-                    false,
-                    false,
-                    false
-            ));
+        if (SpawnConfig.TP_BAR.value()) {
+            long start = System.currentTimeMillis();
 
-            ParticleBuilder particle = new ParticleBuilder(Particle.WITCH)
-                    .count(10)
-                    .offset(0.5, 0.5, 0.5)
-                    .extra(0.1);
-
-            effectTask = EssentialsPlugin.scheduler().runTaskTimerAsync(() ->
-                            particle.location(sender.getLocation()).spawn(),
-                    0, 250, TimeUnit.MILLISECONDS
-            );
+            effectTask = EssentialsPlugin.scheduler().runTaskTimerAsync(() -> sender.sendActionBar(
+                    EssUtils.createTimerBar(teleportDelay.toMillis(), System.currentTimeMillis() - start)
+            ), 0, 500, TimeUnit.MILLISECONDS);
         }
 
         // send the final message
-        TeleportMessages.TELEPORT_ACCEPT_SELF.send(target, placeholders);
+        TeleportMessages.TELEPORT_ACCEPT_SELF.send(commandSender, placeholders);
         TeleportMessages.TELEPORT_ACCEPT_OTHER.send(sender, placeholders);
 
         // Teleport the player to the location
         ScheduledTask finalTask = effectTask;
         EssentialsPlugin.scheduler().runTaskLater(() -> {
-            if (finalTask != null) finalTask.cancel();
+            if (finalTask != null) {
+                finalTask.cancel();
+                sender.sendActionBar(EssUtils.TIMER_FINISHED);
+            }
 
             this.teleport(sender, location, cost, placeholders);
-        }, teleportDelay, TimeUnit.SECONDS);
+        }, teleportDelay.toSeconds(), TimeUnit.SECONDS);
     }
 
     /**
@@ -164,6 +155,11 @@ public class TpAcceptCommand extends BaseRoseCommand {
         return CommandInfo.builder("tpaccept")
                 .aliases("tpyes")
                 .permission("essentials.tpaccept")
+                .arguments(
+                        ArgumentsDefinition.builder()
+                                .optional("target", ArgumentHandlers.PLAYER)
+                                .build()
+                )
                 .playerOnly(true)
                 .build();
     }
