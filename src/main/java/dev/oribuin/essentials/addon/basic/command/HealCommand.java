@@ -55,6 +55,7 @@ public class HealCommand extends BaseRoseCommand {
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("heal")
+                .aliases("eheal")
                 .permission("essentials.heal")
                 .arguments(EssUtils.createTarget(true))
                 .build();

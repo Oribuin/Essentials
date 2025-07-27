@@ -40,6 +40,7 @@ public class PingCommand extends BaseRoseCommand {
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("ping")
+                .aliases("eping")
                 .permission("essentials.ping")
                 .arguments(EssUtils.createTarget(true))
                 .build();

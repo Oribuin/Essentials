@@ -51,7 +51,7 @@ public class FlyCommand extends BaseRoseCommand {
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("fly")
                 .permission("essentials.fly")
-                .aliases("flying", "enablefly")
+                .aliases("flying", "enablefly", "efly")
                 .arguments(EssUtils.createTarget(true))
                 .build();
     }

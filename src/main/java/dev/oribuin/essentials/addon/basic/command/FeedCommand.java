@@ -57,6 +57,7 @@ public class FeedCommand extends BaseRoseCommand {
     @Override
     protected CommandInfo createCommandInfo() {
         return CommandInfo.builder("feed")
+                .aliases("efeed")
                 .permission("essentials.feed")
                 .arguments(EssUtils.createTarget(true))
                 .build();
