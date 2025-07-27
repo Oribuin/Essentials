@@ -23,4 +23,14 @@ public class BasicMessages extends MessageConfig {
     public static Message FLY_OTHER = TextMessage.ofConfig(PREFIX + "You have set <#bc7dff><player><white>'s flight status to <#bc7dff><status><white>!");
     public static Message FLY_DISABLED_WORLD = TextMessage.ofConfig(PREFIX + "Flying is not allowed inside this world.");
 
+    // Feed Command
+    public static Message FEED_COMMAND = TextMessage.ofConfig(PREFIX + "You are now fully satiated");
+    public static Message FEED_OTHER = TextMessage.ofConfig(PREFIX + "<#bc7dff><target><white> is now fully satiated");
+    public static Message FEED_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot be fed as you are on cooldown.");
+    
+    // Heal Command
+    public static Message HEAL_COMMAND = TextMessage.ofConfig(PREFIX + "You are now fully healed");
+    public static Message HEAL_OTHER = TextMessage.ofConfig(PREFIX + "<#bc7dff><target><white> is now fully healed");
+    public static Message HEAL_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot be healed as you are on cooldown.");
+
 }

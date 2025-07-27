@@ -55,6 +55,8 @@ public class Cooldown<T> {
      * @param time  How long the cooldown lasts
      */
     public void setCooldown(T entry, Duration time) {
+        if (time.isNegative() || time.isZero()) return;
+        
         this.cooldown.put(entry, System.currentTimeMillis() + time.toMillis());
     }
 

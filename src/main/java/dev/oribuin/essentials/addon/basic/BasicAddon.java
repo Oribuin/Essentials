@@ -1,7 +1,9 @@
 package dev.oribuin.essentials.addon.basic;
 
 import dev.oribuin.essentials.addon.basic.command.EnderchestCommand;
+import dev.oribuin.essentials.addon.basic.command.FeedCommand;
 import dev.oribuin.essentials.addon.basic.command.FlyCommand;
+import dev.oribuin.essentials.addon.basic.command.HealCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.GamemodeCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.impl.AdventureCommand;
@@ -36,6 +38,8 @@ public class BasicAddon extends Addon {
                 new EnderchestCommand(this.plugin),
                 new PingCommand(this.plugin),
                 new FlyCommand(this.plugin),
+                new FeedCommand(this.plugin),
+                new HealCommand(this.plugin),
 
                 // Gamemode Commands
                 new GamemodeCommand(this.plugin),
