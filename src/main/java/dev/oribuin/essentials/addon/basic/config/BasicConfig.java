@@ -28,6 +28,12 @@ public class BasicConfig extends AddonConfig {
             DURATION, Duration.ofMinutes(1),
             "The cooldown between each heal usage",
             "Set value to '0s' to disable the cooldown entirely."
+    );
+    
+    public final static Option<Duration> REPAIR_COOLDOWN = new Option<>(
+            DURATION, Duration.ofMinutes(1),
+            "The cooldown between each repair usage",
+            "Set value to '0s' to disable the cooldown entirely."
     );  
     
     /**

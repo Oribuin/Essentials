@@ -33,4 +33,9 @@ public class BasicMessages extends MessageConfig {
     public static Message HEAL_OTHER = TextMessage.ofConfig(PREFIX + "<#bc7dff><target><white> is now fully healed");
     public static Message HEAL_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot be healed as you are on cooldown.");
 
+    // Repair Command
+    public static Message REPAIR_COMMAND = TextMessage.ofConfig(PREFIX + "You have repaired a total of <#bc7dff><amount><white> items!");
+    public static Message REPAIR_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot repair your items as you are on cooldown.");
+    public static Message REPAIR_NO_DAMAGED = TextMessage.ofConfig(PREFIX + "None of the items in your inventory are damaged.");
+
 }
