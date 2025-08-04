@@ -38,4 +38,7 @@ public class BasicMessages extends MessageConfig {
     public static Message REPAIR_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot repair your items as you are on cooldown.");
     public static Message REPAIR_NO_DAMAGED = TextMessage.ofConfig(PREFIX + "None of the items in your inventory are damaged.");
 
+    // Weather Command
+    public static Message WEATHER_COMMAND = TextMessage.ofConfig(PREFIX + "You have changed the weather in this world to <#bc7dff><weather><white>.");
+    public static Message PLAYER_WEATHER_COMMAND = TextMessage.ofConfig(PREFIX + "You have your personal weather to <#bc7dff><weather><white>.");
 }

@@ -5,7 +5,9 @@ import dev.oribuin.essentials.addon.basic.command.FeedCommand;
 import dev.oribuin.essentials.addon.basic.command.FlyCommand;
 import dev.oribuin.essentials.addon.basic.command.HealCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
+import dev.oribuin.essentials.addon.basic.command.PlayerWeatherCommand;
 import dev.oribuin.essentials.addon.basic.command.RepairCommand;
+import dev.oribuin.essentials.addon.basic.command.WeatherCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.GamemodeCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.impl.AdventureCommand;
 import dev.oribuin.essentials.addon.basic.command.gamemode.impl.CreativeCommand;
@@ -42,6 +44,8 @@ public class BasicAddon extends Addon {
                 new FeedCommand(this.plugin),
                 new HealCommand(this.plugin),
                 new RepairCommand(this.plugin),
+                new WeatherCommand(this.plugin),
+                new PlayerWeatherCommand(this.plugin),
 
                 // Gamemode Commands
                 new GamemodeCommand(this.plugin),
