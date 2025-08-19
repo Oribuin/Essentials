@@ -9,6 +9,7 @@ import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
 import dev.oribuin.essentials.api.Addon;
 import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.api.config.AddonMessages;
 import dev.oribuin.essentials.manager.DataManager;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ import java.util.List;
 public class HomeAddon extends Addon {
 
     private HomeRepository repository;
+    private AddonMessages messages;
 
     /**
      * The name of the addon
@@ -40,6 +42,7 @@ public class HomeAddon extends Addon {
      */
     @Override
     public void enable() {
+        this.messages = new AddonMessages(this.folder.toPath(), "messages.yml");
         this.repository = DataManager.create(HomeRepository.class);
 
         if (this.repository == null) {
@@ -47,6 +50,8 @@ public class HomeAddon extends Addon {
             AddonProvider.unload(this);
             return;
         }
+        
+        this.messages.register(this.plugin);
 
         // Load Existing Users
         Bukkit.getOnlinePlayers().forEach(player -> this.repository.load(player.getUniqueId()));
@@ -69,7 +74,7 @@ public class HomeAddon extends Addon {
     public List<BaseRoseCommand> commands() {
         return List.of(
                 new HomeDeleteCommand(this.plugin),
-                new HomeSetCommand(this.plugin),
+                new HomeSetCommand(this.plugin, this),
                 new HomeTPCommand(this.plugin)
         );
     }
@@ -79,7 +84,7 @@ public class HomeAddon extends Addon {
      */
     @Override
     public List<AddonConfig> configs() {
-        return List.of(new HomeConfig(), new HomeMessages());
+        return List.of(new HomeConfig());
     }
 
     /**
@@ -111,6 +116,10 @@ public class HomeAddon extends Addon {
      */
     public HomeRepository repository() {
         return repository;
+    }
+
+    public AddonMessages messages() {
+        return messages;
     }
 
     /**

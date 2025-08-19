@@ -1,33 +1,67 @@
 package dev.oribuin.essentials.addon.basic.config;
 
+import dev.oribuin.essentials.api.config.option.ConfigSection;
 import dev.oribuin.essentials.api.config.option.Message;
+import dev.oribuin.essentials.api.config.option.Option;
 import dev.oribuin.essentials.api.config.option.TextMessage;
 import dev.oribuin.essentials.api.config.type.MessageConfig;
 
 import java.util.List;
+
+import static dev.rosewood.rosegarden.config.SettingSerializers.STRING;
 
 public class BasicMessages extends MessageConfig {
 
     private static final String PREFIX = "<#bc7dff><b>Server</b> <gray>| <white>";
 
     // Ping Command
-    public static final Message PING_SELF = TextMessage.ofConfig(PREFIX + "Your ping is <#bc7dff>%ping%ms<white>.", List.of("The message sent when a player checks their own ping."));
-    public static final Message PING_OTHER = TextMessage.ofConfig(PREFIX + "<target>'s ping is <#bc7dff><ping>ms<white>.", List.of("The message sent when a player checks another player's ping."));
+    private static final ConfigSection PING_SECTION = ConfigSection.from("ping-command", "All the available command messages for the /ping command");
+    public static final Message PING_SELF = TextMessage.ofConfig("ping-command.use-message",
+            PREFIX + "Your ping is <#bc7dff>%ping%ms<white>.",
+            List.of("The message sent when a player checks their own ping.")
+    );
+    public static final Message PING_OTHER = TextMessage.ofConfig("ping-command.use-other",
+            PREFIX + "<target>'s ping is <#bc7dff><ping>ms<white>.",
+            List.of("The message sent when a player checks another player's ping.")
+    );
 
     // Gamemode Command
-    public static Message CHANGE_GAMEMODE = TextMessage.ofConfig(PREFIX + "You have changed your gamemode to <#bc7dff><gamemode><white>!", List.of("The message sent when a player changes their own gamemode."));
-    public static Message CHANGE_GAMEMODE_OTHER = TextMessage.ofConfig(PREFIX + "You have changed <#bc7dff><target><white>/'s gamemode to <#bc7dff>%gamemode%<white>!", List.of("The message sent when a player changes their own gamemode."));
+    private static final ConfigSection GAMEMODE_SECTION = ConfigSection.from("gamemode-command", "All the available command messages for the /gamemode commands");
+    public static Message CHANGE_GAMEMODE = TextMessage.ofConfig("gamemode-command.use-command",
+            PREFIX + "You have changed your gamemode to <#bc7dff><gamemode><white>!",
+            List.of("The message sent when a player changes their own gamemode.")
+    );
+    public static Message CHANGE_GAMEMODE_OTHER = TextMessage.ofConfig("gamemode-command.use-command-other",
+            PREFIX + "You have changed <#bc7dff><target><white>/'s gamemode to <#bc7dff>%gamemode%<white>!",
+            List.of("The message sent when a player changes their own gamemode.")
+    );
 
     // Fly Command
-    public static Message FLY_SELF = TextMessage.ofConfig(PREFIX + "You have set your flight status to <#bc7dff><status><white>!");
-    public static Message FLY_OTHER = TextMessage.ofConfig(PREFIX + "You have set <#bc7dff><player><white>'s flight status to <#bc7dff><status><white>!");
+    private static final ConfigSection FLY_SECTION = ConfigSection.from("fly-command", "All the available command messages for the /fly command.");
+    public static Option<String> FLY_ENABLED = new Option<>("fly-command.enabled",
+            STRING, "Enabled",
+            List.of("The short message for when a player's flight state is enabled.")
+    );
+    public static Option<String> FLY_DISABLED = new Option<>("fly-command.disabled",
+            STRING, "Disabled",
+            List.of("The short message for when a player's flight state is disabled.")
+    );
+    public static Message FLY_SELF = TextMessage.ofConfig("fly-command.use-command",
+            PREFIX + "Your flight status is now set to <#bc7dff><status><white>!",
+            List.of("The message sent when a player changes their own flight state")
+    );
+    public static Message FLY_OTHER = TextMessage.ofConfig(
+            "fly-command.use-command-other",
+            PREFIX + "You have set <#bc7dff><player><white>'s flight status to <#bc7dff><status><white>!",
+            List.of("The message sent when a player changes another player's flight state")
+    );
     public static Message FLY_DISABLED_WORLD = TextMessage.ofConfig(PREFIX + "Flying is not allowed inside this world.");
 
     // Feed Command
     public static Message FEED_COMMAND = TextMessage.ofConfig(PREFIX + "You are now fully satiated");
     public static Message FEED_OTHER = TextMessage.ofConfig(PREFIX + "<#bc7dff><target><white> is now fully satiated");
     public static Message FEED_COOLDOWN = TextMessage.ofConfig(PREFIX + "You cannot be fed as you are on cooldown.");
-    
+
     // Heal Command
     public static Message HEAL_COMMAND = TextMessage.ofConfig(PREFIX + "You are now fully healed");
     public static Message HEAL_OTHER = TextMessage.ofConfig(PREFIX + "<#bc7dff><target><white> is now fully healed");
@@ -41,4 +75,6 @@ public class BasicMessages extends MessageConfig {
     // Weather Command
     public static Message WEATHER_COMMAND = TextMessage.ofConfig(PREFIX + "You have changed the weather in this world to <#bc7dff><weather><white>.");
     public static Message PLAYER_WEATHER_COMMAND = TextMessage.ofConfig(PREFIX + "You have your personal weather to <#bc7dff><weather><white>.");
+
+    public static Message TOP_COMMAND = TextMessage.ofConfig(PREFIX + "You have teleported to the highest point");
 }

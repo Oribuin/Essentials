@@ -67,9 +67,9 @@ tasks {
         this.relocate("org.slf4j", "dev.rosewood.rosegarden.libs.slf4j")
     }
 
-    this.processResources {
-        this.expand("version" to project.version)
-    }
+//    this.processResources {
+//        this.expand("version" to project.version)
+//    }
 
     this.build {
         this.dependsOn(shadowJar)

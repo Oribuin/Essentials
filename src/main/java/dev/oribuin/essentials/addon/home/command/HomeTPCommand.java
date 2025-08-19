@@ -7,7 +7,6 @@ import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
-import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.util.EssUtils;
 import dev.oribuin.essentials.util.Placeholders;
@@ -21,7 +20,6 @@ import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.entity.Player;
-import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.time.Duration;
@@ -175,7 +173,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
     @Override
     protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("home")
+        return CommandInfo.builder("homes")
                 .permission("essentials.home.teleport")
                 .playerOnly(true)
                 .arguments(this.createArgumentsDefinition())
@@ -184,7 +182,7 @@ public class HomeTPCommand extends BaseRoseCommand {
 
     private ArgumentsDefinition createArgumentsDefinition() {
         return ArgumentsDefinition.builder()
-                .required("home", new HomeArgumentHandler())
+                .required("homes", new HomeArgumentHandler())
                 .optional("target", ArgumentHandlers.OFFLINE_PLAYER)
                 .build();
     }

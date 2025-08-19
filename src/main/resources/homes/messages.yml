@@ -1,0 +1,47 @@
+# The message sent when a player tries to set a home in a disabled world.
+disabled-world:
+  message: '{{PREFIX}} You cannot set homes in this world.'
+
+# The message sent when a player needs to confirm their teleportation.
+confirm-command:
+  message: '{{PREFIX}} Please type the command again to confirm you want to teleport to [<#bc7dff><home><white>].'
+
+# The message sent when a player sets a home.
+home-set:
+  message: '{{PREFIX}} You have created the home, [<#bc7dff><home><white>]'
+
+# The message sent when a player reaches the maximum amount of homes.
+home-limit:
+  message: '{{PREFIX}} You have reached the maximum homes [<#bc7dff>$<amt>/<max><white>]'
+
+# The message sent when a player tries to teleport to an unsafe home.
+home-unsafe:
+  message: '{{PREFIX}} This home is unsafe to teleport to.'
+
+# The message sent when a player tries to teleport to a home on cooldown.
+home-cooldown:
+  message: '{{PREFIX}} You must wait <time> before teleporting to a home.'
+
+# The message sent when it cost money to teleport a player.
+teleport-cost:
+  message: '{{PREFIX}} It cost you [<#bc7dff>$<cost><white>] to teleport to [<#bc7dff><home><white>]'
+
+# The message sent when a player deletes a home.
+home-deleted:
+  message: '{{PREFIX}} You have deleted the home, [<#bc7dff><home><white>]'
+
+# The message sent when a player tries to set a home with a name that already exists in their list.
+home-already-exists:
+  message: '{{PREFIX}} A home by this name already exists.'
+
+# The message sent when a player teleports to a home.
+home-teleport:
+  message: '{{PREFIX}} You are now teleporting to [<#bc7dff><home><white>]'
+# message for something ??????????
+home-format:
+  message: '{{PREFIX}} <#bc7dff><name><gray>, '
+# The message sent when a player tries to set a home but does not have enough money.
+insufficient-funds:
+  message: '{{PREFIX}} You do not have enough money to set a home.'
+teleport-failed:
+  message: '{{PREFIX}} The teleport was interrupted by an external factor.'

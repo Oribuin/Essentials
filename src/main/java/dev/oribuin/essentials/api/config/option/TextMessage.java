@@ -21,13 +21,13 @@ import java.util.List;
 public class TextMessage {
 
     public static final SettingSerializer<TextMessage> SERIALIZER = SettingSerializers.ofRecord(TextMessage.class, instance -> instance.group(
-            SettingField.of("message", SettingSerializers.STRING, TextMessage::message),
-            SettingField.of("actionbar", SettingSerializers.STRING, TextMessage::actionbar),
-            SettingField.of("sound", SettingSerializers.STRING, TextMessage::sound),
-            SettingField.of("source", SettingSerializers.STRING, TextMessage::sourceName),
-            SettingField.of("title_header", SettingSerializers.STRING, TextMessage::titleHeader),
-            SettingField.of("title_subtitle", SettingSerializers.STRING, TextMessage::titleSubtitle),
-            SettingField.ofOptional("placeholders", SettingSerializers.BOOLEAN, TextMessage::placeholderapi, () -> false)
+            SettingField.ofOptional("message", SettingSerializers.STRING, TextMessage::message, () -> null),
+            SettingField.ofOptional("actionbar", SettingSerializers.STRING, TextMessage::actionbar, () -> null),
+            SettingField.ofOptional("sound", SettingSerializers.STRING, TextMessage::sound, () -> null),
+            SettingField.ofOptional("source", SettingSerializers.STRING, TextMessage::sourceName, () -> null),
+            SettingField.ofOptional("title_header", SettingSerializers.STRING, TextMessage::titleHeader, () -> null),
+            SettingField.ofOptional("title_subtitle", SettingSerializers.STRING, TextMessage::titleSubtitle, () -> null),
+            SettingField.ofOptional("placeholders", SettingSerializers.BOOLEAN, TextMessage::papi, () -> false)
     ).apply(instance, TextMessage::new));
 
     private @Nullable String message;
@@ -37,6 +37,32 @@ public class TextMessage {
     private @Nullable String titleSubtitle;
     private @Nullable Sound.Source source;
     private Boolean placeholderapi;
+
+    /**
+     * Create a new config defined message for the plugin
+     *
+     * @param path     The config defined path to the message
+     * @param message  The message being defined
+     * @param comments The comments for the message
+     *
+     * @return The resulting config option
+     */
+    public static Message ofConfig(String path, String message, List<String> comments) {
+        return new Message(path, new TextMessage(message), comments);
+    }
+
+    /**
+     * Create a new config defined message for the plugin
+     *
+     * @param section  The config defined path to the message
+     * @param message  The message being defined
+     * @param comments The comments for the message
+     *
+     * @return The resulting config option
+     */
+    public static Message ofConfig(ConfigSection section, String message, List<String> comments) {
+        return new Message(section.path(), new TextMessage(message), comments);
+    }
 
     /**
      * Create a new config defined message for the plugin
@@ -53,13 +79,54 @@ public class TextMessage {
     /**
      * Create a new config defined message for the plugin
      *
+     * @param path     The config defined path to the message
+     * @param message  The message being defined
+     * @param comments The comments for the message
+     *
+     * @return The resulting config option
+     */
+    public static Message ofPapiConfig(String path, String message, List<String> comments) {
+        TextMessage textMessage = new TextMessage(message).papi(true);
+        return new Message(path, textMessage, comments);
+    }
+
+    /**
+     * Create a new config defined message for the plugin
+     *
+     * @param section  The config defined path to the message
+     * @param message  The message being defined
+     * @param comments The comments for the message
+     *
+     * @return The resulting config option
+     */
+    public static Message ofPapiConfig(ConfigSection section, String message, List<String> comments) {
+        TextMessage textMessage = new TextMessage(message).papi(true);
+        return new Message(section.path(), textMessage, comments);
+    }
+
+    /**
+     * Create a new config defined message for the plugin
+     *
      * @param message  The message being defined
      * @param comments The comments for the message
      *
      * @return The resulting config option
      */
     public static Message ofPapiConfig(String message, List<String> comments) {
-        return new Message(new TextMessage(message).placeholderapi(true), comments);
+        TextMessage textMessage = new TextMessage(message).papi(true);
+        return new Message(textMessage, comments);
+    }
+
+    /**
+     * Create a new config defined message for the plugin
+     *
+     * @param path    The config defined path to the message
+     * @param message The message being defined
+     *
+     * @return The resulting config option
+     */
+    public static Message ofConfig(String path, String message) {
+        return new Message(path, new TextMessage(message));
     }
 
     /**
@@ -76,12 +143,26 @@ public class TextMessage {
     /**
      * Create a new config defined message for the plugin
      *
+     * @param path    The config defined path to the message
+     * @param message The message being defined
+     *
+     * @return The resulting config option
+     */
+    public static Message ofPapiConfig(String path, String message) {
+        TextMessage textMessage = new TextMessage(message).papi(true);
+        return new Message(path, textMessage);
+    }
+
+    /**
+     * Create a new config defined message for the plugin
+     *
      * @param message The message being defined
      *
      * @return The resulting config option
      */
     public static Message ofPapiConfig(String message) {
-        return new Message(new TextMessage(message).placeholderapi(true));
+        TextMessage textMessage = new TextMessage(message).papi(true);
+        return new Message(textMessage);
     }
 
     /**
@@ -105,7 +186,7 @@ public class TextMessage {
      * @return The resulting config option
      */
     public static Message ofPapiConfig(TextMessage message, String... comments) {
-        return new Message(message.placeholderapi(true), comments);
+        return new Message(message.papi(true), comments);
     }
 
     /**
@@ -293,6 +374,24 @@ public class TextMessage {
         return this.parse(message, null, Placeholders.empty());
     }
 
+    public void apply(StringPlaceholders placeholders) {
+        if (this.message != null) {
+            this.message = placeholders.apply(this.message);
+        }
+
+        if (this.actionbar != null) {
+            this.actionbar = placeholders.apply(this.actionbar);
+        }
+
+        if (this.titleHeader != null) {
+            this.titleHeader = placeholders.apply(this.titleHeader);
+        }
+
+        if (this.titleSubtitle != null) {
+            this.titleSubtitle = placeholders.apply(this.titleSubtitle);
+        }
+    }
+
     public @Nullable String message() {
         return message;
     }
@@ -351,11 +450,11 @@ public class TextMessage {
         return this;
     }
 
-    public Boolean placeholderapi() {
+    public Boolean papi() {
         return placeholderapi;
     }
 
-    public TextMessage placeholderapi(boolean placeholderapi) {
+    public TextMessage papi(boolean placeholderapi) {
         this.placeholderapi = placeholderapi;
         return this;
     }

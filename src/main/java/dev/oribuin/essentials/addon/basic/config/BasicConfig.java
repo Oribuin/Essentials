@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static dev.oribuin.essentials.api.config.EssentialsSerializers.DURATION;
+import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
 
 public class BasicConfig extends AddonConfig {
 
@@ -35,6 +36,11 @@ public class BasicConfig extends AddonConfig {
             "The cooldown between each repair usage",
             "Set value to '0s' to disable the cooldown entirely."
     );  
+    
+    public final static Option<Boolean> REQUIRE_CLEAR_CONFIRMATION = new Option<>(
+            BOOLEAN, true,
+            "Should players be required to type the command gain to clear their inventory?"
+    );
     
     /**
      * Create a new instance of the addon config

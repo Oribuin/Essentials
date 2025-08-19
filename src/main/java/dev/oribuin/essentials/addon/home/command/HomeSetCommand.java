@@ -15,14 +15,19 @@ import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
 public class HomeSetCommand extends BaseRoseCommand {
+    
+    private final HomeAddon addon;
 
-    public HomeSetCommand(RosePlugin rosePlugin) {
+    public HomeSetCommand(RosePlugin rosePlugin, HomeAddon addon) {
         super(rosePlugin);
+        this.addon = addon;
     }
 
     @RoseExecutable
@@ -32,7 +37,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         // Check if the world is disabled
         List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.value();
         if (disabledWorlds.contains(sender.getWorld().getName())) {
-            HomeMessages.DISABLED_WORLD.send(sender);
+            this.addon.messages().from("disabled-world").send(sender);
             return;
         }
 
@@ -41,14 +46,14 @@ public class HomeSetCommand extends BaseRoseCommand {
 
         // Check if a player has a home by that name already
         if (repository.checkExists(sender.getUniqueId(), name)) {
-            HomeMessages.HOME_ALREADY_EXISTS.send(sender);
+            this.addon.messages().from("home-already-exists").send(sender);
             return;
         }
 
         // Check the maximum homes a player can have
         int limit = HomeAddon.limit(sender);
         if (limit != -1 && current.size() >= limit) {
-            HomeMessages.HOME_LIMIT.send(sender, "amt", current.size(), "limit", limit);
+            this.addon.messages().from("home-limit").send(sender, "amt", current.size(), "limit", limit);
             return;
         }
 
@@ -56,7 +61,7 @@ public class HomeSetCommand extends BaseRoseCommand {
         double setCost = HomeConfig.SET_COST.value();
         if (setCost > 0 && !VaultProvider.get().has(sender, setCost)) {
             if (!VaultProvider.get().has(sender, setCost)) {
-                HomeMessages.INSUFFICIENT_FUNDS.send(sender, "cost", setCost);
+                this.addon.messages().from("insufficient-funds").send(sender, "cost", setCost);
                 return;
             }
         }
@@ -69,7 +74,7 @@ public class HomeSetCommand extends BaseRoseCommand {
 
         // Set the home
         repository.save(home);
-        HomeMessages.HOME_SET.send(sender, home.placeholders());
+        this.addon.messages().from("home-set").send(sender, home.placeholders());
     }
 
     @Override

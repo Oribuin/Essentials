@@ -74,8 +74,10 @@ public abstract class AddonConfig {
         this.load();
         try {
             this.file = new File(addonFolder, this.name + ".yml");
-            if (!this.file.exists()) this.file.createNewFile();
-
+            if (!this.file.exists()) {
+                this.file.createNewFile();
+            }
+            
             // Load the config
             this.config = CommentedFileConfiguration.loadConfiguration(this.file);
             for (ConfigOptionType<?> option : this.options.values()) {
