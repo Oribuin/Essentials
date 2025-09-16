@@ -1,34 +1,80 @@
 package dev.oribuin.essentials.addon.home.config;
 
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.Option;
+import dev.oribuin.essentials.addon.home.HomeAddon;
+import dev.oribuin.essentials.config.AddonConfig;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 import java.time.Duration;
 import java.util.List;
 
-import static dev.oribuin.essentials.api.config.EssentialsSerializers.DURATION;
-import static dev.rosewood.rosegarden.config.SettingSerializers.*;
+@ConfigSerializable
+@SuppressWarnings({ "FieldMayBeFinal", "FieldCanBeLocal" })
+public class HomeConfig implements AddonConfig {
 
-public class HomeConfig extends AddonConfig {
-
-    // Module Options
-    public static Option<List<String>> DISABLED_WORLDS = new Option<>(STRING_LIST, List.of("world_nether", "world_the_end"), "Homes cannot be set in these worlds.");
-
-    // Teleport Options
-    public static Option<Duration> TP_DELAY = new Option<>(DURATION, Duration.ofSeconds(5), "The delay in seconds before teleporting to a home.", "This will be overwritten with the permission 'essentials.home.bypass.delay'");
-    public static Option<Duration> TP_COOLDOWN = new Option<>(DURATION, Duration.ofSeconds(30), "The cooldown in seconds between teleporting to homes.", "This will be overwritten with the permission 'essentials.home.bypass.cooldown'");
-    public static Option<Double> TP_COST = new Option<>(DOUBLE, 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.home.bypass.cost'");
-    public static Option<Boolean> TP_BAR = new Option<>(BOOLEAN, true, "Should the plugin display a bar counting until the player teleports (Requires tp-delay to be above 0)");
-    public static Option<Boolean> TP_CONFIRM = new Option<>(BOOLEAN, true, "Should a player be required to confirm they want to teleport to their home?");
-
-    // Home Setting Options
-    public static Option<Double> SET_COST = new Option<>(DOUBLE, 0.0, "The cost to set a home.", "This will be overwritten with the permission 'essentials.home.bypass-set-cost'");
-
-    /**
-     * Create a new instance of the addon config
-     */
-    public HomeConfig() {
-        super("config");
+    public static HomeConfig getInstance() {
+        return HomeAddon.getInstance().getConfigLoader().get(HomeConfig.class);
     }
 
+    @Comment("Whether the basic addon module is enabled")
+    private boolean enabled = true;
+
+    @Comment("Homes cannot be set in these worlds.")
+    private List<String> disabledWorlds = List.of("disabled_world");
+
+    @Comment("The delay before teleporting to your home")
+    private Duration teleportDelay = Duration.ofSeconds(5);
+
+    @Comment("The cooldown before you can teleport to a home again")
+    private Duration teleportCooldown = Duration.ofSeconds(30);
+
+    @Comment("The cost to teleport to a home")
+    private double teleportCost = 0.0;
+
+    @Comment("Should the plugin display a bar counting until the player teleports (Reqiores teleport-delay to be above 0)")
+    private boolean teleportBar = true;
+
+    @Comment("Should a player be required to confirm they want to teleport to their home?")
+    private boolean teleportConfirm = true;
+
+    @Comment("The cost to create a new home")
+    private double setCost = 0.0;
+
+    /**
+     * Check if the addon config is enabled
+     *
+     * @return True if the addon config is enabled
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    public List<String> getDisabledWorlds() {
+        return disabledWorlds;
+    }
+
+    public Duration getTeleportDelay() {
+        return teleportDelay;
+    }
+
+    public Duration getTeleportCooldown() {
+        return teleportCooldown;
+    }
+
+    public double getTeleportCost() {
+        return teleportCost;
+    }
+
+    public boolean useTeleportBar() {
+        return teleportBar;
+    }
+
+    public boolean isTeleportConfirm() {
+        return teleportConfirm;
+    }
+
+    public double getSetCost() {
+        return setCost;
+    }
 }

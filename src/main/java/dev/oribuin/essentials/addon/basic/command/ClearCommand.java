@@ -1,31 +1,58 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import org.bukkit.Bukkit;
+import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Flag;
+import org.incendo.cloud.annotations.Permission;
 
-public class ClearCommand extends BaseRoseCommand {
+public class ClearCommand {
 
-    public ClearCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    /**
+     * Clear a player's inventory
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("clearinventory|clear")
+    @Permission("essentials.clear")
+    @CommandDescription("Clear a player's current inventory")
+    public void clear(Player sender) {
+        BasicMessages messages = BasicMessages.get();
+        PlayerInventory inventory = sender.getInventory();
+
+//        if (armour != null) {
+//            inventory.setContents(new ItemStack[0]);
+//        } else {
+            inventory.setStorageContents(new ItemStack[0]);
+//        }
+
+        messages.getClearInvSelf().send(sender, "target", sender.getName());
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context) {
-        Player player = (Player) context.getSender();
-    }
+    /**
+     * Clear a player's inventory
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("clearinventory|clear <target>")
+    @Permission("essentials.clear.others")
+    @CommandDescription("Clear a player's current inventory")
+    public void clearOther(CommandSender sender, Player target) {
+        BasicMessages messages = BasicMessages.get();
+        PlayerInventory inventory = target.getInventory();
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("trash")
-                .permission("essentials.trash")
-                .aliases("etrash", "bin", "disposal", "dispose", "edispose", "edisposal")
-                .playerOnly(true)
-                .build();
+//        if (armour != null) {
+//            inventory.setContents(new ItemStack[0]);
+//        } else {
+            inventory.setStorageContents(new ItemStack[0]);
+//        }
+
+        messages.getClearInvOther().send(sender, "target", target.getName());
     }
 
 }

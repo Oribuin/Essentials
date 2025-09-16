@@ -1,68 +1,51 @@
 package dev.oribuin.essentials.addon.spawn.command;
 
-import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
-import dev.oribuin.essentials.api.config.option.Option;
-import dev.oribuin.essentials.util.EssUtils;
-import dev.oribuin.essentials.util.FinePosition;
 import dev.oribuin.essentials.util.NumberUtil;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.FinePosition;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Flag;
+import org.incendo.cloud.annotations.Permission;
 
-public class SetSpawnCommand extends BaseRoseCommand {
+public class SetSpawnCommand {
 
-    public SetSpawnCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    private final SpawnAddon addon;
+
+    public SetSpawnCommand(SpawnAddon addon) {
+        this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, String center) {
-        Player sender = (Player) context.getSender();
+    /**
+     * Feed a player and heal their saturation levels
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("setspawn")
+    @Permission("essentials.setspawn")
+    @CommandDescription("Set the server spawn")
+    public void execute(Player sender) {
+        SpawnConfig config = SpawnConfig.getInstance();
+        SpawnMessages messages = SpawnMessages.getInstance();
 
         Location location = sender.getLocation().clone();
-        if (center != null) {
-            location = location.toCenterLocation();
-        }
+//        if (center != null) {
+//            location = location.toCenterLocation();
+//        }
 
-        SpawnConfig config = AddonProvider.SPAWN_ADDON.config();
-        Option<FinePosition> spawnpoint = SpawnConfig.SPAWNPOINT;
-        spawnpoint.value(FinePosition.from(location));
-        config.update(spawnpoint);
-        config.save();
-        
+
+        config.setSpawnpoint(FinePosition.from(location));
         location.getWorld().setSpawnLocation(location);
-        SpawnMessages.SET_SPAWN.send(sender, 
-                "x", NumberUtil.rounded(location.getX(), 3), 
-                "y", NumberUtil.rounded(location.getY(), 3), 
+        this.addon.getConfigLoader().saveConfig(SpawnConfig.class);
+        messages.getSetSpawn().send(sender,
+                "x", NumberUtil.rounded(location.getX(), 3),
+                "y", NumberUtil.rounded(location.getY(), 3),
                 "z", NumberUtil.rounded(location.getZ(), 3)
         );
     }
 
-    /**
-     * @return a newly constructed {@link CommandInfo} for this command
-     */
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("setspawn")
-                .aliases("spawnpoint")
-                .permission("essentials.setspawn")
-                .arguments(this.createArgumentInfo())
-                .playerOnly(true)
-                .build();
-    }
-
-    private ArgumentsDefinition createArgumentInfo() {
-        return ArgumentsDefinition.builder()
-                .optional("--center", ArgumentHandlers.STRING)
-                .build();
-    }
 }

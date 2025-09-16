@@ -1,13 +1,12 @@
 package dev.oribuin.essentials.addon.spawn;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.spawn.command.SetSpawnCommand;
 import dev.oribuin.essentials.addon.spawn.command.SpawnCommand;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.util.Placeholders;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
+import dev.oribuin.essentials.config.AddonConfig;
+import dev.oribuin.essentials.util.model.Placeholders;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,48 +21,54 @@ import org.bukkit.permissions.PermissionDefault;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class SpawnAddon extends Addon {
 
     public static Permission SILENT_JOIN_PERMISSION = new Permission("essentials.join.silent", PermissionDefault.FALSE);
     public static Permission SILENT_LEAVE_PERMISSION = new Permission("essentials.leave.silent", PermissionDefault.FALSE);
-    private final SpawnConfig config = new SpawnConfig();
+    private static SpawnAddon instance;
 
     /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
+     * Create a new instance of the addon
      */
-    @Override
-    public String name() {
-        return "spawn";
+    public SpawnAddon() {
+        super("spawn");
+
+        instance = this;
     }
+
 
     /**
      * Get all the commands for the addon
      */
     @Override
-    public List<BaseRoseCommand> commands() {
-        return List.of(new SetSpawnCommand(this.plugin), new SpawnCommand(this.plugin));
+    public List<Object> getCommands() {
+        return List.of(new SetSpawnCommand(this), new SpawnCommand(this));
     }
 
     /**
      * Get all the configuration files for the addon
      */
     @Override
-    public List<AddonConfig> configs() {
-        return List.of(this.config, new SpawnMessages());
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of(
+                "config", SpawnConfig::new,
+                "messages", SpawnMessages::new
+        );
     }
 
     /**
      * Get all the listeners for the addon
      */
     @Override
-    public List<Listener> listeners() {
+    public List<Listener> getListeners() {
         return List.of(this);
     }
 
     @Override
-    public List<Permission> permissions() {
+    public List<Permission> getPermissions() {
         return List.of(SILENT_JOIN_PERMISSION, SILENT_LEAVE_PERMISSION);
     }
 
@@ -74,24 +79,25 @@ public class SpawnAddon extends Addon {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
+        SpawnConfig config = SpawnConfig.getInstance();
+        SpawnMessages messages = SpawnMessages.getInstance();
+
         Player player = event.getPlayer();
         event.joinMessage(null);
 
         // Send the motd to the player after 1s
-        if (SpawnConfig.USE_MOTD.value()) {
-            SpawnMessages.MOTD.value().send(player, player);
-        }
+        if (config.useMotd()) messages.getMotd().send(player, player);
 
         // Run the first join stuff :3
         boolean isFirstJoin = !player.hasPlayedBefore();
         if (isFirstJoin) {
-            if (SpawnConfig.USE_NEWBIE_SPAWN.value()) {
-                player.teleport(SpawnConfig.NEWBIE_SPAWN.value().asLoc());
+            if (config.isUseNewbieSpawn()) {
+                player.teleport(config.getNewbieSpawnpoint().asLoc());
             }
 
             // Send the first join message to the server
             if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-                SpawnMessages.FIRST_JOIN_MESSAGE.send(this.messageAudience(), player, Placeholders.of(
+                messages.getFirstJoinMessage().send(this.messageAudience(), player, Placeholders.of(
                         "total_players", Bukkit.getOfflinePlayers().length
                 ));
             }
@@ -101,14 +107,14 @@ public class SpawnAddon extends Addon {
 
         // Send the join message to the server
         if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-            SpawnMessages.JOIN_MESSAGE.send(this.messageAudience(), player, Placeholders.of(
+            messages.getJoinMessage().send(this.messageAudience(), player, Placeholders.of(
                     "total_players", Bukkit.getOfflinePlayers().length
             ));
         }
 
         // Teleport the player to spawn on login (if enabled)
-        if (SpawnConfig.ALWAYS_SPAWN_ON_JOIN.value()) {
-            event.getPlayer().teleport(SpawnConfig.SPAWNPOINT.value().asLoc());
+        if (config.isAlwaysSpawnOnJoin()) {
+            event.getPlayer().teleport(config.getSpawnpoint().asLoc());
         }
     }
 
@@ -121,7 +127,7 @@ public class SpawnAddon extends Addon {
     public void onQuit(PlayerQuitEvent event) {
         event.quitMessage(null);
         if (!event.getPlayer().hasPermission(SILENT_LEAVE_PERMISSION)) {
-            SpawnMessages.LEAVE_MESSAGE.send(this.messageAudience(), event.getPlayer());
+            SpawnMessages.getInstance().getLeaveMessage().send(this.messageAudience(), event.getPlayer());
         }
     }
 
@@ -132,8 +138,8 @@ public class SpawnAddon extends Addon {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onRespawn(PlayerRespawnEvent event) {
-        if (SpawnConfig.SPAWN_ON_RESPAWN.value()) {
-            event.setRespawnLocation(SpawnConfig.SPAWNPOINT.value().asLoc());
+        if (SpawnConfig.getInstance().isSpawnOnRespawn()) {
+            event.setRespawnLocation(SpawnConfig.getInstance().getSpawnpoint().asLoc());
         }
     }
 
@@ -144,7 +150,7 @@ public class SpawnAddon extends Addon {
         return Audience.audience(audiences);
     }
 
-    public SpawnConfig config() {
-        return config;
+    public static SpawnAddon getInstance() {
+        return instance;
     }
 }

@@ -1,24 +1,70 @@
 package dev.oribuin.essentials.addon.serverlist.config;
 
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.Option;
+import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
+import dev.oribuin.essentials.config.AddonConfig;
+import dev.oribuin.essentials.config.TextMessage;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static dev.rosewood.rosegarden.config.SettingSerializers.INTEGER;
-import static dev.rosewood.rosegarden.config.SettingSerializers.STRING_LIST;
+@ConfigSerializable
+@SuppressWarnings({ "FieldMayBeFinal", "FieldCanBeLocal" })
+public class ServerListConfig implements AddonConfig {
 
-public class ServerListConfig extends AddonConfig {
+    public static ServerListConfig getInstance() {
+        return ServerListAddon.getInstance().getConfigLoader().get(ServerListConfig.class);
+    }
 
-    public final static Option<Integer> MAX_PLAYERS = new Option<>(INTEGER, 100, "The maximum amount of players that can be on the server at once.");
-    public static final Option<List<String>> LINES = new Option<>(STRING_LIST, List.of("<rainbow>Welcome to the server!", "<white>This is a test message!"), "The lines that will be displayed on the server list.");
-    public static final Option<List<String>> ICON_IMAGES = new Option<>(STRING_LIST, List.of("server-icon.png"), "The path to files to use as the server icon", "Requires a reboot to see changes", "All files will be loaded from /addons/serverlist/icons");
+    @Comment("Whether the basic addon module is enabled")
+    private boolean enabled = true;
+
+    @Comment("The maximum amount of players that can be on the server at once (Display Only)")
+    private int maxPlayers = 69;
+
+    @Comment("The lines that will be displayed on the server list")
+    private List<Lines> lines = new ArrayList<>(List.of(new Lines()));
+
+    @Comment("The list of server icons that will be displayed. File names loaded from ./icons")
+    private List<String> iconImages = List.of("server-icon.png");
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public List<Lines> getLines() {
+        return lines;
+    }
+
+    public List<String> getIconImages() {
+        return iconImages;
+    }
 
     /**
-     * Create a new instance of the addon config
+     * Check if the addon config is enabled
+     *
+     * @return True if the addon config is enabled
      */
-    public ServerListConfig() {
-        super("config");
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
     }
+
+    @ConfigSerializable
+    @SuppressWarnings({ "FieldMayBeFinal", "FieldCanBeLocal" })
+    public static class Lines {
+        private TextMessage firstLine = new TextMessage("<rainbow>Welcome to the server!");
+        private TextMessage secondLine = new TextMessage("<white>Powered by hamsters");
+
+        public TextMessage getFirstLine() {
+            return firstLine;
+        }
+
+        public TextMessage getSecondLine() {
+            return secondLine;
+        }
+    }
+
 
 }

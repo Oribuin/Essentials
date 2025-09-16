@@ -1,46 +1,43 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.basic.BasicAddon;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class EnderchestCommand extends BaseRoseCommand {
+public class EnderchestCommand {
+    
+    private final BasicAddon addon;
 
-    public EnderchestCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    public EnderchestCommand(BasicAddon addon) {
+        this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, Player target) {
-        if (!(context.getSender() instanceof Player commandSender)) return;
-
-        // Swap the target if the sender does not have permission to view other player's ping
-        if (target != null && !context.getSender().hasPermission("essentials.enderchest.others")) {
-            target = commandSender;
-        }
-
-        // Send the ping message
-        if (target != null) {
-            commandSender.openInventory(target.getEnderChest());
-            return;
-        }
-
-        // Send the ping message to the sender
-        commandSender.openInventory(commandSender.getEnderChest());
+    /**
+     * Open a player's current enderchest
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("enderchest|echest|ec")
+    @Permission("essentials.gamemode")
+    @CommandDescription("Change your current gamemode")
+    public void execute(Player sender) {
+        this.addon.getScheduler().runTask(() -> sender.openInventory(sender.getEnderChest()));
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("enderchest")
-                .permission("essentials.enderchest")
-                .arguments(EssUtils.createTarget(true))
-                .aliases("ec", "echest")
-                .playerOnly(true)
-                .build();
+    /**
+     * Open a player's current enderchest
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("enderchest|echest|ec <target>")
+    @Permission("essentials.gamemode.others")
+    @CommandDescription("Change your current gamemode")
+    public void executeOther(Player sender, Player target) {
+        this.addon.getScheduler().runTask(() -> sender.openInventory(target.getEnderChest()));
     }
 
 }

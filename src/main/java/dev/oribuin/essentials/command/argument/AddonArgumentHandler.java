@@ -1,50 +1,59 @@
 package dev.oribuin.essentials.command.argument;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.addon.home.database.HomeRepository;
-import dev.oribuin.essentials.addon.home.model.Home;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.manager.DataManager;
-import dev.rosewood.rosegarden.command.framework.Argument;
-import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.InputIterator;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.caption.CaptionVariable;
+import org.incendo.cloud.caption.StandardCaptionKeys;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.exception.parsing.ParserException;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
-import java.util.List;
-
-public class AddonArgumentHandler extends ArgumentHandler<Addon> {
-
-    public AddonArgumentHandler() {
-        super(Addon.class);
-    }
+@SuppressWarnings("UnstableApiUsage")
+public class AddonArgumentHandler implements ArgumentParser<CommandSender, Addon> {
 
     @Override
-    public Addon handle(CommandContext context, Argument argument, InputIterator inputIterator) throws HandledArgumentException {
-        String input = inputIterator.next();
+    public @NonNull ArgumentParseResult<@NonNull Addon> parse(
+            @NonNull CommandContext<@NonNull CommandSender> commandContext,
+            @NonNull CommandInput commandInput
+    ) {
+        String input = commandInput.peekString();
         Addon addon = AddonProvider.addon(input);
-        if (addon == null) throw new HandledArgumentException("argument-handler-addon");
-        return addon;
+        if (input.isEmpty() || addon == null) return ArgumentParseResult.failure(new AddonParserException(input, commandContext));
+
+        return ArgumentParseResult.success(addon);
     }
 
     @Override
-    public List<String> suggest(CommandContext context, Argument argument, String[] args) {
-        OfflinePlayer target = context.get("target");
-        if (target == null && context.getSender() instanceof Player player) {
-            target = player;
+    public @NonNull SuggestionProvider<CommandSender> suggestionProvider() {
+        return SuggestionProvider.blocking((context, input) ->
+                AddonProvider.addons()
+                        .values()
+                        .stream()
+                        .map(addon -> Suggestion.suggestion(addon.getName()))
+                        .toList()
+        );
+    }
+
+    public static final class AddonParserException extends ParserException {
+
+        private final String input;
+
+        public AddonParserException(String input, CommandContext<?> context) {
+            super(AddonArgumentHandler.class, context, StandardCaptionKeys.EXCEPTION_INVALID_SYNTAX, CaptionVariable.of("input", input));
+
+            this.input = input;
         }
 
-        // Target was not defined and the sender is not a player
-        if (target == null) return List.of("<no homes>");
-
-        // Get the homes of the target
-        List<String> result = DataManager.repository(HomeRepository.class)
-                .getHomes(target.getUniqueId()).stream()
-                .map(Home::name)
-                .toList();
-
-        return result.isEmpty() ? List.of("<no homes>") : result;
+        public String getInput() {
+            return input;
+        }
     }
 
 }

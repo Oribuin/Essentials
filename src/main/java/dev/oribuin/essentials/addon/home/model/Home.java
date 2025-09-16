@@ -1,10 +1,10 @@
 package dev.oribuin.essentials.addon.home.model;
 
-import dev.oribuin.essentials.api.Placeholder;
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
-import dev.oribuin.essentials.util.Placeholders;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
+import dev.oribuin.essentials.util.StringPlaceholders;
+import dev.oribuin.essentials.util.model.Placeholder;
+import dev.oribuin.essentials.util.model.Placeholders;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 

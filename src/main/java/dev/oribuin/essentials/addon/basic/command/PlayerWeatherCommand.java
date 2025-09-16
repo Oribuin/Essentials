@@ -1,46 +1,52 @@
 package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.Weather;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.Weather;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class PlayerWeatherCommand extends BaseRoseCommand {
+public class PlayerWeatherCommand {
 
-    public PlayerWeatherCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, Weather weather) {
-        Player player = (Player) context.getSender();
-        weather.apply(player);
-
-        BasicMessages.PLAYER_WEATHER_COMMAND.send(player,
+    /**
+     * Change your current player weather
+     *
+     * @param sender  The sender who is running the command
+     * @param weather The target weather
+     */
+    @Command("pweather|epweather <weather>")
+    @Permission("essentials.pweather")
+    @CommandDescription("Change your current player weather")
+    public void execute(Player sender, Weather weather) {
+        BasicMessages messages = BasicMessages.get();
+        
+        weather.apply(sender);
+        messages.getPlayerWeather().send(
+                sender,
                 "weather", StringUtils.capitalize(weather.name().toLowerCase())
         );
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("pweather")
-                .permission("essentials.pweather")
-                .aliases("epweather", "pw")
-                .playerOnly(true)
-                .arguments(
-                        ArgumentsDefinition.builder()
-                                .required("weather", ArgumentHandlers.forEnum(Weather.class))
-                                .optional("duration", ArgumentHandlers.INTEGER)
-                                .build()
-                )
-                .build();
+    /**
+     * Change your current player weather
+     *
+     * @param sender  The sender who is running the command
+     * @param weather The target weather
+     */
+    @Command("pweather|epweather <weather> <target>")
+    @Permission("essentials.pweather.others")
+    @CommandDescription("Change your current player weather")
+    public void executeTarget(CommandSender sender, Weather weather, Player target) {
+        BasicMessages messages = BasicMessages.get();
+        weather.apply(target);
+        messages.getPlayerWeatherOther().send(
+                sender,
+                "weather", StringUtils.capitalize(weather.name().toLowerCase())
+        );
     }
 
 }

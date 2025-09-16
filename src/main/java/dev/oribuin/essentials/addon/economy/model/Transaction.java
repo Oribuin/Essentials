@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.addon.economy.model;
 
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 import org.jetbrains.annotations.NotNull;
@@ -119,51 +119,51 @@ public class Transaction {
                '}';
     }
 
-    public @Nullable UUID user() {
+    public @Nullable UUID getUser() {
         return user;
     }
 
-    public void user(@Nullable UUID user) {
+    public void setUser(@Nullable UUID user) {
         this.user = user;
     }
 
-    public @NotNull String source() {
+    public @NotNull String getSource() {
         return source;
     }
 
-    public void source(@NotNull String source) {
+    public void setSource(@NotNull String source) {
         this.source = source;
     }
 
-    public @NotNull BigDecimal current() {
+    public @NotNull BigDecimal getCurrent() {
         return current;
     }
 
-    public void current(@NotNull BigDecimal current) {
+    public void setCurrent(@NotNull BigDecimal current) {
         this.current = current;
     }
 
-    public @NotNull BigDecimal change() {
+    public @NotNull BigDecimal getChange() {
         return change;
     }
 
-    public void change(@NotNull BigDecimal change) {
+    public void getChange(@NotNull BigDecimal change) {
         this.change = change;
     }
 
-    public @NotNull BigDecimal before() {
+    public @NotNull BigDecimal getBefore() {
         return before;
     }
 
-    public void before(@NotNull BigDecimal before) {
+    public void setBefore(@NotNull BigDecimal before) {
         this.before = before;
     }
 
-    public long when() {
+    public long getWhen() {
         return when;
     }
 
-    public void when(long when) {
+    public void setWhen(long when) {
         this.when = when;
     }
 

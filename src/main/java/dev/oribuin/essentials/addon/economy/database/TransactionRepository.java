@@ -1,12 +1,12 @@
 package dev.oribuin.essentials.addon.economy.database;
 
 import dev.oribuin.essentials.addon.economy.model.Transaction;
-import dev.oribuin.essentials.api.database.ModuleRepository;
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.StatementProvider;
-import dev.oribuin.essentials.api.database.StatementType;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
-import dev.rosewood.rosegarden.database.DatabaseConnector;
+import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.StatementProvider;
+import dev.oribuin.essentials.database.StatementType;
+import dev.oribuin.essentials.database.connector.DatabaseConnector;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,12 +42,12 @@ public class TransactionRepository extends ModuleRepository {
      */
     public void save(Transaction transaction) {
         StatementProvider.create(StatementType.INSERT, this)
-                .column("user", DataTypes.UUID, transaction.user())
-                .column("source", DataTypes.STRING, transaction.source())
-                .column("current", DataTypes.BIG_DECIMAL, transaction.current())
-                .column("change", DataTypes.BIG_DECIMAL, transaction.change())
-                .column("before", DataTypes.BIG_DECIMAL, transaction.before())
-                .column("time", DataTypes.LONG, transaction.when())
+                .column("user", DataTypes.UUID, transaction.getUser())
+                .column("source", DataTypes.STRING, transaction.getSource())
+                .column("current", DataTypes.BIG_DECIMAL, transaction.getCurrent())
+                .column("change", DataTypes.BIG_DECIMAL, transaction.getChange())
+                .column("before", DataTypes.BIG_DECIMAL, transaction.getBefore())
+                .column("time", DataTypes.LONG, transaction.getWhen())
                 .execute();
     }
 

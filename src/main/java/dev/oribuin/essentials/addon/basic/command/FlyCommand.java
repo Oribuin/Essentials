@@ -2,58 +2,64 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
 import java.util.List;
 
-public class FlyCommand extends BaseRoseCommand {
+public class FlyCommand {
 
-    public FlyCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
+    /**
+     * Toggle a player's flight status
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("fly|efly|togglefly")
+    @Permission("essentials.fly")
+    @CommandDescription("Toggle your flight state")
+    public void execute(Player sender) {
+        BasicConfig config = BasicConfig.get();
+        BasicMessages messages = BasicMessages.get();
 
-    @RoseExecutable
-    public void execute(CommandContext context, Player target) {
-        // Swap the target if the sender does not have permission to view other player's ping
-        if (target != null && !context.getSender().hasPermission("essentials.fly.others") && context.getSender() instanceof Player sender) {
-            target = sender;
-        }
-
-        Player focus = target != null ? target : (Player) context.getSender();
 
         // Check if world is disabled
-        List<String> disabledWorlds = BasicConfig.DISABLED_FLIGHT_WORLDS.value();
-        if (!disabledWorlds.isEmpty() && disabledWorlds.contains(focus.getWorld().getName())) {
-            BasicMessages.FLY_DISABLED_WORLD.send(context.getSender());
+        List<String> disabledWorlds = config.getDisabledFlightWorlds();
+        if (!disabledWorlds.isEmpty() && disabledWorlds.contains(sender.getWorld().getName())) {
+            messages.getFlyDisabledWorld().send(sender);
             return;
         }
 
-        focus.setAllowFlight(!focus.getAllowFlight());
-        String status = focus.getAllowFlight() ? "Enabled" : "Disabled";
-
-        if (target != null) {
-            BasicMessages.FLY_OTHER.send(context.getSender(),
-                    "target", target.getName(),
-                    "status", status
-            );
-        }
-
-        BasicMessages.FLY_SELF.send(context.getSender(), "status", status);
+        String status = !sender.getAllowFlight() ? "Enabled" : "Disabled";
+        sender.setAllowFlight(!sender.getAllowFlight());
+        messages.getFlySelf().send(sender, "status", status);
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("fly")
-                .permission("essentials.fly")
-                .aliases("flying", "enablefly", "efly")
-                .arguments(EssUtils.createTarget(true))
-                .build();
+    /**
+     * Toggle a player's flight status
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("fly|efly|togglefly <target>")
+    @Permission("essentials.fly.others")
+    @CommandDescription("Toggle another player's flight state")
+    public void executeOther(CommandSender sender, Player target) {
+        BasicConfig config = BasicConfig.get();
+        BasicMessages messages = BasicMessages.get();
+
+        // Check if world is disabled
+        List<String> disabledWorlds = config.getDisabledFlightWorlds();
+        if (!disabledWorlds.isEmpty() && disabledWorlds.contains(target.getWorld().getName())) {
+            messages.getFlyDisabledWorld().send(sender);
+            return;
+        }
+
+        String status = !target.getAllowFlight() ? "Enabled" : "Disabled";
+        target.setAllowFlight(!target.getAllowFlight());
+        messages.getFlyOther().send(sender, "target", target.getName(), "status", status);
     }
 
 }

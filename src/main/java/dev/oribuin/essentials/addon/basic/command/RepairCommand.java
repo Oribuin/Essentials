@@ -2,82 +2,96 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.command.argument.FlagArgumentHandler;
-import dev.oribuin.essentials.util.CommandFlag;
-import dev.oribuin.essentials.util.Cooldown;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.Cooldown;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class RepairCommand extends BaseRoseCommand {
+public class RepairCommand {
 
-    private final CommandFlag<String> ALL = new CommandFlag<>("all");
     private final Cooldown<UUID> cooldown = new Cooldown<>();
 
-    public RepairCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, CommandFlag<String> all) {
-        Player player = (Player) context.getSender();
+    /**
+     * Fix the item that you're holding
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("repair|erepair|fix|efix")
+    @Permission("essentials.fix")
+    @CommandDescription("Fix the item that you're holding")
+    public void fixHand(Player sender) {
+        BasicConfig config = BasicConfig.get();
+        BasicMessages messages = BasicMessages.get();
 
         // Check if a player is on cooldown
-        if (this.cooldown.onCooldown(player.getUniqueId())) {
-            BasicMessages.REPAIR_COOLDOWN.send(player);
+        if (this.cooldown.onCooldown(sender.getUniqueId())) {
+            long remaining = this.cooldown.getDurationRemaining(sender.getUniqueId()).getSeconds();
+            messages.getRepairCooldown().send(sender, "time", remaining);
+            return;
+        }
+
+        // Check if the item being held is damaged
+        ItemStack stack = sender.getInventory().getItemInMainHand();
+        Integer damage = stack.getData(DataComponentTypes.DAMAGE);
+        if (damage == null || damage <= 0) {
+            messages.getRepairNoDamage().send(sender);
+            return;
+        }
+
+        // Repair the items and send the message
+        this.cooldown.setCooldown(sender.getUniqueId(), config.getRepairCooldown());
+        stack.resetData(DataComponentTypes.DAMAGE);
+        messages.getRepairCommand().send(sender, "amount", 1);
+    }
+
+    /**
+     * Fix the item that you're holding
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("repair|erepair|fix|efix all")
+    @Permission("essentials.fix.all")
+    @CommandDescription("Fix the item that you're holding")
+    public void fixAll(Player sender) {
+        BasicConfig config = BasicConfig.get();
+        BasicMessages messages = BasicMessages.get();
+
+        // Check if a player is on cooldown
+        if (this.cooldown.onCooldown(sender.getUniqueId())) {
+            long remaining = this.cooldown.getDurationRemaining(sender.getUniqueId()).getSeconds();
+            messages.getRepairCooldown().send(sender, "time", remaining);
             return;
         }
 
         List<ItemStack> applicable = new ArrayList<>();
         // Add all the player items if available 
-        if (all != null && player.hasPermission("essentials.fix.all")) {
-            for (ItemStack stack : player.getInventory().getContents()) {
-                if (stack == null || stack.getType().isAir()) continue;
+        for (ItemStack stack : sender.getInventory().getContents()) {
+            if (stack == null || stack.getType().isAir()) continue;
 
-                Integer damage = stack.getData(DataComponentTypes.DAMAGE);
-                if (damage == null || damage <= 0) continue;
-
-                applicable.add(stack);
-            }
-        } else { // Add only the item in the player's main hand
-            ItemStack stack = player.getInventory().getItemInMainHand();
             Integer damage = stack.getData(DataComponentTypes.DAMAGE);
-            if (damage != null && damage > 0) applicable.add(stack);
+            if (damage == null || damage <= 0) continue;
+
+            applicable.add(stack);
         }
 
-        // Check if any of the tools are damaged
+        // Check if any items need to be repaired
         if (applicable.isEmpty()) {
-            BasicMessages.REPAIR_NO_DAMAGED.send(player);
+            messages.getRepairNoDamage().send(sender);
             return;
         }
 
         // Repair the items and send the message
-        this.cooldown.setCooldown(player.getUniqueId(), BasicConfig.REPAIR_COOLDOWN.value());
+        this.cooldown.setCooldown(sender.getUniqueId(), config.getRepairCooldown());
         applicable.forEach(x -> x.resetData(DataComponentTypes.DAMAGE));
-        BasicMessages.REPAIR_COMMAND.send(player, "amount", applicable.size());
-    }
-
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("repair")
-                .aliases("fix", "erepair", "efix")
-                .permission("essentials.repair")
-                .arguments(ArgumentsDefinition.builder().optional(
-                        "all", new FlagArgumentHandler(ALL)
-                ).build())
-                .playerOnly(true)
-                .build();
+        messages.getRepairCommand().send(sender, "amount", applicable.size());
     }
 
 }

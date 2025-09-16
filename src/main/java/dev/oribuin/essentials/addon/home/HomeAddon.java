@@ -1,17 +1,17 @@
 package dev.oribuin.essentials.addon.home;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.command.HomeDeleteCommand;
 import dev.oribuin.essentials.addon.home.command.HomeSetCommand;
 import dev.oribuin.essentials.addon.home.command.HomeTPCommand;
+import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.AddonMessages;
+import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.manager.DataManager;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,19 +22,30 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class HomeAddon extends Addon {
 
     private HomeRepository repository;
-    private AddonMessages messages;
+    private static HomeAddon instance;
 
     /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
+     * Create a new instance of the addon
+     */
+    public HomeAddon() {
+        super("homes");
+
+        instance = this;
+    }
+
+    /**
+     * Before the addon starts loading, register whatever is needed to be used when its enabled
      */
     @Override
-    public String name() {
-        return "homes";
+    public void load() {
+        // Register Command Argument Providers
+        this.registerParser(Home.class, new HomeArgumentHandler());
     }
 
     /**
@@ -42,7 +53,6 @@ public class HomeAddon extends Addon {
      */
     @Override
     public void enable() {
-        this.messages = new AddonMessages(this.folder.toPath(), "messages.yml");
         this.repository = DataManager.create(HomeRepository.class);
 
         if (this.repository == null) {
@@ -50,12 +60,11 @@ public class HomeAddon extends Addon {
             AddonProvider.unload(this);
             return;
         }
-        
-        this.messages.register(this.plugin);
 
         // Load Existing Users
         Bukkit.getOnlinePlayers().forEach(player -> this.repository.load(player.getUniqueId()));
     }
+
 
     /**
      * When the addon is being disabled.
@@ -71,27 +80,31 @@ public class HomeAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<BaseRoseCommand> commands() {
+    public List<Object> getCommands() {
         return List.of(
-                new HomeDeleteCommand(this.plugin),
-                new HomeSetCommand(this.plugin, this),
-                new HomeTPCommand(this.plugin)
+                new HomeDeleteCommand(this),
+                new HomeSetCommand(this),
+                new HomeTPCommand()
         );
     }
+
 
     /**
      * Get all the configuration files for the addon
      */
     @Override
-    public List<AddonConfig> configs() {
-        return List.of(new HomeConfig());
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of(
+                "config", HomeConfig::new,
+                "messages", HomeMessages::new
+        );
     }
 
     /**
      * Get all the listeners for the addon
      */
     @Override
-    public List<Listener> listeners() {
+    public List<Listener> getListeners() {
         return List.of(this);
     }
 
@@ -118,8 +131,8 @@ public class HomeAddon extends Addon {
         return repository;
     }
 
-    public AddonMessages messages() {
-        return messages;
+    public static HomeAddon getInstance() {
+        return instance;
     }
 
     /**
@@ -130,7 +143,7 @@ public class HomeAddon extends Addon {
      * @return The limit of homes the player can have
      */
     public static int limit(Player player) {
-        int amount = -1;
+        int amount = 0;
         for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
             final String target = info.getPermission().toLowerCase();
 

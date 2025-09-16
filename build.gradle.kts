@@ -1,7 +1,12 @@
+import org.gradle.internal.declarativedsl.language.This
+import java.io.ByteArrayOutputStream
+
 plugins {
     `java-library`
     `maven-publish`
     id("com.gradleup.shadow") version "8.3.5"
+    id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
+
 }
 group = "dev.oribuin"
 version = "1.0"
@@ -30,10 +35,18 @@ repositories {
 }
 
 dependencies {
-    api("dev.rosewood:rosegarden:1.5.4-SNAPSHOT")
+    // Commands, Configs & Database
+    api("org.incendo:cloud-core:2.0.0")
+    api("org.incendo:cloud-annotations:2.0.0")
+    api("org.incendo:cloud-paper:2.0.0-beta.10")
+    api("org.spongepowered:configurate-yaml:4.2.0")
+    api("com.zaxxer:HikariCP:4.0.3")
+
+    // Additional Utilities
     api("net.objecthunter:exp4j:0.4.8")
     api("com.jeff-media:MorePersistentDataTypes:2.4.0")
-
+    
+    // Spigot
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
@@ -48,6 +61,16 @@ dependencies {
 
 tasks {
 
+    val commitHash = let {
+        val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
+        val output = ByteArrayOutputStream()
+        process.inputStream.copyTo(output)
+
+        output.toString().trim()
+    }
+
+    project.version = commitHash
+    
     this.compileJava {
         this.options.compilerArgs.add("-parameters")
         this.options.isFork = true
@@ -65,6 +88,18 @@ tasks {
         // rosegarden should be relocating this
         this.relocate("com.zaxxer", "dev.rosewood.rosegarden.libs.hikari")
         this.relocate("org.slf4j", "dev.rosewood.rosegarden.libs.slf4j")
+        
+        this.minimize()
+    }
+    
+    bukkit {
+        this.name = "EssentialsO"
+        this.main = "dev.oribuin.essentials.EssentialsPlugin"
+        this.version = project.version as String?
+        this.author = "Oribuin";
+        this.description = "essentials plugin copy 50032"
+        this.apiVersion = "1.21"
+        this.softDepend = listOf("Vault", "PlaceholderAPI")
     }
 
 //    this.processResources {

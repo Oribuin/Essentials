@@ -1,8 +1,5 @@
 package dev.oribuin.essentials.util;
 
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import io.papermc.paper.registry.RegistryAccess;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -100,25 +97,11 @@ public class EssUtils {
     }
 
     /**
-     * Create a default argument definition with a singular target
-     *
-     * @param optional Whether the target should be optional
-     *
-     * @return The command argument definition
-     */
-    public static ArgumentsDefinition createTarget(boolean optional) {
-        ArgumentsDefinition.Builder builder = ArgumentsDefinition.builder();
-        if (optional) builder = builder.optional("target", ArgumentHandlers.PLAYER);
-        else builder = builder.required("target", ArgumentHandlers.PLAYER);
-        return builder.build();
-    }
-    
-    
-    /**
      * Create a timer bar message counting down until something is ready
      *
      * @param total   The total length of the timer
      * @param current The progress of the timer
+     *
      * @return The resulting message
      */
     public static Component createTimerBar(long total, long current) {
@@ -133,7 +116,7 @@ public class EssUtils {
         String orangeZone = "<#f58516><bold>" + "|".repeat(textLength - redLength);
         return kyorify(redZone + orangeZone);
     }
-    
+
 
     /**
      * Convert a string into a duration
@@ -144,7 +127,7 @@ public class EssUtils {
      */
     public static Duration asDuration(String value) {
         if (value == null) return Duration.ZERO;
-        
+
         Matcher matcher = DURATION_PATTERN.matcher(value.toLowerCase());
         Duration duration = Duration.ZERO;
 
@@ -176,5 +159,5 @@ public class EssUtils {
     public static String fromDuration(Duration duration) {
         return duration.toString().substring(2);
     }
-    
+
 }

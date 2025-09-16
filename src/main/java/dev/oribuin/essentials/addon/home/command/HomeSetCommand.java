@@ -1,6 +1,5 @@
 package dev.oribuin.essentials.addon.home.command;
 
-import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
@@ -8,60 +7,61 @@ import dev.oribuin.essentials.addon.home.database.HomeRepository;
 import dev.oribuin.essentials.addon.home.event.HomeCreateEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
 import java.util.List;
 
-public class HomeSetCommand extends BaseRoseCommand {
-    
+public class HomeSetCommand {
+
     private final HomeAddon addon;
 
-    public HomeSetCommand(RosePlugin rosePlugin, HomeAddon addon) {
-        super(rosePlugin);
+    public HomeSetCommand(HomeAddon addon) {
         this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, String name) {
-        Player sender = (Player) context.getSender();
+    /**
+     * Create a new user home
+     *
+     * @param sender The sender who is running the command
+     * @param name   The name of the new home
+     */
+    @Command("sethome|createhome <home>")
+    @Permission("essentials.home.create")
+    @CommandDescription("Delete a user's home ")
+    public void execute(Player sender, String name) {
+        HomeConfig config = HomeConfig.getInstance();
+        HomeMessages messages = HomeMessages.getInstance();
+        HomeRepository repository = this.addon.repository();
 
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.value();
-        if (disabledWorlds.contains(sender.getWorld().getName())) {
-            this.addon.messages().from("disabled-world").send(sender);
+        if (config.getDisabledWorlds().contains(sender.getWorld().getName())) {
+            messages.getDisabledWorld().send(sender);
             return;
         }
 
-        HomeRepository repository = AddonProvider.HOME_ADDON.repository();
         List<Home> current = repository.getHomes(sender.getUniqueId());
 
         // Check if a player has a home by that name already
         if (repository.checkExists(sender.getUniqueId(), name)) {
-            this.addon.messages().from("home-already-exists").send(sender);
+            messages.getHomeAlreadyExists().send(sender);
             return;
         }
 
         // Check the maximum homes a player can have
         int limit = HomeAddon.limit(sender);
         if (limit != -1 && current.size() >= limit) {
-            this.addon.messages().from("home-limit").send(sender, "amt", current.size(), "limit", limit);
+            messages.getHomeLimit().send(sender, "amt", current.size(), "limit", limit);
             return;
         }
 
         // Check for price of setting a home
-        double setCost = HomeConfig.SET_COST.value();
+        double setCost = config.getSetCost();
         if (setCost > 0 && !VaultProvider.get().has(sender, setCost)) {
             if (!VaultProvider.get().has(sender, setCost)) {
-                this.addon.messages().from("insufficient-funds").send(sender, "cost", setCost);
+                messages.getInsufficientFunds().send(sender, "cost", setCost);
                 return;
             }
         }
@@ -74,17 +74,7 @@ public class HomeSetCommand extends BaseRoseCommand {
 
         // Set the home
         repository.save(home);
-        this.addon.messages().from("home-set").send(sender, home.placeholders());
-    }
-
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("sethome")
-                .aliases("createhome")
-                .arguments(ArgumentsDefinition.of("name", ArgumentHandlers.STRING))
-                .permission("essentials.home.create")
-                .playerOnly(true)
-                .build();
+        messages.getHomeSet().send(sender, home.placeholders());
     }
 
 }

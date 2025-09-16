@@ -2,65 +2,69 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.Cooldown;
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.Cooldown;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-import java.util.UUID;
-
-public class FeedCommand extends BaseRoseCommand {
+public class FeedCommand {
 
     private final Cooldown<CommandSender> cooldown = new Cooldown<>();
 
-    public FeedCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, Player target) {
-        // Swap the target if the sender does not have permission to feed another player 
-        if (target != null && !context.getSender().hasPermission("essentials.feed.others") && context.getSender() instanceof Player sender) {
-            target = sender;
-        }
+    /**
+     * Feed a player and heal their saturation levels
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("feed|efeed")
+    @Permission("essentials.feed")
+    @CommandDescription("Fill up your own hunger bar")
+    public void execute(Player sender) {
+        BasicMessages messages = BasicMessages.get();
 
         // Check if target is on cooldown
-        if (this.cooldown.onCooldown(context.getSender())) {
-            BasicMessages.FEED_COOLDOWN.send(context.getSender());
+        if (this.cooldown.onCooldown(sender)) {
+            long remaining = this.cooldown.getDurationRemaining(sender).getSeconds();
+            messages.getFeedCooldown().send(sender, "time", remaining);
             return;
         }
 
         // Apply cooldown to target
-        this.cooldown.setCooldown(context.getSender(), BasicConfig.FEED_COOLDOWN.value());
-        
+        this.cooldown.setCooldown(sender, BasicConfig.get().getFeedCooldown());
+
         // Feed the target
-        if (target != null) {
-            target.setSaturation(20);
-            target.setFoodLevel(20);
-            BasicMessages.FEED_OTHER.send(context.getSender(), "target", target.getName());
+        sender.setFoodLevel(20);
+        sender.setSaturation(10);
+        messages.getFeedSelf().send(sender);
+    }
+
+    /**
+     * Feed a player and heal their saturation levels
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("feed|efeed <target>")
+    @Permission("essentials.feed.others")
+    @CommandDescription("Fill up another player's hunger bar")
+    public void executeOther(CommandSender sender, Player target) {
+        BasicMessages messages = BasicMessages.get();
+
+        // Check if target is on cooldown
+        if (this.cooldown.onCooldown(sender)) {
+            messages.getFeedCooldown().send(sender);
             return;
         }
 
-        Player player = (Player) context.getSender();
-        
-        // Feed the sender
-        BasicMessages.FEED_COMMAND.send(player);
-        player.setSaturation(20);
-        player.setFoodLevel(20);
-    }
+        // Apply cooldown to target
+        this.cooldown.setCooldown(sender, BasicConfig.get().getFeedCooldown());
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("feed")
-                .aliases("efeed")
-                .permission("essentials.feed")
-                .arguments(EssUtils.createTarget(true))
-                .build();
+        // Feed the target
+        target.setFoodLevel(20);
+        target.setSaturation(10);
+        messages.getFeedOther().send(sender, "target", target.getName());
     }
 
 }

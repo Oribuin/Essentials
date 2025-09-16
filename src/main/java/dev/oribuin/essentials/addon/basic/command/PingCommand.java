@@ -1,49 +1,59 @@
 package dev.oribuin.essentials.addon.basic.command;
 
+import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.config.TextMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class PingCommand extends BaseRoseCommand {
+public class PingCommand {
 
-    public PingCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
+    /**
+     * Check a players current latency to the server
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("ping|eping|latency [target]")
+    @Permission("essentials.ping")
+    @CommandDescription("Check your current latency to the server")
+    public void executeRegular(CommandSender sender, Player target) {
+        BasicMessages messages = BasicMessages.get();
 
-    @RoseExecutable
-    public void execute(CommandContext context, Player target) {
-        // Swap the target if the sender does not have permission to view other player's ping
-        if (target != null && !context.getSender().hasPermission("essentials.ping.others") && context.getSender() instanceof Player sender) {
-            target = sender;
-        }
-
-        // Send the ping message
-        if (target != null) {
-            BasicMessages.PING_OTHER.send(context.getSender(),
-                    "ping", target.getPing(),
-                    "target", target.getName()
-            );
+        // Check if the sender is allowed to control others
+        if (target != null && !sender.hasPermission("essentials.ping.others")) {
+            EssentialsPlugin.getMessages().getNoPermission().send(sender);
             return;
         }
 
-        // Send the ping message to the sender
-        BasicMessages.PING_SELF.send(context.getSender(),
-                "ping", context.getSender() instanceof Player player ? player.getPing() : 0
-        );
+        // Check if the sender is a player
+        if (target == null && !(sender instanceof Player)) {
+            EssentialsPlugin.getMessages().getRequirePlayer().send(sender);
+            return;
+        }
+
+        Player focus = target != null ? target : (Player) sender;
+        TextMessage message = target != null ? messages.getPingOther() : messages.getPingSelf();
+        message.send(sender, "ping", focus.getPing(), "target", focus.getName());
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("ping")
-                .aliases("eping")
-                .permission("essentials.ping")
-                .arguments(EssUtils.createTarget(true))
-                .build();
+    /**
+     * Check the average latency to the server
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("ping|eping|latency average")
+    @Permission("essentials.ping.average")
+    @CommandDescription("Check your current latency to the server")
+    public void executeAverage(CommandSender sender) {
+        BasicMessages messages = BasicMessages.get();
+        int average = (int) Bukkit.getOnlinePlayers().stream().mapToInt(Player::getPing).average().orElse(-1.0);
+        messages.getPingAverage().send(sender, "ping", average);
     }
+
 
 }

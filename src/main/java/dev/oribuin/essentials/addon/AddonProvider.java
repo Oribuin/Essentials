@@ -7,7 +7,6 @@ import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
-import dev.oribuin.essentials.api.Addon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +25,7 @@ public class AddonProvider {
     public static final TeleportAddon TELEPORT_ADDON = registerSupplier(TeleportAddon::new);
 
     public static void init() {
-        EssentialsPlugin.get().getLogger().info("Initialised " + AddonProvider.class.getSimpleName() + " into the plugin.");
+        EssentialsPlugin.getInstance().getLogger().info("Initialised " + AddonProvider.class.getSimpleName() + " into the plugin.");
     }
 
     public static Map<Class<? extends Addon>, Addon> addons() {
@@ -57,7 +56,7 @@ public class AddonProvider {
      */
     public static @Nullable Addon addon(@NotNull String name) {
         return addons.values().stream()
-                .filter(x -> x.name().equalsIgnoreCase(name))
+                .filter(x -> x.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
     }
@@ -77,13 +76,14 @@ public class AddonProvider {
      * @param addon The addon to register
      */
     public static <T extends Addon> T register(T addon) {
-        EssentialsPlugin.get().getLogger().info("Registering Addon: " + addon.getClass().getSimpleName());
+        EssentialsPlugin.getInstance().getLogger().info("Registering Addon: " + addon.getClass().getSimpleName());
 
         try {
             addons.put(addon.getClass(), addon);
+            addon.initialise();
             return addon;
         } catch (Exception e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e.getMessage());
+            EssentialsPlugin.getInstance().getLogger().severe("Failed to register the addon: " + addon.getClass().getSimpleName() + " - " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -96,10 +96,10 @@ public class AddonProvider {
      */
     public static void unload(Addon addon) {
         try {
-            addon.enabled(false);
+            addon.isEnabled(false);
             addon.unload();
         } catch (Exception e) {
-            EssentialsPlugin.get().getLogger().severe("Failed to unload the addon: " + addon.name() + " - " + e.getMessage());
+            EssentialsPlugin.getInstance().getLogger().severe("Failed to unload the addon: " + addon.getName() + " - " + e.getMessage());
         } finally {
             addons.remove(addon.getClass());
         }

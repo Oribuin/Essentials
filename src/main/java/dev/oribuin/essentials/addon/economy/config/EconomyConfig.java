@@ -1,31 +1,113 @@
 package dev.oribuin.essentials.addon.economy.config;
 
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.Option;
+import dev.oribuin.essentials.addon.economy.EconomyAddon;
+import dev.oribuin.essentials.config.AddonConfig;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
-import java.util.List;
+@ConfigSerializable
+@SuppressWarnings({ "FieldMayBeFinal", "FieldCanBeLocal" })
+public class EconomyConfig implements AddonConfig {
 
-import static dev.rosewood.rosegarden.config.SettingSerializers.*;
-
-public class EconomyConfig extends AddonConfig {
-
-    public static Option<Double> STARTING_BALANCE = new Option<>(DOUBLE, 500.0, "The amount of money a player who has recently joined has.");
-    public static Option<Integer> CACHE_DURATION = new Option<>(INTEGER, 30, "The number of seconds to hold a player's user account in the cache before being released");
-    public static Option<String> CURRENCY_SYMBOL = new Option<>(STRING, "$", List.of("The symbol for all the currency displayed within the plugin"));
-    public static Option<String> CURRENCY_NAME_PLURAL = new Option<>(STRING, "Coins", List.of("The name for plural economy balance>"));
-    public static Option<String> CURRENCY_SEPARATOR = new Option<>(STRING, ",");
-    public static Option<String> CURRENCY_DECIMAL = new Option<>(STRING, ".");
-    public static Option<String> CURRENCY_ABBREV_THOUSANDS = new Option<>("abbreviations.thousands", STRING, "k");
-    public static Option<String> CURRENCY_ABBREV_MILLIONS = new Option<>("abbreviations.millions", STRING, "m");
-    public static Option<String> CURRENCY_ABBREV_BILLIONS = new Option<>("abbreviations.billions", STRING, "b");
-    public static Option<Boolean> PAY_CONFIRM = new Option<>("confirm-payment-toggle", BOOLEAN, true);
-
-    /**
-     * Create a new instance of the addon config
-     */
-    public EconomyConfig() {
-        super("config");
+    public static EconomyConfig get() {
+        return EconomyAddon.getInstance().getConfigLoader().get(EconomyConfig.class);
     }
 
+    @Comment("Whether the basic addon module is enabled")
+    private boolean enabled = true;
 
+    @Comment("The amount of money a player who has recently joined has.")
+    private double startingBalance = 500.0;
+
+    @Comment("The number of seconds to hold a player's account in the cache")
+    private int cacheDuration = 30;
+
+    @Comment("Should players have to confirm the money they're paying someone else")
+    private boolean payConfirm = true;
+
+    @Comment("The settings for all the currency language")
+    private Currency currency = new Currency();
+
+    @Comment("The settings for all abbreviations of currency amounts")
+    private Abbreviations abbreviations = new Abbreviations();
+
+    /**
+     * Check if the addon config is enabled
+     *
+     * @return True if the addon config is enabled
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @ConfigSerializable
+    public static class Currency {
+        @Comment("The symbol for all currency displayed within the plugin")
+        private String symbol = "$";
+
+        @Comment("The name for the plural amount of the economy balance")
+        private String plural = "Coins";
+
+        @Comment("The separator between every 3 digits of a balance")
+        private String separator = ",";
+
+        @Comment("The decimal symbol")
+        private String decimal = ".";
+
+        public String getSymbol() {
+            return symbol;
+        }
+
+        public String getPlural() {
+            return plural;
+        }
+
+        public String getSeparator() {
+            return separator;
+        }
+
+        public String getDecimal() {
+            return decimal;
+        }
+    }
+
+    @ConfigSerializable
+    public static class Abbreviations {
+        private String thousands = "k";
+        private String millions = "m";
+        private String billion = "b";
+
+        public String getThousands() {
+            return thousands;
+        }
+
+        public String getMillions() {
+            return millions;
+        }
+
+        public String getBillion() {
+            return billion;
+        }
+    }
+
+    public double getStartingBalance() {
+        return startingBalance;
+    }
+
+    public int getCacheDuration() {
+        return cacheDuration;
+    }
+
+    public boolean isPayConfirm() {
+        return payConfirm;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public Abbreviations getAbbreviations() {
+        return abbreviations;
+    }
 }

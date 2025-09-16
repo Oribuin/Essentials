@@ -1,46 +1,42 @@
 package dev.oribuin.essentials.addon.basic.command;
 
+import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.Weather;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.Weather;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class WeatherCommand extends BaseRoseCommand {
+import java.time.Duration;
 
-    public WeatherCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+public class WeatherCommand {
+
+    private final BasicAddon addon;
+
+    public WeatherCommand(BasicAddon addon) {
+        this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, Weather weather, Integer duration) {
-        Player player = (Player) context.getSender();
-        weather.apply(player.getLocation(), duration);
+    /**
+     * Change your current player weather
+     *
+     * @param sender  The sender who is running the command
+     * @param weather The target weather
+     */
+    @Command("weather|eweather|setweather <weather> [duration]")
+    @Permission("essentials.weather")
+    @CommandDescription("Change your current player weather")
+    public void execute(Player sender, Weather weather, Duration duration) {
+        BasicMessages messages = BasicMessages.get();
 
-        BasicMessages.WEATHER_COMMAND.send(player,
+        // Applies the weather state to the world 
+        this.addon.getScheduler().runTask(() -> weather.apply(sender.getLocation(), duration));
+        messages.getWeatherCommand().send(
+                sender,
                 "weather", StringUtils.capitalize(weather.name().toLowerCase())
         );
-    }
-
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("weather")
-                .permission("essentials.weather")
-                .aliases("eweather", "setweather")
-                .playerOnly(true)
-                .arguments(
-                        ArgumentsDefinition.builder()
-                                .required("weather", ArgumentHandlers.forEnum(Weather.class))
-                                .optional("duration", ArgumentHandlers.INTEGER)
-                                .build()
-                )
-                .build();
     }
 
 }

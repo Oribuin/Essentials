@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.addon.economy.model;
 
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -81,23 +81,23 @@ public class UserAccount {
                '}';
     }
 
-    public UUID player() {
+    public UUID getPlayer() {
         return player;
     }
 
-    public BigDecimal amount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void amount(BigDecimal amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public long lastUpdated() {
+    public long getLastUpdated() {
         return lastUpdated;
     }
 
-    public void lastUpdated(long lastUpdated) {
+    public void setLastUpdated(long lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 }

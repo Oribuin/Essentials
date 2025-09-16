@@ -1,27 +1,33 @@
 package dev.oribuin.essentials.addon.home.command;
 
-import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
+import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.event.HomeDeleteEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class HomeDeleteCommand extends BaseRoseCommand {
+public class HomeDeleteCommand {
 
-    public HomeDeleteCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    private final HomeAddon addon;
+
+    public HomeDeleteCommand(HomeAddon addon) {
+        this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, Home home) {
-        Player sender = (Player) context.getSender();
+    /**
+     * Delete a user's home
+     *
+     * @param sender The sender who is running the command
+     * @param home   The target of the command
+     */
+    @Command("delhome|removehome|unsethome <home>")
+    @Permission("essentials.home.delete")
+    @CommandDescription("Delete a user's home ")
+    public void execute(Player sender, Home home) {
+        HomeMessages messages = HomeMessages.getInstance();
 
         HomeDeleteEvent event = new HomeDeleteEvent(sender, home);
         event.callEvent();
@@ -29,18 +35,31 @@ public class HomeDeleteCommand extends BaseRoseCommand {
         if (event.isCancelled()) return;
 
         // Set the home
-        AddonProvider.HOME_ADDON.repository().delete(home);
-        HomeMessages.HOME_DELETED.send(sender, home.placeholders());
+        this.addon.repository().delete(home);
+        messages.getHomeDeleted().send(sender, home.placeholders());
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("delhome")
-                .aliases("deletehome", "removehome", "unsethome")
-                .arguments(ArgumentsDefinition.of("homes", new HomeArgumentHandler()))
-                .permission("essentials.home.delete")
-                .playerOnly(true)
-                .build();
+    /**
+     * Delete a user's home
+     *
+     * @param sender The sender who is running the command
+     * @param home   The target of the command
+     */
+    @Command("delhome|removehome|unsethome <home> <target>")
+    @Permission("essentials.home.delete.others")
+    @CommandDescription("Add money to a users account")
+    public void executeOther(Player sender, Home home, Player target) {
+        HomeMessages messages = HomeMessages.getInstance();
+
+        HomeDeleteEvent event = new HomeDeleteEvent(sender, home);
+        event.callEvent();
+
+        // Check if event was cancelled
+        if (event.isCancelled()) return;
+
+        // Delete the home
+        this.addon.repository().delete(home);
+        messages.getHomeDeleted().send(sender, home.placeholders());
     }
 
 }

@@ -1,8 +1,11 @@
 package dev.oribuin.essentials.addon.basic;
 
+import dev.oribuin.essentials.addon.Addon;
+import dev.oribuin.essentials.addon.basic.command.ClearCommand;
 import dev.oribuin.essentials.addon.basic.command.EnderchestCommand;
 import dev.oribuin.essentials.addon.basic.command.FeedCommand;
 import dev.oribuin.essentials.addon.basic.command.FlyCommand;
+import dev.oribuin.essentials.addon.basic.command.GamemodeCommand;
 import dev.oribuin.essentials.addon.basic.command.HealCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
 import dev.oribuin.essentials.addon.basic.command.PlayerWeatherCommand;
@@ -10,53 +13,54 @@ import dev.oribuin.essentials.addon.basic.command.RepairCommand;
 import dev.oribuin.essentials.addon.basic.command.TopCommand;
 import dev.oribuin.essentials.addon.basic.command.TrashCommand;
 import dev.oribuin.essentials.addon.basic.command.WeatherCommand;
-import dev.oribuin.essentials.addon.basic.command.gamemode.GamemodeCommand;
-import dev.oribuin.essentials.addon.basic.command.gamemode.impl.AdventureCommand;
-import dev.oribuin.essentials.addon.basic.command.gamemode.impl.CreativeCommand;
-import dev.oribuin.essentials.addon.basic.command.gamemode.impl.SpectatorCommand;
-import dev.oribuin.essentials.addon.basic.command.gamemode.impl.SurvivalCommand;
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
+import dev.oribuin.essentials.config.AddonConfig;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class BasicAddon extends Addon {
 
+    private static BasicAddon instance;
+
     /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
+     * Create a new instance of the addon
+     */
+    public BasicAddon() {
+        super("basic");
+
+        instance = this;
+    }
+
+    /**
+     * When the addon is finished loading and is ready to be used.
      */
     @Override
-    public String name() {
-        return "basics";
+    public void enable() {
+        // This command is wonky so we register it differently
+        GamemodeCommand gamemodeCommand = new GamemodeCommand(this);
+        gamemodeCommand.register();
     }
 
     /**
      * Get all the commands for the addon
      */
     @Override
-    public List<BaseRoseCommand> commands() {
+    public List<Object> getCommands() {
         return List.of(
-                new EnderchestCommand(this.plugin),
-                new PingCommand(this.plugin),
-                new FlyCommand(this.plugin),
-                new FeedCommand(this.plugin),
-                new HealCommand(this.plugin),
-                new RepairCommand(this.plugin),
-                new TopCommand(this.plugin),
-                new TrashCommand(this.plugin),
-                new WeatherCommand(this.plugin),
-                new PlayerWeatherCommand(this.plugin),
-
-                // Gamemode Commands
-                new GamemodeCommand(this.plugin),
-                new AdventureCommand(this.plugin),
-                new CreativeCommand(this.plugin),
-                new SpectatorCommand(this.plugin),
-                new SurvivalCommand(this.plugin)
+                new ClearCommand(),
+                new EnderchestCommand(this),
+                new FeedCommand(),
+                new FlyCommand(),
+                new HealCommand(),
+                new PingCommand(),
+                new PlayerWeatherCommand(),
+                new RepairCommand(),
+                new TopCommand(),
+                new TrashCommand(this),
+                new WeatherCommand(this)
         );
     }
 
@@ -64,11 +68,14 @@ public class BasicAddon extends Addon {
      * Get all the configuration files for the addon
      */
     @Override
-    public List<AddonConfig> configs() {
-        return List.of(
-                new BasicConfig(),
-                new BasicMessages()
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of(
+                "config", BasicConfig::new,
+                "messages", BasicMessages::new
         );
     }
 
+    public static BasicAddon get() {
+        return instance;
+    }
 }

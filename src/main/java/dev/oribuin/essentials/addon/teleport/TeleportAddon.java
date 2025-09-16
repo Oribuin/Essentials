@@ -1,16 +1,16 @@
 package dev.oribuin.essentials.addon.teleport;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.teleport.command.BackCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAcceptCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskHereCommand;
+import dev.oribuin.essentials.addon.teleport.command.TpCancelCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpDenyCommand;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
+import dev.oribuin.essentials.config.AddonConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -32,12 +32,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class TeleportAddon extends Addon {
 
     private final List<TeleportRequest> requests = new ArrayList<>();
     private final Map<String, Permission> worldPerms = new HashMap<>();
     private final Map<UUID, Location> previousLocations = new HashMap<>();
+    private static TeleportAddon instance;
+
+    /**
+     * Create a new instance of the addon
+     */
+    public TeleportAddon() {
+        super("teleport");
+
+        instance = this;
+    }
 
     /**
      * When the addon is finished loading and is ready to be used.
@@ -83,7 +94,7 @@ public class TeleportAddon extends Addon {
      */
     public @Nullable TeleportRequest getOutgoing(@NotNull UUID sender) {
         return this.requests.stream()
-                .sorted(Comparator.comparingLong(TeleportRequest::when).reversed())
+                .sorted(Comparator.comparingLong(TeleportRequest::getWhen).reversed())
                 .filter(x -> x.isSender(sender) && !x.hasExpired())
                 .findFirst()
                 .orElse(null);
@@ -98,7 +109,7 @@ public class TeleportAddon extends Addon {
      */
     public @Nullable TeleportRequest getIncoming(@NotNull UUID target, @Nullable Player priority) {
         return this.requests.stream()
-                .sorted(Comparator.comparingLong(TeleportRequest::when).reversed())
+                .sorted(Comparator.comparingLong(TeleportRequest::getWhen).reversed())
                 .filter(x -> x.isTarget(target) && !x.hasExpired())
                 .filter(x -> priority == null || x.isSender(priority.getUniqueId()))
                 .findFirst()
@@ -129,8 +140,8 @@ public class TeleportAddon extends Addon {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onTeleport(PlayerTeleportEvent event) {
         // Check if the player has access to teleport to the world
-        if (TeleportConfig.DISABLE_INACCESSIBLE_TELEPORT.value() && !event.getPlayer().hasPermission(this.getPerm(event.getTo().getWorld().getName()))) {
-            TeleportMessages.DISABLED_WORLD.send(event.getPlayer());
+        if (TeleportConfig.getInstance().disableInaccessibleTp() && !event.getPlayer().hasPermission(this.getPerm(event.getTo().getWorld().getName()))) {
+            TeleportMessages.getInstance().getDisabledWorld().send(event.getPlayer());
             event.setCancelled(true);
             return;
         }
@@ -150,27 +161,18 @@ public class TeleportAddon extends Addon {
     }
 
     /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
-     */
-    @Override
-    public String name() {
-        return "teleport";
-    }
-
-    /**
      * Get all the configuration files for the addon
      */
     @Override
-    public List<AddonConfig> configs() {
-        return List.of(new TeleportConfig(), new TeleportMessages());
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of(
+                "config", TeleportConfig::new,
+                "messages", TeleportMessages::new
+        );
     }
 
-    /**
-     * Get all the listeners for the addon
-     */
     @Override
-    public List<Listener> listeners() {
+    public List<Listener> getListeners() {
         return List.of(this);
     }
 
@@ -178,13 +180,14 @@ public class TeleportAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<BaseRoseCommand> commands() {
+    public List<Object> getCommands() {
         return List.of(
-                new BackCommand(this.plugin),
-                new TpAcceptCommand(this.plugin),
-                new TpAskCommand(this.plugin),
-                new TpAskHereCommand(this.plugin),
-                new TpDenyCommand(this.plugin)
+                new BackCommand(this),
+                new TpAcceptCommand(this),
+                new TpAskCommand(this),
+                new TpAskHereCommand(this),
+                new TpCancelCommand(this),
+                new TpDenyCommand(this)
         );
     }
 
@@ -194,5 +197,9 @@ public class TeleportAddon extends Addon {
 
     public Map<UUID, Location> previousLocations() {
         return previousLocations;
+    }
+
+    public static TeleportAddon getInstance() {
+        return instance;
     }
 }

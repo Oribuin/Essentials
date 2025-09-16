@@ -2,64 +2,70 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
-import dev.oribuin.essentials.util.Cooldown;
-import dev.oribuin.essentials.util.EssUtils;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.util.model.Cooldown;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class HealCommand extends BaseRoseCommand {
+public class HealCommand {
 
     private final Cooldown<CommandSender> cooldown = new Cooldown<>();
 
-    public HealCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, Player target) {
-        // Swap the target if the sender does not have permission to heal another player 
-        if (target != null && !context.getSender().hasPermission("essentials.health.others") && context.getSender() instanceof Player sender) {
-            target = sender;
-        }
+    /**
+     * Heal the player from their injuries
+     *
+     * @param sender The sender who is running the command
+     */
+    @Command("heal|eheal")
+    @Permission("essentials.heal")
+    @CommandDescription("Heal yourself from your injuries")
+    public void execute(Player sender) {
+        BasicMessages messages = BasicMessages.get();
 
         // Check if target is on cooldown
-        if (this.cooldown.onCooldown(context.getSender())) {
-            BasicMessages.HEAL_COOLDOWN.send(context.getSender());
+        if (this.cooldown.onCooldown(sender)) {
+            long remaining = this.cooldown.getDurationRemaining(sender).getSeconds();
+            messages.getHealCooldown().send(sender, "time", remaining);
             return;
         }
 
         // Apply cooldown to target
-        this.cooldown.setCooldown(context.getSender(), BasicConfig.HEAL_COOLDOWN.value());
+        this.cooldown.setCooldown(sender, BasicConfig.get().getHealCooldown());
 
-        // Send the ping message
-        if (target != null) {
-            this.healTarget(target);
-            BasicMessages.HEAL_OTHER.send(context.getSender(), "target", target.getName());
+        this.healTarget(sender);
+        messages.getHealSelf().send(sender, "target", sender.getName());
+    }
+
+    /**
+     * Heal the player from their injuries
+     *
+     * @param sender The sender who is running the command
+     * @param target The target of the command
+     */
+    @Command("heal|eheal <target>")
+    @Permission("essentials.heal.others")
+    @CommandDescription("Heal yourself from your injuries")
+    public void executeOther(CommandSender sender, Player target) {
+        BasicMessages messages = BasicMessages.get();
+
+        // Check if target is on cooldown
+        if (this.cooldown.onCooldown(sender)) {
+            long remaining = this.cooldown.getDurationRemaining(sender).getSeconds();
+            messages.getHealCooldown().send(sender, "time", remaining);
             return;
         }
 
-        Player player = (Player) context.getSender();
+        // Apply cooldown to target
+        this.cooldown.setCooldown(sender, BasicConfig.get().getHealCooldown());
 
-        // Heal the command sender
-        BasicMessages.HEAL_COMMAND.send(player);
-        this.healTarget(player);
+        this.healTarget(target);
+        messages.getHealOther().send(sender, "target", target.getName());
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("heal")
-                .aliases("eheal")
-                .permission("essentials.heal")
-                .arguments(EssUtils.createTarget(true))
-                .build();
-    }
 
     /**
      * Fully heal a player's health and saturation
@@ -72,6 +78,6 @@ public class HealCommand extends BaseRoseCommand {
 
         player.setHealth(attribute.getValue());
         player.setFoodLevel(20);
-        player.setSaturation(20);
+        player.setSaturation(10);
     }
 }

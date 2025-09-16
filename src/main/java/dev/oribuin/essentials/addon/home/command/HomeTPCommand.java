@@ -1,31 +1,23 @@
 package dev.oribuin.essentials.addon.home.command;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
+import dev.oribuin.essentials.scheduler.task.ScheduledTask;
 import dev.oribuin.essentials.util.EssUtils;
-import dev.oribuin.essentials.util.Placeholders;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
-import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import dev.oribuin.essentials.util.StringPlaceholders;
+import dev.oribuin.essentials.util.model.Confirmation;
+import dev.oribuin.essentials.util.model.Cooldown;
+import dev.oribuin.essentials.util.model.Placeholders;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -38,32 +30,34 @@ import java.util.concurrent.TimeUnit;
  * - essentials.home.bypass.delay - Bypasses the delays and effects
  * - essentials.home.bypass.unsafe - Bypasses the requirement for a home to be safe before teleporting
  */
-public class HomeTPCommand extends BaseRoseCommand {
+public class HomeTPCommand {
 
-    private final Map<UUID, Long> cooldowns = new HashMap<>();
-    private final Cache<UUID, Home> confirmation = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.MINUTES)
-            .build();
+    private final Cooldown<UUID> cooldown = new Cooldown<>();
+    private final Confirmation<UUID> confirmation = new Confirmation<>(60, TimeUnit.SECONDS);
 
-    public HomeTPCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, Home home) {
-        Player sender = (Player) context.getSender();
+    /**
+     * Teleport to your home
+     *
+     * @param sender The sender who is running the command
+     * @param home   The target of the command
+     */
+    @Command("home <home>")
+    @Permission("essentials.home.teleport")
+    @CommandDescription("Teleport to your home")
+    public void execute(Player sender, Home home) {
+        HomeConfig config = HomeConfig.getInstance();
+        HomeMessages messages = HomeMessages.getInstance();
 
         // Check if the world is disabled
-        List<String> disabledWorlds = HomeConfig.DISABLED_WORLDS.value();
-        if (disabledWorlds.contains(home.location().getWorld().getName())) {
-            HomeMessages.DISABLED_WORLD.send(sender);
+        if (config.getDisabledWorlds().contains(home.location().getWorld().getName())) {
+            messages.getDisabledWorld().send(sender);
             return;
         }
 
         // Number values are defaulted to 0 when not found
-        Duration cooldown = HomeConfig.TP_COOLDOWN.value();
-        Duration teleportDelay = HomeConfig.TP_DELAY.value();
-        double cost = HomeConfig.TP_COST.value();
+        Duration cooldown = config.getTeleportCooldown();
+        Duration teleportDelay = config.getTeleportDelay();
+        double cost = config.getTeleportCost();
 
         // establish all the placeholders
         StringPlaceholders placeholders = home.placeholders(Placeholders.of(
@@ -73,7 +67,7 @@ public class HomeTPCommand extends BaseRoseCommand {
         ));
 
         if (!home.isSafe() && !sender.hasPermission("essentials.home.bypass.unsafe")) {
-            HomeMessages.HOME_UNSAFE.send(sender, placeholders);
+            messages.getHomeUnsafe().send(sender, placeholders);
             return;
         }
 
@@ -81,70 +75,91 @@ public class HomeTPCommand extends BaseRoseCommand {
         if (cost > 0.0 && !sender.hasPermission("essentials.home.bypass.cost")) {
             // check if they have enough
             if (!VaultProvider.get().has(sender, cost)) {
-                HomeMessages.INSUFFICIENT_FUNDS.send(sender, placeholders);
+                messages.getInsufficientFunds().send(sender, placeholders);
                 return;
             }
         }
 
         // Check if a player has confirmed they want to teleport here
-        if (HomeConfig.TP_CONFIRM.value() && !sender.hasPermission("essentials.home.bypass.confirm")) {
-            Home confirmHome = this.confirmation.getIfPresent(sender.getUniqueId());
-
-            if (confirmHome == null || !confirmHome.name().equalsIgnoreCase(home.name())) {
-                this.confirmation.put(sender.getUniqueId(), home);
-                HomeMessages.CONFIRM_COMMAND.send(sender, placeholders);
+        if (config.isTeleportConfirm() && !sender.hasPermission("essentials.home.bypass.confirm")) {
+            if (!this.confirmation.passed(sender.getUniqueId())) {
+                this.confirmation.apply(sender.getUniqueId());
+                messages.getConfirmCommand().send(sender, placeholders);
                 return;
             }
         }
 
         // Check if the player is on cooldown, ignore cooldown if they have a specific perm (disabled default)
         if (!cooldown.isZero() && !sender.hasPermission("essentials.home.bypass.cooldown")) {
-            long lastTeleport = this.cooldowns.getOrDefault(sender.getUniqueId(), 0L);
-            long timeLeft = (lastTeleport + cooldown.toMillis() - System.currentTimeMillis()) / 1000L;
-
-            // Player is still on cooldown :3
-            if (timeLeft > 0) {
-                HomeMessages.HOME_COOLDOWN.send(sender, "time", timeLeft + "s");
+            if (this.cooldown.onCooldown(sender.getUniqueId())) {
+                long remaining = this.cooldown.getDurationRemaining(sender.getUniqueId()).getSeconds();
+                messages.getHomeCooldown().send(sender, "time", remaining);
                 return;
             }
 
-            this.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
+            this.cooldown.setCooldown(sender.getUniqueId(), cooldown);
         }
 
         // player dosent need confirmation anymore
-        this.confirmation.invalidate(sender.getUniqueId());
+        this.confirmation.passed(sender.getUniqueId());
 
         // If the player has permission to bypass the delay, skip all effects
         if (sender.hasPermission("essentials.home.bypass.delay") || !teleportDelay.isZero()) {
             // send the final message
-            HomeMessages.HOME_TELEPORT.send(sender, placeholders);
+            messages.getHomeTeleporting().send(sender, placeholders);
             this.teleport(sender, home, cost, placeholders);
             return;
         }
 
         // Create the teleportation timer bar 
         ScheduledTask task = null;
-        if (HomeConfig.TP_BAR.value()) {
+        if (config.useTeleportBar()) {
             long start = System.currentTimeMillis();
 
-            task = EssentialsPlugin.scheduler().runTaskTimerAsync(() -> sender.sendActionBar(
+            task = EssentialsPlugin.getInstance().getScheduler().runTaskTimerAsync(() -> sender.sendActionBar(
                     EssUtils.createTimerBar(teleportDelay.toMillis(), System.currentTimeMillis() - start)
             ), 0, 500, TimeUnit.MILLISECONDS);
         }
 
         // send the final message
-        HomeMessages.HOME_TELEPORT.send(sender, placeholders);
+        messages.getHomeTeleporting().send(sender, placeholders);
 
         // Teleport the player to the location
         ScheduledTask finalTask = task;
-        EssentialsPlugin.scheduler().runTaskLater(() -> {
+        EssentialsPlugin.getInstance().getScheduler().runTaskLater(() -> {
             if (finalTask != null) {
                 finalTask.cancel();
                 sender.sendActionBar(EssUtils.TIMER_FINISHED);
             }
-            
+
             this.teleport(sender, home, cost, placeholders);
         }, teleportDelay.toSeconds(), TimeUnit.SECONDS);
+    }
+
+    /**
+     * Teleport to another player's home
+     *
+     * @param sender The sender who is running the command
+     * @param home   The target of the command
+     */
+    @Command("home <home> <target>")
+    @Permission("essentials.home.teleport")
+    @CommandDescription("Teleport to your home")
+    public void executeOther(Player sender, Home home, Player target) {
+        HomeConfig config = HomeConfig.getInstance();
+        HomeMessages messages = HomeMessages.getInstance();
+        StringPlaceholders placeholders = Placeholders.builder()
+                .addAll(home.placeholders())
+                .add("owner", target.getName())
+                .build();
+
+        if (!home.isSafe() && !sender.hasPermission("essentials.home.bypass.unsafe")) {
+            messages.getHomeUnsafe().send(sender, placeholders);
+            return;
+        }
+
+        // send the final message
+        messages.getHomeTeleportingOther().send(sender, placeholders);
     }
 
     /**
@@ -156,35 +171,22 @@ public class HomeTPCommand extends BaseRoseCommand {
      * @param placeholders The placeholders for messages
      */
     private void teleport(Player player, Home home, double cost, StringPlaceholders placeholders) {
+        HomeMessages messages = HomeMessages.getInstance();
+
         player.teleportAsync(home.location(), PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(result -> {
             // check if teleport failed
             if (!result) {
-                HomeMessages.TELEPORT_FAILED.send(player, placeholders);
+                messages.getTeleportFailed().send(player, placeholders);
                 return;
             }
 
             // Take away the money from the player.
             if (cost > 0) {
                 VaultProvider.get().take(player, cost);
-                HomeMessages.TELEPORT_COST.send(player, placeholders);
+                messages.getTeleportFailed().send(player, placeholders);
             }
         });
     }
 
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("homes")
-                .permission("essentials.home.teleport")
-                .playerOnly(true)
-                .arguments(this.createArgumentsDefinition())
-                .build();
-    }
-
-    private ArgumentsDefinition createArgumentsDefinition() {
-        return ArgumentsDefinition.builder()
-                .required("homes", new HomeArgumentHandler())
-                .optional("target", ArgumentHandlers.OFFLINE_PLAYER)
-                .build();
-    }
 
 }

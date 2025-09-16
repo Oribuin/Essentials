@@ -1,27 +1,77 @@
 package dev.oribuin.essentials.manager;
 
 import dev.oribuin.essentials.EssentialsPlugin;
-import dev.oribuin.essentials.api.database.ModuleRepository;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.database.DataMigration;
-import dev.rosewood.rosegarden.database.DatabaseConnector;
-import dev.rosewood.rosegarden.manager.AbstractDataManager;
+import dev.oribuin.essentials.config.impl.MySQLConfig;
+import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.connector.DatabaseConnector;
+import dev.oribuin.essentials.database.connector.MySQLConnector;
+import dev.oribuin.essentials.database.connector.SQLiteConnector;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
-public class DataManager extends AbstractDataManager {
+public class DataManager {
 
     private static final Map<Class<? extends ModuleRepository>, ModuleRepository> repositories = new HashMap<>();
+    private final EssentialsPlugin plugin;
+    private DatabaseConnector connector;
 
-    public DataManager(RosePlugin rosePlugin) {
-        super(rosePlugin);
+
+    public DataManager(EssentialsPlugin plugin) {
+        this.plugin = plugin;
+        this.reload();
+    }
+
+    /**
+     * Reload all the data manager, refreshing all connections
+     */
+    public void reload() {
+        MySQLConfig sqlConfig = MySQLConfig.get();
+        if (sqlConfig.isEnabled()) {
+            String hostname = sqlConfig.getHostname();
+            int port = sqlConfig.getPort();
+            String database = sqlConfig.getDatabaseName();
+            String username = sqlConfig.getUsername();
+            String password = sqlConfig.getPassword();
+            boolean useSSL = sqlConfig.useSSL();
+            int poolSize = sqlConfig.getConnectionPoolSize();
+
+            this.connector = new MySQLConnector(this.plugin, hostname, port, database, username, password, useSSL, poolSize);
+            this.plugin.getLogger().info("Data manager connected using MySQL.");
+        } else {
+            this.connector = new SQLiteConnector(this.plugin);
+            this.connector.cleanup();
+            this.plugin.getLogger().info("Data manager connected using SQLite.");
+        }
+    }
+
+    public void disable() {
+        if (this.connector == null) return;
+
+        // Wait for all connections to finish
+        long now = System.currentTimeMillis();
+        long deadline = now + 5000;
+        synchronized (this.connector.getLock()) {
+            while (!this.connector.isFinished() && now < deadline) {
+                try {
+                    this.connector.getLock().wait(deadline - now);
+                    now = System.currentTimeMillis();
+                } catch (InterruptedException ex) {
+                    this.plugin.getLogger().severe("Interrupted error occurred: " + ex.getMessage());
+                }
+            }
+        }
+
+        for (ModuleRepository repository : repositories.values()) {
+            repository.unload();
+        }
+        this.connector.closeConnection();
+    }
+
+    public final boolean isConnected() {
+        return this.connector != null;
     }
 
     /**
@@ -32,7 +82,7 @@ public class DataManager extends AbstractDataManager {
      */
     public static <T extends ModuleRepository> T create(Class<T> repository) {
         try {
-            DatabaseConnector connector = EssentialsPlugin.get().getManager(DataManager.class).getDatabaseConnector();
+            DatabaseConnector connector = EssentialsPlugin.getInstance().getDataManager().getConnector();
 
             T repo = repository.getConstructor(DatabaseConnector.class).newInstance(connector);
             repositories.put(repository, repo);
@@ -56,9 +106,7 @@ public class DataManager extends AbstractDataManager {
         return clazz.cast(repositories.get(clazz));
     }
 
-    @Override
-    public @NotNull List<Supplier<? extends DataMigration>> getDataMigrations() {
-        return new ArrayList<>();
+    public DatabaseConnector getConnector() {
+        return connector;
     }
-
 }

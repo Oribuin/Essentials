@@ -1,9 +1,9 @@
 package dev.oribuin.essentials.addon.serverlist;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.serverlist.config.ServerListConfig;
 import dev.oribuin.essentials.addon.serverlist.listener.ServerListListener;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.api.config.AddonConfig;
+import dev.oribuin.essentials.config.AddonConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.util.CachedServerIcon;
@@ -11,10 +11,23 @@ import org.bukkit.util.CachedServerIcon;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class ServerListAddon extends Addon {
 
+    private static ServerListAddon instance;
     private final List<CachedServerIcon> icons = new ArrayList<>();
+
+    /**
+     * Create a new instance of the addon
+     */
+    public ServerListAddon() {
+        super("serverlist");
+
+        instance = this;
+    }
+
 
     /**
      * When the addon is finished loading and is ready to be used.
@@ -23,48 +36,41 @@ public class ServerListAddon extends Addon {
     public void enable() {
         this.icons.clear();
 
-        ServerListConfig.ICON_IMAGES.value().forEach(s -> {
-            File folder = new File(this.folder, "icons");
-            File file = new File(folder, s);
+        File folder = new File(this.folder, "icons");
+        ServerListConfig.getInstance().getIconImages().forEach(name -> {
+            File file = new File(folder, name);
 
             try {
                 this.icons.add(Bukkit.loadServerIcon(file));
             } catch (Exception ex) {
-                this.logger.warning("Failed to load icon: " + file.getPath() + " due to " + ex.getMessage());
             }
         });
-
-        if (!this.icons.isEmpty()) {
-            this.logger.info("Loaded a total of: " + this.icons.size() + " into the plugin");
-        }
+        this.logger.info("Loaded a total of: " + this.icons.size() + " into the plugin");
     }
 
-    /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
-     */
-    @Override
-    public String name() {
-        return "serverlist";
-    }
 
     /**
      * Get all the listeners for the addon
      */
     @Override
-    public List<Listener> listeners() {
-        return List.of(new ServerListListener());
+    public List<Listener> getListeners() {
+        return List.of(new ServerListListener(this));
     }
+
 
     /**
      * Get all the configuration files for the addon
      */
     @Override
-    public List<AddonConfig> configs() {
-        return List.of(new ServerListConfig());
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of("config", ServerListConfig::new);
     }
 
     public List<CachedServerIcon> icons() {
         return icons;
+    }
+
+    public static ServerListAddon getInstance() {
+        return instance;
     }
 }

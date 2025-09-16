@@ -44,7 +44,7 @@ public class VaultEconomyProvider implements Economy {
      * @return The balance if available
      */
     private @NotNull UserAccount account(@NotNull OfflinePlayer player) {
-        return AddonProvider.ECONOMY_ADDON.repository().getBalance(player.getUniqueId());
+        return AddonProvider.ECONOMY_ADDON.getRepository().getBalance(player.getUniqueId());
     }
 
     /**
@@ -58,7 +58,7 @@ public class VaultEconomyProvider implements Economy {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(playerName);
         if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) return null;
 
-        return AddonProvider.ECONOMY_ADDON.repository().getBalance(offlinePlayer.getUniqueId());
+        return AddonProvider.ECONOMY_ADDON.getRepository().getBalance(offlinePlayer.getUniqueId());
     }
 
     @Override
@@ -68,7 +68,7 @@ public class VaultEconomyProvider implements Economy {
 
     @Override
     public String getName() {
-        return "EssentialsAddon Economy";
+        return "Essentials Economy";
     }
 
     @Override
@@ -91,12 +91,12 @@ public class VaultEconomyProvider implements Economy {
 
     @Override
     public String currencyNamePlural() {
-        return EconomyConfig.CURRENCY_NAME_PLURAL.value();
+        return EconomyConfig.get().getCurrency().getPlural();
     }
 
     @Override
     public String currencyNameSingular() {
-        return EconomyConfig.CURRENCY_SYMBOL.value();
+        return EconomyConfig.get().getCurrency().getSymbol();
     }
 
     /**
@@ -113,7 +113,7 @@ public class VaultEconomyProvider implements Economy {
         // Create a new account for the user
         return AddonProvider.ECONOMY_ADDON.deposit(
                 offlinePlayer.getUniqueId(),
-                EconomyConfig.STARTING_BALANCE.value(),
+                EconomyConfig.get().getStartingBalance(),
                 "User Account Created"
         ) != null;
     }
@@ -232,7 +232,7 @@ public class VaultEconomyProvider implements Economy {
     @Override
     public double getBalance(String player) {
         UserAccount account = this.account(player);
-        return account != null ? account.amount().doubleValue() : 0.0;
+        return account != null ? account.getAmount().doubleValue() : 0.0;
     }
 
     /**
@@ -244,7 +244,7 @@ public class VaultEconomyProvider implements Economy {
      */
     @Override
     public double getBalance(OfflinePlayer offlinePlayer) {
-        return this.account(offlinePlayer).amount().doubleValue();
+        return this.account(offlinePlayer).getAmount().doubleValue();
     }
 
     /**
@@ -261,7 +261,7 @@ public class VaultEconomyProvider implements Economy {
     @Override
     public double getBalance(String player, String world) {
         UserAccount account = this.account(player);
-        return account != null ? account.amount().doubleValue() : 0.0;
+        return account != null ? account.getAmount().doubleValue() : 0.0;
     }
 
 
@@ -292,7 +292,7 @@ public class VaultEconomyProvider implements Economy {
     @Override
     public boolean has(String player, double amount) {
         UserAccount account = this.account(player);
-        double balance = account != null ? account.amount().doubleValue() : 0.0;
+        double balance = account != null ? account.getAmount().doubleValue() : 0.0;
         return balance >= amount;
     }
 
@@ -306,7 +306,7 @@ public class VaultEconomyProvider implements Economy {
      */
     @Override
     public boolean has(OfflinePlayer offlinePlayer, double amount) {
-        return this.account(offlinePlayer).amount().doubleValue() >= amount;
+        return this.account(offlinePlayer).getAmount().doubleValue() >= amount;
     }
 
     /**
@@ -324,7 +324,7 @@ public class VaultEconomyProvider implements Economy {
     @Override
     public boolean has(String player, String world, double amount) {
         UserAccount account = this.account(player);
-        double balance = account != null ? account.amount().doubleValue() : 0.0;
+        double balance = account != null ? account.getAmount().doubleValue() : 0.0;
         return balance >= amount;
     }
 

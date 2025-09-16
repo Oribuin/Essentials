@@ -1,15 +1,21 @@
 package dev.oribuin.essentials.addon.economy;
 
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.addon.economy.command.EconomyCommand;
-import dev.oribuin.essentials.addon.economy.command.impl.PayCommand;
+import dev.oribuin.essentials.addon.economy.command.AddBalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.BalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.PayCommand;
+import dev.oribuin.essentials.addon.economy.command.ResetBalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.SetBalanceCommand;
+import dev.oribuin.essentials.addon.economy.command.TakeBalanceCommand;
+import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
+import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.database.TransactionRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
-import dev.oribuin.essentials.api.Addon;
+import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.manager.DataManager;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,20 +29,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class EconomyAddon extends Addon {
 
     private EconomyRepository repository;
     private TransactionRepository transactions;
+    private static EconomyAddon instance;
+
 
     /**
-     * The name of the addon
-     * This will be used for logging and the name of the addon.
+     * Create a new instance of the addon
      */
-    @Override
-    public String name() {
-        return "economy";
+    public EconomyAddon() {
+        super("economy");
+
+        instance = this;
     }
 
     /**
@@ -44,6 +54,7 @@ public class EconomyAddon extends Addon {
      */
     @Override
     public void enable() {
+        NumberUtil.setCachedValues();
         this.repository = DataManager.create(EconomyRepository.class);
         //        this.transactions = DataManager.create(TransactionRepository.class);
 
@@ -61,7 +72,6 @@ public class EconomyAddon extends Addon {
             return;
         }
 
-        NumberUtil.setCachedValues();
 
         this.repository.refreshBatch(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList());
     }
@@ -94,15 +104,33 @@ public class EconomyAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<BaseRoseCommand> commands() {
-        return List.of(new EconomyCommand(this.plugin), new PayCommand(this.plugin));
+    public List<Object> getCommands() {
+        return List.of(
+                new AddBalanceCommand(),
+                new BalanceCommand(),
+                new PayCommand(),
+                new ResetBalanceCommand(),
+                new SetBalanceCommand(),
+                new TakeBalanceCommand()
+        );
+    }
+
+    /**
+     * Get all the configuration files for the addon
+     */
+    @Override
+    public Map<String, Supplier<AddonConfig>> getConfigs() {
+        return Map.of(
+                "config", EconomyConfig::new,
+                "messages", EconomyMessages::new
+        );
     }
 
     /**
      * Get all the listeners for the addon
      */
     @Override
-    public List<Listener> listeners() {
+    public List<Listener> getListeners() {
         return List.of(this);
     }
 
@@ -116,7 +144,12 @@ public class EconomyAddon extends Addon {
         }
     }
 
-    public EconomyRepository repository() {
+    public EconomyRepository getRepository() {
         return repository;
     }
+
+    public static EconomyAddon getInstance() {
+        return instance;
+    }
 }
+

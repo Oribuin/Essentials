@@ -47,7 +47,7 @@ public final class TeleportRequest {
      * @return The teleport request
      */
     public boolean hasExpired() {
-        return System.currentTimeMillis() - when > TeleportConfig.REQUEST_TIMEOUT.value() * 1000;
+        return System.currentTimeMillis() - when > TeleportConfig.getInstance().getRequestTimeout().toMillis() * 1000;
     }
 
     /**
@@ -72,33 +72,33 @@ public final class TeleportRequest {
         return this.sender.equals(user);
     }
 
-    public UUID sender() {
+    public UUID getSender() {
         return sender;
     }
 
-    public UUID target() {
+    public UUID getTarget() {
         return target;
     }
 
-    public long when() {
+    public long getWhen() {
         return when;
     }
 
-    public Location where() {
+    public Location getWhere() {
         return where;
     }
 
-    public void where(Location where) {
+    public void setWhere(Location where) {
         this.where = where;
     }
 
     @Override
     public String toString() {
-        return "TeleportRequest[" +
-               "sender=" + sender + ", " +
-               "target=" + target + ", " +
-               "when=" + when + ']';
+        return "TeleportRequest{" +
+               "sender=" + sender +
+               ", target=" + target +
+               ", when=" + when +
+               ", where=" + where +
+               '}';
     }
-
-
 }

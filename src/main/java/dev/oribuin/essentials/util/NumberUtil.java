@@ -1,6 +1,20 @@
 package dev.oribuin.essentials.util;
 
+import java.util.concurrent.TimeUnit;
+
 public final class NumberUtil {
+
+    /**
+     * Converts a long value and TimeUnit to a value in ticks
+     *
+     * @param value    The value
+     * @param timeUnit The TimeUnit
+     *
+     * @return the value in ticks, rounded to the nearest tick
+     */
+    public static long timeUnitToTicks(long value, TimeUnit timeUnit) {
+        return Math.round(timeUnit.toMillis(value) / 50.0);
+    }
 
     /**
      * Convert a Double into a String with maximum 2 decimal places

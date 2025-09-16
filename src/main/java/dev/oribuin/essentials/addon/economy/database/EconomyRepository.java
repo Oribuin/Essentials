@@ -7,13 +7,13 @@ import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
-import dev.oribuin.essentials.api.database.ModuleRepository;
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.StatementProvider;
-import dev.oribuin.essentials.api.database.StatementType;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
-import dev.rosewood.rosegarden.database.DatabaseConnector;
-import dev.rosewood.rosegarden.scheduler.task.ScheduledTask;
+import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.StatementProvider;
+import dev.oribuin.essentials.database.StatementType;
+import dev.oribuin.essentials.database.connector.DatabaseConnector;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
+import dev.oribuin.essentials.scheduler.task.ScheduledTask;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +58,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
         this.accountCache = CacheBuilder.newBuilder()
                 .concurrencyLevel(2)
                 .expireAfterAccess(5, TimeUnit.MINUTES)
-                .refreshAfterWrite(EconomyConfig.CACHE_DURATION.value(), TimeUnit.SECONDS)
+                .refreshAfterWrite(EconomyConfig.get().getCacheDuration(), TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
                     public @NotNull UserAccount load(@NotNull UUID key) {
@@ -66,7 +66,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
                     }
                 });
 
-        this.updateTask = EssentialsPlugin.scheduler().runTaskTimerAsync(this::update, 1L, 1L, TimeUnit.SECONDS);
+        this.updateTask = EssentialsPlugin.getInstance().getScheduler().runTaskTimerAsync(this::update, 1L, 1L, TimeUnit.SECONDS);
     }
 
     /**
@@ -82,7 +82,6 @@ public class EconomyRepository extends ModuleRepository implements Listener {
         this.update();
         this.accountCache.invalidateAll();
         this.pendingTransactions.clear();
-        super.unload();
     }
 
     /**
@@ -113,7 +112,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
                 for (Map.Entry<UUID, Deque<Transaction>> entry : processing.entrySet()) {
                     for (Transaction transaction : entry.getValue()) {
                         statement.setString(1, entry.getKey().toString());
-                        statement.setBigDecimal(2, transaction.current());
+                        statement.setBigDecimal(2, transaction.getCurrent());
                         statement.setLong(3, System.currentTimeMillis());
                         statement.addBatch();
                     }
@@ -132,7 +131,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
      * @return The account retrieved from the cache
      */
     public @NotNull UserAccount getBalance(@NotNull UUID owner) {
-        UserAccount account = new UserAccount(owner, EconomyConfig.STARTING_BALANCE.value());
+        UserAccount account = new UserAccount(owner, EconomyConfig.get().getStartingBalance());
         try {
             account = this.accountCache.get(owner);
         } catch (ExecutionException ignored) {
@@ -140,12 +139,12 @@ public class EconomyRepository extends ModuleRepository implements Listener {
 
         Deque<Transaction> pending = this.pendingTransactions.get(owner);
         if (pending != null) {
-            BigDecimal current = account.amount();
+            BigDecimal current = account.getAmount();
             for (Transaction transaction : pending) {
-                current = current.add(transaction.change());
+                current = current.add(transaction.getChange());
             }
 
-            account.amount(current);
+            account.setAmount(current);
         }
 
         return account;
@@ -164,7 +163,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
                 .column("user", DataTypes.UUID, owner)
                 .executeSync();
 
-        UserAccount account = new UserAccount(owner, EconomyConfig.STARTING_BALANCE.value());
+        UserAccount account = new UserAccount(owner, EconomyConfig.get().getStartingBalance());
 
         if (result != null) {
             QueryResult.Row row = result.first();
@@ -242,11 +241,11 @@ public class EconomyRepository extends ModuleRepository implements Listener {
         if (amount.doubleValue() < 0) return false;
 
         UserAccount account = this.getBalance(target);
-        BigDecimal current = account.amount();
-        account.amount(amount);
+        BigDecimal current = account.getAmount();
+        account.setAmount(amount);
 
         Transaction transaction = new Transaction(target, source, amount, amount);
-        transaction.before(current);
+        transaction.setBefore(current);
         return this.publishChange(target, transaction);
     }
 
@@ -261,8 +260,8 @@ public class EconomyRepository extends ModuleRepository implements Listener {
     @Nullable
     public Transaction offset(@NotNull UUID target, BigDecimal amount, String source) {
         UserAccount userAccount = this.getBalance(target);
-        BigDecimal before = userAccount.amount();
-        BigDecimal newBalance = userAccount.amount().add(amount);
+        BigDecimal before = userAccount.getAmount();
+        BigDecimal newBalance = userAccount.getAmount().add(amount);
         Transaction transaction = new Transaction(
                 target,
                 source,
@@ -272,7 +271,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
                 System.currentTimeMillis()
         );
 
-        userAccount.amount(newBalance);
+        userAccount.setAmount(newBalance);
         return this.publishChange(target, transaction) ? transaction : null;
     }
 

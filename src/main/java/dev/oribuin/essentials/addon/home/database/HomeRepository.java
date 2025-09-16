@@ -1,12 +1,12 @@
 package dev.oribuin.essentials.addon.home.database;
 
 import dev.oribuin.essentials.addon.home.model.Home;
-import dev.oribuin.essentials.api.database.ModuleRepository;
-import dev.oribuin.essentials.api.database.QueryResult;
-import dev.oribuin.essentials.api.database.StatementProvider;
-import dev.oribuin.essentials.api.database.StatementType;
-import dev.oribuin.essentials.api.database.serializer.def.DataTypes;
-import dev.rosewood.rosegarden.database.DatabaseConnector;
+import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.QueryResult;
+import dev.oribuin.essentials.database.StatementProvider;
+import dev.oribuin.essentials.database.StatementType;
+import dev.oribuin.essentials.database.connector.DatabaseConnector;
+import dev.oribuin.essentials.database.serializer.def.DataTypes;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

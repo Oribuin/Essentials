@@ -1,43 +1,34 @@
 package dev.oribuin.essentials.command.impl;
 
+import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
-import dev.oribuin.essentials.api.Addon;
-import dev.oribuin.essentials.command.argument.AddonArgumentHandler;
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import org.bukkit.command.CommandSender;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class ReloadCommand extends BaseRoseCommand {
+public class ReloadCommand {
 
-    public ReloadCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    private final EssentialsPlugin plugin;
+
+    public ReloadCommand(EssentialsPlugin plugin) {
+        this.plugin = plugin;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context, Addon addon) {
+    @Command("essentials|ess reload [addon]")
+    @Permission("essentials.reload")
+    @CommandDescription("Reload the plugin Command")
+    public void execute(CommandSender sender, Addon addon) {
         if (addon != null) {
             AddonProvider.unload(addon);
             AddonProvider.register(addon);
-            context.getSender().sendMessage("Reloaded the addon: " + addon.name());
+            sender.sendMessage("Reloaded the addon: " + addon.getClass().getSimpleName());
             return;
         }
 
-        this.rosePlugin.reload(); // Reload the entire plugin
-        context.getSender().sendMessage("Reloaded the plugin");
+        this.plugin.reload();
+        sender.sendMessage("Reloaded the plugin");
     }
-
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("essreload")
-                .arguments(ArgumentsDefinition.builder()
-                        .optional("addon", new AddonArgumentHandler())
-                        .build()
-                )
-                .descriptionKey("command-reload-description")
-                .permission("essentials.reload")
-                .build();
-    }
+    
 }

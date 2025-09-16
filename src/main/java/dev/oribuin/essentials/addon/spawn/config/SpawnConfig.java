@@ -1,64 +1,113 @@
 package dev.oribuin.essentials.addon.spawn.config;
 
-import dev.oribuin.essentials.api.config.AddonConfig;
-import dev.oribuin.essentials.api.config.option.Option;
-import dev.oribuin.essentials.util.FinePosition;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import dev.oribuin.essentials.addon.spawn.SpawnAddon;
+import dev.oribuin.essentials.config.AddonConfig;
+import dev.oribuin.essentials.util.model.FinePosition;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 import java.time.Duration;
 
-import static dev.oribuin.essentials.api.config.EssentialsSerializers.DURATION;
-import static dev.oribuin.essentials.api.config.EssentialsSerializers.POSITION;
-import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
-import static dev.rosewood.rosegarden.config.SettingSerializers.DOUBLE;
+@ConfigSerializable
+@SuppressWarnings({ "FieldMayBeFinal", "FieldCanBeLocal" })
+public class SpawnConfig implements AddonConfig {
 
-public class SpawnConfig extends AddonConfig {
+    public static SpawnConfig getInstance() {
+        return SpawnAddon.getInstance().getConfigLoader().get(SpawnConfig.class);
+    }
 
-    public static Option<Boolean> TP_CONFIRM = new Option<>(BOOLEAN, true, "Should a player be required to confirm they want to teleport to spawn?");
-    public static Option<Double> TP_COST = new Option<>(DOUBLE, 0.0, "The cost to teleport to a home.", "This will be overwritten with the permission 'essentials.spawn.bypass.cost'");
-    public static Option<Boolean> TP_BAR = new Option<>(BOOLEAN, true, "Should the plugin display a bar counting until the player teleports (Requires tp-delay to be above 0)");
-    public static Option<Duration> TP_DELAY = new Option<>(DURATION, Duration.ofSeconds(5), "The time it will take  for a player to teleport (Requires TP Effects)");
-    public static Option<Duration> TP_COOLDOWN = new Option<>(DURATION, Duration.ofSeconds(30), "The cooldown between teleporting to spawn.", "This will be overwritten with the permission 'essentials.spawn.bypass.cooldown'");
-    public static final Option<Boolean> USE_MOTD = new Option<>(BOOLEAN, true, "Should a message be sent to players when the join the server?");
-    public static final Option<Boolean> USE_NEWBIE_SPAWN = new Option<>(BOOLEAN, false, "Should new players go to their own spawn point");
-    public static final Option<Boolean> SPAWN_ON_RESPAWN = new Option<>(BOOLEAN, false, "Should players be teleported to spawn when they die?");
-    public static final Option<Boolean> ALWAYS_SPAWN_ON_JOIN = new Option<>(BOOLEAN, false,
-            "When a player joins the server should they be forcefully",
-            "forcefully teleported to the server spawn (This does not apply to new joins)"
-    );
-    public static final Option<FinePosition> SPAWNPOINT = new Option<>(POSITION, worldSpawn(),
-            "The default spawn point for all players when they join or type /spawn"
-    );
-    public static final Option<FinePosition> NEWBIE_SPAWN = new Option<>(POSITION, worldSpawn(),
-            "The default spawn point for all players when they join or type /spawn"
-    );
+    @Comment("Whether the basic addon module is enabled")
+    private boolean enabled = true;
+
+    @Comment("Should a player be required to confirm they want to teleport to spawn?")
+    private boolean teleportConfirm = false;
+
+    @Comment("Should there be a cost to teleport to the server spawn?")
+    private double teleportCost = 0.0;
+
+    @Comment("Should the plugin display a bar counting until the player teleports? (Requires 'teleport-delay' to be more than 0)")
+    private boolean teleportBar = true;
+
+    @Comment("Should there be a delay until the player teleports")
+    private Duration teleportDelay = Duration.ofSeconds(5);
+
+    @Comment("Should there be a cooldown between each command usage?")
+    private Duration teleportCooldown = Duration.ofSeconds(30);
+
+    @Comment("Should the plugin send an motd when a player joins?")
+    private boolean useMOTD = true;
+
+    @Comment("Should new players go to their own spawn point?")
+    private boolean useNewbieSpawn = false;
+
+    @Comment("Should players be teleported to the spawn when they die?")
+    private boolean spawnOnRespawn = false;
+
+    @Comment("When a player joins the server, should they always teleport to the server spawn?")
+    private boolean alwaysSpawnOnJoin = false;
+
+    @Comment("The regular spawnpoint when using /spawn")
+    private FinePosition spawnpoint = new FinePosition();
+
+    @Comment("The newbie spawnpoint (Requires the 'use-newbie-spawn' to be set to true")
+    private FinePosition newbieSpawnpoint = new FinePosition();
 
     /**
-     * Create a new instance of the addon config
-     */
-    public SpawnConfig() {
-        super("config");
-    }
-
-    /**
-     * Convert a string and three doubles into a Location
+     * Check if the addon config is enabled
      *
-     * @param world The location wor ld
-     * @param x     The x coordinate
-     * @param y     The y coordinate
-     * @param z     The z coordinate
-     *
-     * @return The world if available
+     * @return True if the addon config is enabled
      */
-    private static FinePosition from(String world, double x, double y, double z) {
-        return new FinePosition(world, x, y, z);
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
-    private static FinePosition worldSpawn() {
-        World world = Bukkit.getWorlds().get(0);
-        if (world == null) return from("world", 0, 65, 0);
-
-        return FinePosition.from(world.getSpawnLocation().toCenterLocation());
+    public boolean isTeleportConfirm() {
+        return teleportConfirm;
     }
+
+    public double getTeleportCost() {
+        return teleportCost;
+    }
+
+    public boolean isTeleportBar() {
+        return teleportBar;
+    }
+
+    public Duration getTeleportDelay() {
+        return teleportDelay;
+    }
+
+    public Duration getTeleportCooldown() {
+        return teleportCooldown;
+    }
+
+    public boolean useMotd() {
+        return useMOTD;
+    }
+
+    public boolean isUseNewbieSpawn() {
+        return useNewbieSpawn;
+    }
+
+    public boolean isSpawnOnRespawn() {
+        return spawnOnRespawn;
+    }
+
+    public boolean isAlwaysSpawnOnJoin() {
+        return alwaysSpawnOnJoin;
+    }
+
+    public FinePosition getSpawnpoint() {
+        return spawnpoint;
+    }
+
+    public void setSpawnpoint(FinePosition spawnpoint) {
+        this.spawnpoint = spawnpoint;
+    }
+
+    public FinePosition getNewbieSpawnpoint() {
+        return newbieSpawnpoint;
+    }
+
 }

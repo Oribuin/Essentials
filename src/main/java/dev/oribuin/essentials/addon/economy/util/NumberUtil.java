@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class NumberUtil {
 
     private static NumberFormat formatter = NumberFormat.getInstance();
+    private static String symbol;
     private static String decimal;
     private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
 
@@ -26,7 +27,7 @@ public class NumberUtil {
      */
     public static String format(double amount) {
         if (formatter != null) {
-            return formatter.format(amount);
+            return symbol + formatter.format(amount);
         } else {
             return String.valueOf(amount);
         }
@@ -74,7 +75,8 @@ public class NumberUtil {
     }
 
     public static void setCachedValues() {
-        String separator = EconomyConfig.CURRENCY_SEPARATOR.value();
+        EconomyConfig config = EconomyConfig.get();
+        String separator = config.getCurrency().getSeparator();
         DecimalFormat decimalFormat = new DecimalFormat();
         DecimalFormatSymbols symbols = decimalFormat.getDecimalFormatSymbols();
         if (!separator.isEmpty()) {
@@ -88,10 +90,11 @@ public class NumberUtil {
         }
 
         suffixes.clear();
-        suffixes.put(1_000L, EconomyConfig.CURRENCY_ABBREV_THOUSANDS.value());
-        suffixes.put(1_000_000L, EconomyConfig.CURRENCY_ABBREV_MILLIONS.value());
-        suffixes.put(1_000_000_000L, EconomyConfig.CURRENCY_ABBREV_BILLIONS.value());
-        decimal = EconomyConfig.CURRENCY_DECIMAL.value();
+        suffixes.put(1_000L, config.getAbbreviations().getThousands());
+        suffixes.put(1_000_000L, config.getAbbreviations().getMillions());
+        suffixes.put(1_000_000_000L, config.getAbbreviations().getBillion());
+        symbol = config.getCurrency().getSymbol();
+        decimal = config.getCurrency().getDecimal();
     }
 
 }

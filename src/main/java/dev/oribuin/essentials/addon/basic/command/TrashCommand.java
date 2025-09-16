@@ -1,33 +1,47 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
-import dev.rosewood.rosegarden.command.framework.CommandContext;
-import dev.rosewood.rosegarden.command.framework.CommandInfo;
-import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
+import dev.oribuin.essentials.addon.basic.BasicAddon;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
 
-public class TrashCommand extends BaseRoseCommand {
+public class TrashCommand {
+    
+    private final BasicAddon addon;
 
-    public TrashCommand(RosePlugin rosePlugin) {
-        super(rosePlugin);
+    public TrashCommand(BasicAddon addon) {
+        this.addon = addon;
     }
 
-    @RoseExecutable
-    public void execute(CommandContext context) {
-        Player player = (Player) context.getSender();
-
-        player.openInventory(Bukkit.createInventory(null, 9 * 4));
+    /**
+     * Open a trash can for the player to dispose of items
+     *
+     * @param sender The player opening the trashcan
+     */
+    @Command("trash|etrash|bin|disposal|dispose|edispose|edisposal")
+    @Permission("essentials.trash")
+    @CommandDescription("Open a trash can for the player")
+    public void execute(Player sender) {
+        Inventory inventory = Bukkit.createInventory(null, 9 * 4, Component.text("Trash Can"));
+        this.addon.getScheduler().runTask(() -> sender.openInventory(inventory));
     }
-
-    @Override
-    protected CommandInfo createCommandInfo() {
-        return CommandInfo.builder("trash")
-                .permission("essentials.trash")
-                .aliases("etrash", "bin", "disposal", "dispose", "edispose", "edisposal")
-                .playerOnly(true)
-                .build();
+    
+    /**
+     * Open a trash can for the player to dispose of items
+     *
+     * @param sender The player opening the trashcan
+     */
+    @Command("trash|etrash|bin|disposal|dispose|edispose|edisposal <target>")
+    @Permission("essentials.trash.other")
+    @CommandDescription("Open a trash can for the player")
+    public void execute(CommandSender sender, Player target) {
+        Inventory inventory = Bukkit.createInventory(null, 9 * 4, Component.text("Trash Can"));
+        this.addon.getScheduler().runTask(() -> target.openInventory(inventory));
     }
 
 }
