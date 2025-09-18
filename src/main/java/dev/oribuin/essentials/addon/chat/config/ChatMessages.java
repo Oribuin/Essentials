@@ -23,8 +23,12 @@ public class ChatMessages implements AddonConfig {
     private TextMessage userMessagesClosed = new TextMessage(PREFIX + "This user has their private messages ignored");
     private TextMessage directMessageSent = new TextMessage("<white>You → <#bc7dff><recipient><gray>:<white> <message>");
     private TextMessage directMessageReceived = new TextMessage("<#bc7dff><sender> → <white>You<gray>:<white> <message>");
-    private TextMessage socialSpyMessage = new TextMessage("<#9983f2><bold>SSpy</bold> <white>| <#bc7dff><sender> <white>→ <#bc7dff><recipient><gray>:<white> <message>");
+    private TextMessage socialSpyMessage = new TextMessage("<#9983f2><bold>SSpy</bold> <white>| <#bc7dff><sender> <white>→ <#bc7dff><recipient><gray>:<#9983f2> <message>");
     private TextMessage nobodyToReply = new TextMessage(PREFIX + "You do not have anybody to reply to");
+    private TextMessage resetNickname = new TextMessage(PREFIX + "You have reset your nickname");
+    private TextMessage resetNicknameOther = new TextMessage(PREFIX + "You have reset <#bc7dff><target><white>'s nickname");
+    private TextMessage setNickname = new TextMessage(PREFIX + "You have changed your nickname to <nickname>");
+    private TextMessage setNicknameOther = new TextMessage(PREFIX + "You have changed <#bc7dff><target><white>'s nickname to <nickname>");
 
     public TextMessage getPlayerIgnored() {
         return playerIgnored;
@@ -64,5 +68,21 @@ public class ChatMessages implements AddonConfig {
 
     public TextMessage getNobodyToReply() {
         return nobodyToReply;
+    }
+
+    public TextMessage getResetNickname() {
+        return resetNickname;
+    }
+
+    public TextMessage getResetNicknameOther() {
+        return resetNicknameOther;
+    }
+
+    public TextMessage getSetNickname() {
+        return setNickname;
+    }
+
+    public TextMessage getSetNicknameOther() {
+        return setNicknameOther;
     }
 }

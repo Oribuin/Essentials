@@ -40,7 +40,7 @@ public class ChatSender implements ForwardingAudience.Single {
     public ChatSender(@NotNull UUID uuid) {
         this.uuid = uuid;
         this.lastMessaged = null;
-        this.dirty = false;
+        this.dirty = true;
         this.nickname = null;
         this.ignoredUsers = new HashSet<>();
         this.mutedChannels = new HashSet<>();
@@ -207,8 +207,5 @@ public class ChatSender implements ForwardingAudience.Single {
         this.socialSpy = socialSpy;
         this.dirty = true;
     }
-
-    public record UserSet(Set<UUID> users) {}
-    public record ChannelSet(Set<String> channels) {}
     
 }

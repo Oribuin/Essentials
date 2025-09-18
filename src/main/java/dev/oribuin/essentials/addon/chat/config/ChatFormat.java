@@ -26,7 +26,7 @@ public class ChatFormat {
      * @param channel The chat channel
      */
     public ChatFormat(ChatChannel channel) {
-        this(channel, "%vault_prefix% <white>%player_name% <reset><!italic><gray>» <white><message>");
+        this(channel, "%vault_prefix% <white><player> <reset><!italic><gray>» <white><message>");
     }
 
     /**

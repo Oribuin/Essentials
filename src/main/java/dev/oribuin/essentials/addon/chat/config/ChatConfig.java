@@ -24,7 +24,7 @@ public class ChatConfig implements AddonConfig {
     private int maxNickLength = 16;
     private List<ChatFormat> formats = new ArrayList<>(List.of(
             new ChatFormat(ChatChannels.GLOBAL),
-            new ChatFormat(ChatChannels.LOCAL, "<#3b94ed%><bold>Local <white>| %vault_prefix% <white>%player_name% <reset><!italic><gray>» <white><message>")
+            new ChatFormat(ChatChannels.LOCAL, "<#3b94ed%><bold>Local <white>| %vault_prefix% <white><player> <reset><!italic><gray>» <white><message>")
     ));
 
     private List<Pattern> chatfilter = new ArrayList<>(List.of(

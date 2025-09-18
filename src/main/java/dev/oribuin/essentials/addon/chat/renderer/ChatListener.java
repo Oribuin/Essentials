@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.chat.renderer;
 
 import dev.oribuin.essentials.addon.chat.ChatAddon;
 import dev.oribuin.essentials.addon.chat.channel.ChatChannels;
+import dev.oribuin.essentials.addon.chat.database.ChatRepository;
 import dev.oribuin.essentials.addon.chat.database.ChatSender;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.audience.Audience;
@@ -12,8 +13,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class ChatListener implements Listener {
@@ -69,11 +72,33 @@ public class ChatListener implements Listener {
         event.viewers().forEach(x -> x.sendMessage(finalFormat));
     }
 
+    /**
+     * Load the user's chat data when they login to the server
+     *
+     * @param event The player join event
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
-        this.addon.getScheduler().runTaskAsync(() ->
-                this.addon.getRepository().loadSync(event.getPlayer().getUniqueId())
-        );
+        ChatRepository repository = this.addon.getRepository();
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        repository.getAsync(uuid).thenAccept(sender -> repository.getUsers().put(uuid, sender));
+    }
+
+    /**
+     * Remove the user's data from the cache and save it when they leave
+     *
+     * @param event The player quit event
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onQuit(PlayerQuitEvent event) {
+        ChatRepository repository = this.addon.getRepository();
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        ChatSender sender = repository.getUsers().remove(uuid);
+        if (sender != null) {
+            this.addon.getScheduler().runTaskAsync(() -> repository.saveUser(sender));
+        }
     }
 
 }

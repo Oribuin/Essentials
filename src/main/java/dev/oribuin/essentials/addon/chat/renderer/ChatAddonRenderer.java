@@ -85,7 +85,7 @@ public class ChatAddonRenderer implements io.papermc.paper.chat.ChatRenderer.Vie
                 )).build()
                 .deserialize(sender.getNickname() != null ? sender.getNickname() : player.getName())
                 .append(Component.empty());
-
+        
         Component messageComponent = MiniMessage.builder().tags(TagResolver.builder()
                         .resolvers(getAvailable(player))
                         .build())
