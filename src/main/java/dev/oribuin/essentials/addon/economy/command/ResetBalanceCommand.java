@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
@@ -13,7 +14,7 @@ import org.incendo.cloud.annotations.Permission;
 
 import java.math.BigDecimal;
 
-public class ResetBalanceCommand {
+public class ResetBalanceCommand implements AddonCommand {
 
     /**
      * Reset a user's current balance

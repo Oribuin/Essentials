@@ -2,7 +2,6 @@ package dev.oribuin.essentials.command.argument;
 
 import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.caption.CaptionVariable;

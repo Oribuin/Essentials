@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.economy.provider;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.addon.economy.EconomyAddon;
 import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
@@ -44,7 +45,7 @@ public class VaultEconomyProvider implements Economy {
      * @return The balance if available
      */
     private @NotNull UserAccount account(@NotNull OfflinePlayer player) {
-        return AddonProvider.ECONOMY_ADDON.getRepository().getBalance(player.getUniqueId());
+        return EconomyAddon.getInstance().getRepository().getBalance(player.getUniqueId());
     }
 
     /**
@@ -58,7 +59,7 @@ public class VaultEconomyProvider implements Economy {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(playerName);
         if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) return null;
 
-        return AddonProvider.ECONOMY_ADDON.getRepository().getBalance(offlinePlayer.getUniqueId());
+        return EconomyAddon.getInstance().getRepository().getBalance(offlinePlayer.getUniqueId());
     }
 
     @Override

@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.model.Cooldown;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class FeedCommand {
+public class FeedCommand implements AddonCommand {
 
     private final Cooldown<CommandSender> cooldown = new Cooldown<>();
 

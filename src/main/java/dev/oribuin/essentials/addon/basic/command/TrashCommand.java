@@ -1,6 +1,7 @@
 package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.BasicAddon;
+import dev.oribuin.essentials.command.AddonCommand;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -10,8 +11,8 @@ import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class TrashCommand {
-    
+public class TrashCommand implements AddonCommand {
+
     private final BasicAddon addon;
 
     public TrashCommand(BasicAddon addon) {
@@ -30,7 +31,7 @@ public class TrashCommand {
         Inventory inventory = Bukkit.createInventory(null, 9 * 4, Component.text("Trash Can"));
         this.addon.getScheduler().runTask(() -> sender.openInventory(inventory));
     }
-    
+
     /**
      * Open a trash can for the player to dispose of items
      *

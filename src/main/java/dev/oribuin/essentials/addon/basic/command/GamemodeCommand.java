@@ -3,8 +3,8 @@ package dev.oribuin.essentials.addon.basic.command;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.TextMessage;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -14,10 +14,9 @@ import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 import org.incendo.cloud.bukkit.parser.PlayerParser;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
-import org.incendo.cloud.paper.PaperCommandManager;
 
 @SuppressWarnings("UnstableApiUsage")
-public class GamemodeCommand {
+public class GamemodeCommand implements AddonCommand {
 
     private final BasicAddon addon;
 

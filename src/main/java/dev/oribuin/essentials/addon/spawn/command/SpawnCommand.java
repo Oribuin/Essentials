@@ -3,6 +3,7 @@ package dev.oribuin.essentials.addon.spawn.command;
 import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.scheduler.task.ScheduledTask;
 import dev.oribuin.essentials.util.EssUtils;
@@ -22,7 +23,7 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class SpawnCommand {
+public class SpawnCommand implements AddonCommand {
 
     private final SpawnAddon addon;
     private final Cooldown<UUID> cooldown;

@@ -51,7 +51,7 @@ public class ConfigHandler<T> {
                     .indent(2)
                     .path(parent.resolve(name))
                     .build());
-            
+
 
             this.config = this.base.referenceTo(addonConfig);
             this.base.save();

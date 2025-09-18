@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.model.Cooldown;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class RepairCommand {
+public class RepairCommand implements AddonCommand {
 
     private final Cooldown<UUID> cooldown = new Cooldown<>();
 

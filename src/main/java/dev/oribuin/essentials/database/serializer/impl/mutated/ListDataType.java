@@ -9,16 +9,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ListDataType<T> extends DataType<T> {
+public class ListDataType<T> extends DataType<List<T>> {
 
     private static final Gson GSON = new Gson();
-    private final Class<T> type;
-    private final List<T> list;
+    private transient final DataType<T> type;
+    private final List<T> values;
 
-    public ListDataType(Class<T> type, List<T> list) {
+    public ListDataType(DataType<T> type, List<T> values) {
         super(ColumnType.TEXT);
         this.type = type;
-        this.list = list;
+        this.values = values;
     }
 
     /**
@@ -31,8 +31,8 @@ public class ListDataType<T> extends DataType<T> {
      * @throws SQLException If an error occurs while serializing the value
      */
     @Override
-    public void serialize(PreparedStatement statement, int index, T value) throws SQLException {
-        statement.setString(index, GSON.toJson(new ListDataType<>(this.type, this.list)));
+    public void serialize(PreparedStatement statement, int index, List<T> value) throws SQLException {
+        statement.setString(index, GSON.toJson(new ListDataType<>(this.type, value)));
     }
 
     /**
@@ -46,11 +46,15 @@ public class ListDataType<T> extends DataType<T> {
      * @throws SQLException If an error occurs while deserializing the value
      */
     @Override
-    public T deserialize(QueryResult.Row row, String name) {
+    public List<T> deserialize(QueryResult.Row row, String name) {
         String result = row.getString(name);
         if (result == null) return null;
 
-        return GSON.fromJson(result, this.type);
+        ListDataType<T> dataType = GSON.fromJson(result, ListDataType.class);
+        return dataType.getValues();
     }
 
+    public List<T> getValues() {
+        return values;
+    }
 }

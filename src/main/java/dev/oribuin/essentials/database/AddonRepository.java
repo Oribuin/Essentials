@@ -3,12 +3,12 @@ package dev.oribuin.essentials.database;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.database.connector.DatabaseConnector;
 
-public abstract class ModuleRepository {
+public abstract class AddonRepository {
 
     protected final DatabaseConnector connector;
     protected String table;
 
-    public ModuleRepository(DatabaseConnector connector, String table) {
+    public AddonRepository(DatabaseConnector connector, String table) {
         this.connector = connector;
         this.table = "essentials_" + table;
     }

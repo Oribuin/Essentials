@@ -72,7 +72,7 @@ public class StatementProvider {
      *
      * @return The statement provider
      */
-    public static StatementProvider create(StatementType type, ModuleRepository repository) {
+    public static StatementProvider create(StatementType type, AddonRepository repository) {
         try {
             return new StatementProvider(type, repository.connector.connect()).table(repository.table);
         } catch (SQLException ex) {

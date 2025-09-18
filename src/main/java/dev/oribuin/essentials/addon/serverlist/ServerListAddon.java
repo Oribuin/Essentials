@@ -45,6 +45,7 @@ public class ServerListAddon extends Addon {
             } catch (Exception ex) {
             }
         });
+
         this.logger.info("Loaded a total of: " + this.icons.size() + " into the plugin");
     }
 

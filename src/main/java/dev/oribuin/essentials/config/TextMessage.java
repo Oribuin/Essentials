@@ -59,7 +59,7 @@ public class TextMessage {
     public TextMessage() {
         this(null, null, null, null, null, null, null);
     }
-    
+
     /**
      * Create a new message that can be sent to an audience with specified params
      *

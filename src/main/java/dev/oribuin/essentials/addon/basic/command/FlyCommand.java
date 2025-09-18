@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
@@ -10,7 +11,7 @@ import org.incendo.cloud.annotations.Permission;
 
 import java.util.List;
 
-public class FlyCommand {
+public class FlyCommand implements AddonCommand {
 
     /**
      * Toggle a player's flight status

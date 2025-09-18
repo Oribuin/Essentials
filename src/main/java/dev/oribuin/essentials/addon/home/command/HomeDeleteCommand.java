@@ -4,12 +4,13 @@ import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.event.HomeDeleteEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class HomeDeleteCommand {
+public class HomeDeleteCommand implements AddonCommand {
 
     private final HomeAddon addon;
 

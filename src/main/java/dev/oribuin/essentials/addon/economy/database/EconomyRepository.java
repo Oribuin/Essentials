@@ -7,13 +7,14 @@ import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.economy.config.EconomyConfig;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.model.UserAccount;
-import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.AddonRepository;
 import dev.oribuin.essentials.database.QueryResult;
 import dev.oribuin.essentials.database.StatementProvider;
 import dev.oribuin.essentials.database.StatementType;
 import dev.oribuin.essentials.database.connector.DatabaseConnector;
 import dev.oribuin.essentials.database.serializer.def.DataTypes;
 import dev.oribuin.essentials.scheduler.task.ScheduledTask;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class EconomyRepository extends ModuleRepository implements Listener {
+public class EconomyRepository extends AddonRepository implements Listener {
 
     private final LoadingCache<UUID, UserAccount> accountCache;
     private final Map<UUID, Deque<Transaction>> pendingTransactions;
@@ -79,7 +80,18 @@ public class EconomyRepository extends ModuleRepository implements Listener {
             this.updateTask = null;
         }
 
-        this.update();
+        // update manually because task while disabling is a bitch !!
+        Map<UUID, Deque<Transaction>> processing;
+        synchronized (this.pendingTransactions) {
+            if (this.pendingTransactions.isEmpty()) return;
+
+            processing = new HashMap<>(this.pendingTransactions);
+            this.pendingTransactions.clear();
+        }
+
+        this.push(processing);
+
+        // grr
         this.accountCache.invalidateAll();
         this.pendingTransactions.clear();
     }
@@ -105,8 +117,20 @@ public class EconomyRepository extends ModuleRepository implements Listener {
      * @param processing The transactions to push
      */
     private void push(Map<UUID, Deque<Transaction>> processing) {
+        if (Bukkit.isPrimaryThread()) {
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
+        }
+        
         // do this part manually because i dont feel like editing statementprovider :3
-        this.async(() -> this.connector.connect(connection -> {
+        this.connector.connect(connection -> {
             String query = "REPLACE INTO " + this.table + " (user, amount, last_updated) VALUES (?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 for (Map.Entry<UUID, Deque<Transaction>> entry : processing.entrySet()) {
@@ -120,7 +144,7 @@ public class EconomyRepository extends ModuleRepository implements Listener {
 
                 statement.executeBatch();
             }
-        }));
+        });
     }
 
     /**

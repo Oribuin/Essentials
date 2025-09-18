@@ -1,16 +1,16 @@
 package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.model.Weather;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.incendo.cloud.annotations.Argument;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class PlayerWeatherCommand {
+public class PlayerWeatherCommand implements AddonCommand {
 
     /**
      * Change your current player weather
@@ -23,7 +23,7 @@ public class PlayerWeatherCommand {
     @CommandDescription("Change your current player weather")
     public void execute(Player sender, Weather weather) {
         BasicMessages messages = BasicMessages.get();
-        
+
         weather.apply(sender);
         messages.getPlayerWeather().send(
                 sender,

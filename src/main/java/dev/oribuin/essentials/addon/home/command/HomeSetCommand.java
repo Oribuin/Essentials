@@ -6,15 +6,17 @@ import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
 import dev.oribuin.essentials.addon.home.event.HomeCreateEvent;
 import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.annotations.Argument;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
 import java.util.List;
 
-public class HomeSetCommand {
+public class HomeSetCommand implements AddonCommand {
 
     private final HomeAddon addon;
 
@@ -31,7 +33,7 @@ public class HomeSetCommand {
     @Command("sethome|createhome <home>")
     @Permission("essentials.home.create")
     @CommandDescription("Delete a user's home ")
-    public void execute(Player sender, String name) {
+    public void execute(Player sender, @Argument("home") String name) {
         HomeConfig config = HomeConfig.getInstance();
         HomeMessages messages = HomeMessages.getInstance();
         HomeRepository repository = this.addon.repository();

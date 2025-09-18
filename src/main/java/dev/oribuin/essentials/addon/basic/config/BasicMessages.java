@@ -85,7 +85,7 @@ public class BasicMessages implements AddonConfig {
 
     @Comment("The message sent when a player changes their personal weather")
     private TextMessage playerWeather = new TextMessage(PREFIX + "You have changed your personal weather to <#bc7dff><weather><white>");
-    
+
     @Comment("The message sent when a player changes their personal weather")
     private TextMessage playerWeatherOther = new TextMessage(PREFIX + "You have changed <#bc7dff><target><white>'s personal weather to <#bc7dff><weather><white>");
 

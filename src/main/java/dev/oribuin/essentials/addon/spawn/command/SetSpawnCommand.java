@@ -3,16 +3,16 @@ package dev.oribuin.essentials.addon.spawn.command;
 import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.NumberUtil;
 import dev.oribuin.essentials.util.model.FinePosition;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
-import org.incendo.cloud.annotations.Flag;
 import org.incendo.cloud.annotations.Permission;
 
-public class SetSpawnCommand {
+public class SetSpawnCommand implements AddonCommand {
 
     private final SpawnAddon addon;
 
@@ -33,9 +33,9 @@ public class SetSpawnCommand {
         SpawnMessages messages = SpawnMessages.getInstance();
 
         Location location = sender.getLocation().clone();
-//        if (center != null) {
-//            location = location.toCenterLocation();
-//        }
+        //        if (center != null) {
+        //            location = location.toCenterLocation();
+        //        }
 
 
         config.setSpawnpoint(FinePosition.from(location));

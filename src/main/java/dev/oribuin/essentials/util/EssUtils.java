@@ -160,4 +160,18 @@ public class EssUtils {
         return duration.toString().substring(2);
     }
 
+    public static String replaceLegacy(String message) {
+        for (LegacyChatColor color : LegacyChatColor.values()) {
+            message = message.replace(
+                    String.format("&%s", color.getCode()),
+                    String.format("<%s>", color.name())
+            );
+
+            message = message.replace(
+                    String.format("§%s", color.getCode()),
+                    String.format("<%s>", color.name())
+            );
+        }
+        return message;
+    }
 }

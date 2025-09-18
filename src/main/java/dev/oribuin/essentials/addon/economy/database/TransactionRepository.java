@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.addon.economy.database;
 
 import dev.oribuin.essentials.addon.economy.model.Transaction;
-import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.AddonRepository;
 import dev.oribuin.essentials.database.QueryResult;
 import dev.oribuin.essentials.database.StatementProvider;
 import dev.oribuin.essentials.database.StatementType;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-public class TransactionRepository extends ModuleRepository {
+public class TransactionRepository extends AddonRepository {
 
     /**
      * Create a new transaction repository to store all the established transactions

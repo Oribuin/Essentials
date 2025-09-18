@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.scheduler.task.ScheduledTask;
 import dev.oribuin.essentials.util.EssUtils;
@@ -21,7 +22,7 @@ import org.incendo.cloud.annotations.Permission;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-public class TpAcceptCommand {
+public class TpAcceptCommand implements AddonCommand {
 
     private final TeleportAddon addon;
 
@@ -75,7 +76,7 @@ public class TpAcceptCommand {
         );
 
         addon.requests().remove(incoming);
-        
+
         // Check if the location is safe to teleport to TODO //  Implement FinePosition#isSafe or something to that effect
         if (!Home.isSafe(location) && !commandSender.hasPermission("essentials.tpa.bypass.unsafe")) {
             messages.getTeleportUnsafe().send(commandSender, placeholders);
@@ -150,7 +151,7 @@ public class TpAcceptCommand {
                 VaultProvider.get().take(player, cost);
                 TeleportMessages.getInstance().getTeleportCost().send(player, placeholders);
             }
-            
+
         });
     }
 

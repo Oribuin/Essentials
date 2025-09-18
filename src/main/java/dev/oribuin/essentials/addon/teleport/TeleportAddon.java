@@ -10,6 +10,7 @@ import dev.oribuin.essentials.addon.teleport.command.TpDenyCommand;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -180,7 +181,7 @@ public class TeleportAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return List.of(
                 new BackCommand(this),
                 new TpAcceptCommand(this),

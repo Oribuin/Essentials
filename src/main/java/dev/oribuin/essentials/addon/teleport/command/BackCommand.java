@@ -3,6 +3,7 @@ package dev.oribuin.essentials.addon.teleport.command;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,7 +11,7 @@ import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class BackCommand {
+public class BackCommand implements AddonCommand {
 
     private final TeleportAddon addon;
 

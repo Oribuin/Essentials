@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.TextMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -10,7 +11,7 @@ import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class PingCommand {
+public class PingCommand implements AddonCommand {
 
     /**
      * Check a players current latency to the server

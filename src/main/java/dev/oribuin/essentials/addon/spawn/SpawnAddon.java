@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.spawn.command.SetSpawnCommand;
 import dev.oribuin.essentials.addon.spawn.command.SpawnCommand;
 import dev.oribuin.essentials.addon.spawn.config.SpawnConfig;
 import dev.oribuin.essentials.addon.spawn.config.SpawnMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.util.model.Placeholders;
 import net.kyori.adventure.audience.Audience;
@@ -22,6 +23,7 @@ import org.bukkit.permissions.PermissionDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 public class SpawnAddon extends Addon {
@@ -44,7 +46,7 @@ public class SpawnAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return List.of(new SetSpawnCommand(this), new SpawnCommand(this));
     }
 
@@ -53,10 +55,7 @@ public class SpawnAddon extends Addon {
      */
     @Override
     public Map<String, Supplier<AddonConfig>> getConfigs() {
-        return Map.of(
-                "config", SpawnConfig::new,
-                "messages", SpawnMessages::new
-        );
+        return Map.of("config", SpawnConfig::new, "messages", SpawnMessages::new);
     }
 
     /**
@@ -86,7 +85,7 @@ public class SpawnAddon extends Addon {
         event.joinMessage(null);
 
         // Send the motd to the player after 1s
-        if (config.useMotd()) messages.getMotd().send(player, player);
+        if (config.useMotd()) this.getScheduler().runTaskLaterAsync(() -> messages.getMotd().send(player, player), 1, TimeUnit.SECONDS);
 
         // Run the first join stuff :3
         boolean isFirstJoin = !player.hasPlayedBefore();
@@ -97,9 +96,7 @@ public class SpawnAddon extends Addon {
 
             // Send the first join message to the server
             if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-                messages.getFirstJoinMessage().send(this.messageAudience(), player, Placeholders.of(
-                        "total_players", Bukkit.getOfflinePlayers().length
-                ));
+                messages.getFirstJoinMessage().send(this.messageAudience(), player, Placeholders.of("total_players", Bukkit.getOfflinePlayers().length));
             }
 
             return;
@@ -107,9 +104,7 @@ public class SpawnAddon extends Addon {
 
         // Send the join message to the server
         if (!player.hasPermission(SILENT_JOIN_PERMISSION)) {
-            messages.getJoinMessage().send(this.messageAudience(), player, Placeholders.of(
-                    "total_players", Bukkit.getOfflinePlayers().length
-            ));
+            messages.getJoinMessage().send(this.messageAudience(), player, Placeholders.of("total_players", Bukkit.getOfflinePlayers().length));
         }
 
         // Teleport the player to spawn on login (if enabled)

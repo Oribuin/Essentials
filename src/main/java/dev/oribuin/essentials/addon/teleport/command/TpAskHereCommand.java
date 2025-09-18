@@ -4,6 +4,7 @@ import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.StringPlaceholders;
 import dev.oribuin.essentials.util.model.Cooldown;
 import dev.oribuin.essentials.util.model.Placeholders;
@@ -16,7 +17,7 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class TpAskHereCommand {
+public class TpAskHereCommand implements AddonCommand {
 
     private final TeleportAddon addon;
     private final Cooldown<UUID> cooldown;

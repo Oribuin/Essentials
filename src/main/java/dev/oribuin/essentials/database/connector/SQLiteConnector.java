@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings("Deprecation")
+@SuppressWarnings("deprecation")
 public class SQLiteConnector implements DatabaseConnector {
 
     private final EssentialsPlugin javaPlugin;

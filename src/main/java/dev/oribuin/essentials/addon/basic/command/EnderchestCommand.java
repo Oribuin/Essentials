@@ -1,14 +1,14 @@
 package dev.oribuin.essentials.addon.basic.command;
 
-import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.BasicAddon;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class EnderchestCommand {
-    
+public class EnderchestCommand implements AddonCommand {
+
     private final BasicAddon addon;
 
     public EnderchestCommand(BasicAddon addon) {

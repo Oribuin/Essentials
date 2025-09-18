@@ -5,6 +5,7 @@ import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.model.Placeholders;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -14,7 +15,7 @@ import org.incendo.cloud.annotations.Permission;
 
 import java.math.BigDecimal;
 
-public class TakeBalanceCommand {
+public class TakeBalanceCommand implements AddonCommand {
 
     /**
      * Add money to a users account

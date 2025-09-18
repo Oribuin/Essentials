@@ -8,6 +8,7 @@ import dev.oribuin.essentials.addon.economy.config.EconomyMessages;
 import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.StringPlaceholders;
 import dev.oribuin.essentials.util.model.Placeholders;
 import org.bukkit.entity.Player;
@@ -19,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class PayCommand {
+public class PayCommand implements AddonCommand {
 
     private final Cache<UUID, Boolean> confirmation = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)

@@ -11,7 +11,7 @@ public class PluginMessages {
 
     private static final String PREFIX = "<#bc7dff><b>Server</b> <gray>| <white>";
 
-    public static PluginMessages get() {
+    public static PluginMessages getInstance() {
         return EssentialsPlugin.getInstance().getConfigLoader().get(PluginMessages.class);
     }
 
@@ -20,7 +20,7 @@ public class PluginMessages {
 
     @Comment("The message sent when a player does not have permission to do something.")
     private TextMessage requirePlayer = new TextMessage(PREFIX + "You need to be sender type of <#bc7dff><sender><white> to run this command");
-    
+
     @Comment("The message sent when a player gets the syntax for a message wrong")
     private TextMessage invalidSyntax = new TextMessage(PREFIX + "You have provided invalid syntax. The correct usage is: <#bc7dff><syntax>");
 

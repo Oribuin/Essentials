@@ -15,6 +15,7 @@ import dev.oribuin.essentials.addon.basic.command.TrashCommand;
 import dev.oribuin.essentials.addon.basic.command.WeatherCommand;
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class BasicAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return List.of(
                 new ClearCommand(),
                 new EnderchestCommand(this),

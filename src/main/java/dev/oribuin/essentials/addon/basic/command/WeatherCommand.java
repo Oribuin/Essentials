@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.BasicAddon;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.util.model.Weather;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
@@ -11,7 +12,7 @@ import org.incendo.cloud.annotations.Permission;
 
 import java.time.Duration;
 
-public class WeatherCommand {
+public class WeatherCommand implements AddonCommand {
 
     private final BasicAddon addon;
 

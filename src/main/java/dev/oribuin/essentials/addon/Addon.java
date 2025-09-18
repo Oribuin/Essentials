@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon;
 
 
 import dev.oribuin.essentials.EssentialsPlugin;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.config.ConfigHandler;
 import dev.oribuin.essentials.config.ConfigLoader;
@@ -102,11 +103,13 @@ public abstract class Addon implements Listener {
         });
 
         // Register all the commands
-        try {
-            this.plugin.getParser().parse(this.getCommands());
-        } catch (Exception ex) {
-            this.logger.severe("Exception Occurred while parsing Commands: " + ex.getMessage());
-        }
+        this.getCommands().forEach(addonCommand -> {
+            try {
+                this.plugin.getParser().parse(addonCommand);
+            } catch (Exception ex) {
+                this.logger.severe("There was an issue registering the command class [" + addonCommand.getClass().getSimpleName() + "]: " + ex.getMessage());
+            }
+        });
 
         this.enable();
     }
@@ -162,7 +165,7 @@ public abstract class Addon implements Listener {
     /**
      * Get all the commands for the addon
      */
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return new ArrayList<>();
     }
 

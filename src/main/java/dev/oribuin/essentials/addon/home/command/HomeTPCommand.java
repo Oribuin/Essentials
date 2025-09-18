@@ -4,6 +4,7 @@ import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.hook.plugin.economy.VaultProvider;
 import dev.oribuin.essentials.scheduler.task.ScheduledTask;
 import dev.oribuin.essentials.util.EssUtils;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * - essentials.home.bypass.delay - Bypasses the delays and effects
  * - essentials.home.bypass.unsafe - Bypasses the requirement for a home to be safe before teleporting
  */
-public class HomeTPCommand {
+public class HomeTPCommand implements AddonCommand {
 
     private final Cooldown<UUID> cooldown = new Cooldown<>();
     private final Confirmation<UUID> confirmation = new Confirmation<>(60, TimeUnit.SECONDS);

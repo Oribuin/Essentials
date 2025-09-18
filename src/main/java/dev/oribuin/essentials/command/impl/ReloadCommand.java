@@ -3,12 +3,13 @@ package dev.oribuin.essentials.command.impl;
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class ReloadCommand {
+public class ReloadCommand implements AddonCommand {
 
     private final EssentialsPlugin plugin;
 
@@ -30,5 +31,5 @@ public class ReloadCommand {
         this.plugin.reload();
         sender.sendMessage("Reloaded the plugin");
     }
-    
+
 }

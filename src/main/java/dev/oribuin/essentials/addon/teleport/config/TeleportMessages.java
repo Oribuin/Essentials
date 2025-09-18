@@ -21,7 +21,7 @@ public class TeleportMessages implements AddonConfig {
     private TextMessage teleportTimeout = new TextMessage(PREFIX + "Your teleport request to [<#bc7dff><target><white>] has timed out.");
     private TextMessage teleportTimeoutOther = new TextMessage(PREFIX + "The teleport request from [<#bc7dff><sender><white>] has timed out.");
     private TextMessage teleportFailed = new TextMessage(PREFIX + "Your teleport request was not successful. Please contact an admin about this.");
-    
+
     private TextMessage teleportCost = new TextMessage(PREFIX + "It cost you [<#bc7dff>$<cost><white>] to teleport to [<#bc7dff><target><white>]");
     private TextMessage teleportUnsafe = new TextMessage(PREFIX + "The teleport location is not safe, this request has been cancelled.");
     private TextMessage insufficientFunds = new TextMessage(PREFIX + "You do not have enough money to accept this teleport");
@@ -72,7 +72,7 @@ public class TeleportMessages implements AddonConfig {
             <#bc7dff><b>Teleport</b> <gray>| <white>
             <#bc7dff><b>Teleport</b> <gray>| <white><#f0720c><click:suggest_command:'/tpcancel'>[Cancel Request]</click>
                        \s""");
-    
+
     // Teleport cancelled
     private TextMessage teleportCancelled = new TextMessage(PREFIX + "You have cancelled any outgoing teleport requests");
 
@@ -151,11 +151,11 @@ public class TeleportMessages implements AddonConfig {
     public TextMessage getTeleportAskReceived() {
         return teleportAskReceived;
     }
-    
+
     public TextMessage getTeleportAskSelf() {
         return teleportAskSelf;
     }
-    
+
     public TextMessage getTeleportHereAskReceived() {
         return teleportHereAskReceived;
     }

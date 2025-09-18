@@ -3,15 +3,13 @@ package dev.oribuin.essentials.addon.teleport.command;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
 import dev.oribuin.essentials.addon.teleport.model.TeleportRequest;
-import dev.oribuin.essentials.util.StringPlaceholders;
-import dev.oribuin.essentials.util.model.Placeholders;
-import org.bukkit.Bukkit;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 
-public class TpCancelCommand {
+public class TpCancelCommand implements AddonCommand {
 
     private final TeleportAddon addon;
 

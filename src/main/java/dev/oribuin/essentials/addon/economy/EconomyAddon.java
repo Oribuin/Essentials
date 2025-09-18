@@ -14,6 +14,7 @@ import dev.oribuin.essentials.addon.economy.database.EconomyRepository;
 import dev.oribuin.essentials.addon.economy.database.TransactionRepository;
 import dev.oribuin.essentials.addon.economy.model.Transaction;
 import dev.oribuin.essentials.addon.economy.util.NumberUtil;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.manager.DataManager;
 import net.milkbowl.vault.economy.Economy;
@@ -104,7 +105,7 @@ public class EconomyAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return List.of(
                 new AddBalanceCommand(),
                 new BalanceCommand(),

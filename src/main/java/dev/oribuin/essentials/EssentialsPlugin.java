@@ -3,6 +3,8 @@ package dev.oribuin.essentials;
 import dev.oribuin.essentials.addon.Addon;
 import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.economy.provider.VaultEconomyProvider;
+import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
+import dev.oribuin.essentials.addon.home.model.Home;
 import dev.oribuin.essentials.command.argument.AddonArgumentHandler;
 import dev.oribuin.essentials.config.ConfigLoader;
 import dev.oribuin.essentials.config.impl.MySQLConfig;
@@ -84,7 +86,13 @@ public class EssentialsPlugin extends JavaPlugin {
         commandSettings.set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
 
         this.parser = new AnnotationParser<>(this.commandManager, CommandSender.class);
-        this.commandManager.parserRegistry().registerParser(ParserDescriptor.of(new AddonArgumentHandler(), Addon.class));
+        this.commandManager.parserRegistry().registerParser(
+                ParserDescriptor.of(new AddonArgumentHandler(), Addon.class)
+        );
+
+        this.commandManager.parserRegistry().registerParser(
+                ParserDescriptor.of(new HomeArgumentHandler(), Home.class)
+        );
 
         if (this.commandManager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.commandManager.registerBrigadier();
@@ -93,13 +101,13 @@ public class EssentialsPlugin extends JavaPlugin {
         }
 
         this.commandManager.exceptionController()
-                .registerHandler(NoPermissionException.class, x -> PluginMessages.get()
+                .registerHandler(NoPermissionException.class, x -> PluginMessages.getInstance()
                         .getNoPermission().send(x.context().sender())
                 )
-                .registerHandler(InvalidSyntaxException.class, x -> PluginMessages.get()
+                .registerHandler(InvalidSyntaxException.class, x -> PluginMessages.getInstance()
                         .getInvalidSyntax().send(x.context().sender(), "syntax", x.exception().correctSyntax())
                 )
-                .registerHandler(InvalidCommandSenderException.class, x -> PluginMessages.get()
+                .registerHandler(InvalidCommandSenderException.class, x -> PluginMessages.getInstance()
                         .getRequirePlayer().send(x.context().sender(), "sender", x.context().sender().getName())
                 );
 

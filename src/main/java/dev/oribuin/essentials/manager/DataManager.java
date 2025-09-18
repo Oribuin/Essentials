@@ -2,7 +2,7 @@ package dev.oribuin.essentials.manager;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.config.impl.MySQLConfig;
-import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.AddonRepository;
 import dev.oribuin.essentials.database.connector.DatabaseConnector;
 import dev.oribuin.essentials.database.connector.MySQLConnector;
 import dev.oribuin.essentials.database.connector.SQLiteConnector;
@@ -14,10 +14,9 @@ import java.util.Map;
 
 public class DataManager {
 
-    private static final Map<Class<? extends ModuleRepository>, ModuleRepository> repositories = new HashMap<>();
+    private static final Map<Class<? extends AddonRepository>, AddonRepository> repositories = new HashMap<>();
     private final EssentialsPlugin plugin;
     private DatabaseConnector connector;
-
 
     public DataManager(EssentialsPlugin plugin) {
         this.plugin = plugin;
@@ -64,7 +63,7 @@ public class DataManager {
             }
         }
 
-        for (ModuleRepository repository : repositories.values()) {
+        for (AddonRepository repository : repositories.values()) {
             repository.unload();
         }
         this.connector.closeConnection();
@@ -80,7 +79,7 @@ public class DataManager {
      *
      * @param repository The repository class
      */
-    public static <T extends ModuleRepository> T create(Class<T> repository) {
+    public static <T extends AddonRepository> T create(Class<T> repository) {
         try {
             DatabaseConnector connector = EssentialsPlugin.getInstance().getDataManager().getConnector();
 
@@ -102,7 +101,7 @@ public class DataManager {
      *
      * @return The repository
      */
-    public static <T extends ModuleRepository> T repository(Class<T> clazz) {
+    public static <T extends AddonRepository> T repository(Class<T> clazz) {
         return clazz.cast(repositories.get(clazz));
     }
 

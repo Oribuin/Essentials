@@ -40,7 +40,6 @@ public class ServerListListener implements Listener {
             event.motd(component);
         }
 
-
         List<CachedServerIcon> serverIcons = this.addon.icons();
         if (!serverIcons.isEmpty()) {
             CachedServerIcon random = serverIcons.get((int) (Math.random() * serverIcons.size()));

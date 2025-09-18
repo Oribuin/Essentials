@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon;
 
 import dev.oribuin.essentials.EssentialsPlugin;
 import dev.oribuin.essentials.addon.basic.BasicAddon;
+import dev.oribuin.essentials.addon.chat.ChatAddon;
 import dev.oribuin.essentials.addon.economy.EconomyAddon;
 import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
@@ -18,6 +19,7 @@ public class AddonProvider {
 
     private static final Map<Class<? extends Addon>, Addon> addons = new ConcurrentHashMap<>();
     public static final BasicAddon BASIC_ADDON = registerSupplier(BasicAddon::new);
+    public static final ChatAddon CHAT_ADDON = registerSupplier(ChatAddon::new);
     public static final EconomyAddon ECONOMY_ADDON = registerSupplier(EconomyAddon::new);
     public static final HomeAddon HOME_ADDON = registerSupplier(HomeAddon::new);
     public static final ServerListAddon SERVER_LIST_ADDON = registerSupplier(ServerListAddon::new);

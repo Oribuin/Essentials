@@ -14,6 +14,7 @@ import dev.oribuin.essentials.database.serializer.impl.UUIDDataType;
 import dev.oribuin.essentials.database.serializer.impl.mutated.EnumDataType;
 import dev.oribuin.essentials.database.serializer.impl.mutated.ListDataType;
 import dev.oribuin.essentials.database.serializer.impl.mutated.MapDataType;
+import dev.oribuin.essentials.database.serializer.impl.mutated.SetDataType;
 import dev.oribuin.essentials.database.serializer.impl.spigot.ItemStackArrayDataType;
 import dev.oribuin.essentials.database.serializer.impl.spigot.ItemStackDataType;
 import dev.oribuin.essentials.database.serializer.impl.spigot.LocationDataType;
@@ -25,7 +26,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +53,9 @@ public class DataTypes {
     public static final DataType<ItemStack[]> ITEM_STACK_ARRAY = new ItemStackArrayDataType();
     public static final DataType<NamespacedKey> NAMESPACE = new NamespaceDataType();
 
+    // Lists and things ... ?
+    public static final SetDataType<UUID> UUID_SET = new SetDataType<>(UUID, new HashSet<>());
+
     /**
      * @return Create a new EnumDataType instance
      */
@@ -60,8 +66,15 @@ public class DataTypes {
     /**
      * @return Create a new ListDataType instance
      */
-    public static <T extends List<T>> DataType<T> listType(Class<T> clazz, List<T> list) {
-        return new ListDataType<>(clazz, list);
+    public static <T> ListDataType<T> listType(DataType<T> type) {
+        return new ListDataType<>(type, new ArrayList<>());
+    }
+
+    /**
+     * @return Create a new SetDataType instance
+     */
+    public static <T> SetDataType<T> setType(DataType<T> type) {
+        return new SetDataType<>(type, new HashSet<>());
     }
 
     /**

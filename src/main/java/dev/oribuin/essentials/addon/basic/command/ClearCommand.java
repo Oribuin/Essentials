@@ -1,16 +1,16 @@
 package dev.oribuin.essentials.addon.basic.command;
 
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
+import dev.oribuin.essentials.command.AddonCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
-import org.incendo.cloud.annotations.Flag;
 import org.incendo.cloud.annotations.Permission;
 
-public class ClearCommand {
+public class ClearCommand implements AddonCommand {
 
     /**
      * Clear a player's inventory
@@ -24,11 +24,11 @@ public class ClearCommand {
         BasicMessages messages = BasicMessages.get();
         PlayerInventory inventory = sender.getInventory();
 
-//        if (armour != null) {
-//            inventory.setContents(new ItemStack[0]);
-//        } else {
-            inventory.setStorageContents(new ItemStack[0]);
-//        }
+        //        if (armour != null) {
+        //            inventory.setContents(new ItemStack[0]);
+        //        } else {
+        inventory.setStorageContents(new ItemStack[0]);
+        //        }
 
         messages.getClearInvSelf().send(sender, "target", sender.getName());
     }
@@ -46,11 +46,11 @@ public class ClearCommand {
         BasicMessages messages = BasicMessages.get();
         PlayerInventory inventory = target.getInventory();
 
-//        if (armour != null) {
-//            inventory.setContents(new ItemStack[0]);
-//        } else {
-            inventory.setStorageContents(new ItemStack[0]);
-//        }
+        //        if (armour != null) {
+        //            inventory.setContents(new ItemStack[0]);
+        //        } else {
+        inventory.setStorageContents(new ItemStack[0]);
+        //        }
 
         messages.getClearInvOther().send(sender, "target", target.getName());
     }

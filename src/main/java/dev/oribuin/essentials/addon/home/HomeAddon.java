@@ -5,11 +5,10 @@ import dev.oribuin.essentials.addon.AddonProvider;
 import dev.oribuin.essentials.addon.home.command.HomeDeleteCommand;
 import dev.oribuin.essentials.addon.home.command.HomeSetCommand;
 import dev.oribuin.essentials.addon.home.command.HomeTPCommand;
-import dev.oribuin.essentials.addon.home.command.argument.HomeArgumentHandler;
 import dev.oribuin.essentials.addon.home.config.HomeConfig;
 import dev.oribuin.essentials.addon.home.config.HomeMessages;
 import dev.oribuin.essentials.addon.home.database.HomeRepository;
-import dev.oribuin.essentials.addon.home.model.Home;
+import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
 import dev.oribuin.essentials.manager.DataManager;
 import org.bukkit.Bukkit;
@@ -45,7 +44,7 @@ public class HomeAddon extends Addon {
     @Override
     public void load() {
         // Register Command Argument Providers
-        this.registerParser(Home.class, new HomeArgumentHandler());
+        //        this.registerParser(Home.class, new HomeArgumentHandler());
     }
 
     /**
@@ -80,7 +79,7 @@ public class HomeAddon extends Addon {
      * Get all the commands for the addon
      */
     @Override
-    public List<Object> getCommands() {
+    public List<AddonCommand> getCommands() {
         return List.of(
                 new HomeDeleteCommand(this),
                 new HomeSetCommand(this),

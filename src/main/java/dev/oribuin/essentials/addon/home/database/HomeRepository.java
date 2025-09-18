@@ -1,7 +1,7 @@
 package dev.oribuin.essentials.addon.home.database;
 
 import dev.oribuin.essentials.addon.home.model.Home;
-import dev.oribuin.essentials.database.ModuleRepository;
+import dev.oribuin.essentials.database.AddonRepository;
 import dev.oribuin.essentials.database.QueryResult;
 import dev.oribuin.essentials.database.StatementProvider;
 import dev.oribuin.essentials.database.StatementType;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class HomeRepository extends ModuleRepository implements Listener {
+public class HomeRepository extends AddonRepository implements Listener {
 
     private final Map<UUID, List<Home>> homes = new HashMap<>();
 
