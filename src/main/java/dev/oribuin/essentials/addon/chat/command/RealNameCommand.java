@@ -4,6 +4,7 @@ import dev.oribuin.essentials.addon.chat.ChatAddon;
 import dev.oribuin.essentials.addon.chat.config.ChatMessages;
 import dev.oribuin.essentials.addon.chat.database.ChatSender;
 import dev.oribuin.essentials.command.AddonCommand;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotations.Command;
 import org.incendo.cloud.annotations.CommandDescription;
@@ -30,6 +31,8 @@ public class RealNameCommand implements AddonCommand {
         ChatSender chatSender = this.addon.getRepository().get(sender.getUniqueId());
         
         // todo: make sure you cant rat out of a staff member with it
+        
+        
     }
 
 }

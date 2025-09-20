@@ -72,7 +72,7 @@ public class ChatChannels {
 
             @Override
             public @NotNull Audience getAudience(@NotNull Player source) {
-                return Bukkit.getServer();
+                return this.filter(Bukkit.getServer(), source);
             }
         };
     }

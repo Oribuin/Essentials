@@ -130,6 +130,7 @@ public class TextMessage {
         for (int i = 0; i < placeholders.length; i += 2) {
             if (placeholders[i] instanceof String placeholder) {
                 Object value = placeholders[i + 1];
+                if (value == null) value = "null";
                 builder.add(placeholder, value);
             }
         }

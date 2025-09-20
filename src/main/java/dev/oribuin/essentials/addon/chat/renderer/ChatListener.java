@@ -53,7 +53,6 @@ public class ChatListener implements Listener {
 
         Component format = ChatAddonRenderer.render(player, sender, event.message());
 
-        // todo: ignore check
         // todo: caps check but wgaf
         if (plain.contains("<item>") && player.hasPermission("essentials.chat.item")) {
             // todo: have clicking on item open it in gui

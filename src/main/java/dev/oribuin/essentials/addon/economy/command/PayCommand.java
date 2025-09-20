@@ -33,7 +33,7 @@ public class PayCommand implements AddonCommand {
      * @param target The target of the command
      * @param amount The amount of money to change
      */
-    @Command("economy|eco pay <target> <amount>")
+    @Command("pay <target> <amount>")
     @Permission("essentials.economy.pay")
     @CommandDescription("Add money to a users account")
     public void execute(Player sender, Player target, Double amount) {

@@ -77,7 +77,7 @@ public class BasicMessages implements AddonConfig {
     private TextMessage repairCooldown = new TextMessage(PREFIX + "You cannot repair your items as you are on cooldown");
 
     @Comment("The message sent when a player tries to repair with no damaged items")
-    private TextMessage repairNoDamage = new TextMessage(PREFIX + "None of the items in your  ntory are damaged");
+    private TextMessage repairNoDamage = new TextMessage(PREFIX + "None of the items in your inventory are damaged");
 
     // Weather Command
     @Comment("The message sent when a player changes the weather")
@@ -97,6 +97,12 @@ public class BasicMessages implements AddonConfig {
 
     @Comment("The message sent when a player clears someone else's inventory")
     private TextMessage clearInvOther = new TextMessage(PREFIX + "You have cleared <#bc7dff><target><white>'s inventory");
+
+    @Comment("The message sent when a player checks their own location")
+    private TextMessage whereAmI = new TextMessage(PREFIX + "You are currently at <#bc7dff><x><white>,<#bc7dff><y><white>,<#bc7dff><z><white> in world <#bc7dff><world>");
+    
+    @Comment("The message sent when someone checks someone else's location")
+    private TextMessage whereIsOther = new TextMessage(PREFIX + "<#bc7dff><target><white> are currently at <#bc7dff><x><white>,<#bc7dff><y><white>,<#bc7dff><z><white> in world <#bc7dff><world>");
 
     public TextMessage getPingSelf() {
         return pingSelf;
@@ -196,5 +202,13 @@ public class BasicMessages implements AddonConfig {
 
     public TextMessage getClearInvOther() {
         return clearInvOther;
+    }
+
+    public TextMessage getWhereAmI() {
+        return whereAmI;
+    }
+
+    public TextMessage getWhereIsOther() {
+        return whereIsOther;
     }
 }

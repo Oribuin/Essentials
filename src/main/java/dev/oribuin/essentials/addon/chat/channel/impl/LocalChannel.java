@@ -29,11 +29,12 @@ public class LocalChannel implements ChatChannel {
      */
     @Override
     public @Nullable Audience getAudience(@NotNull Player source) {
-        return Audience.audience(
-                source.getWorld().getPlayers().stream()
-                        .filter(x -> x.getLocation().distance(source.getLocation()) <= radius)
-                        .toList()
-        );
+        return this.filter(
+                Audience.audience(
+                        source.getWorld().getPlayers().stream()
+                                .filter(x -> x.getLocation().distance(source.getLocation()) <= radius)
+                                .toList()
+                ), source);
     }
 
 }

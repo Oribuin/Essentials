@@ -33,7 +33,7 @@ public class FlyCommand implements AddonCommand {
             return;
         }
 
-        String status = !sender.getAllowFlight() ? "Enabled" : "Disabled";
+        String status = !sender.getAllowFlight() ? messages.getFlyEnabledShorthand() : messages.getFlyDisabledShorthand();
         sender.setAllowFlight(!sender.getAllowFlight());
         messages.getFlySelf().send(sender, "status", status);
     }

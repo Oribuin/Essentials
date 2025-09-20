@@ -28,7 +28,7 @@ public class GlobalChannel implements ChatChannel {
      */
     @Override
     public @Nullable Audience getAudience(@NotNull Player source) {
-        return Bukkit.getServer();
+        return this.filter(Bukkit.getServer(), source);
     }
 
 }

@@ -117,18 +117,6 @@ public class EconomyRepository extends AddonRepository implements Listener {
      * @param processing The transactions to push
      */
     private void push(Map<UUID, Deque<Transaction>> processing) {
-        if (Bukkit.isPrimaryThread()) {
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-            System.out.println("OH NO PUSH IS ON THE MAIN THREAD !!!!!!!!!!!!!!!!!");
-        }
-        
         // do this part manually because i dont feel like editing statementprovider :3
         this.connector.connect(connection -> {
             String query = "REPLACE INTO " + this.table + " (user, amount, last_updated) VALUES (?, ?, ?)";

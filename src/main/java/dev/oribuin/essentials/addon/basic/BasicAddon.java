@@ -13,10 +13,16 @@ import dev.oribuin.essentials.addon.basic.command.RepairCommand;
 import dev.oribuin.essentials.addon.basic.command.TopCommand;
 import dev.oribuin.essentials.addon.basic.command.TrashCommand;
 import dev.oribuin.essentials.addon.basic.command.WeatherCommand;
+import dev.oribuin.essentials.addon.basic.command.WhereAmICommand;
 import dev.oribuin.essentials.addon.basic.config.BasicConfig;
 import dev.oribuin.essentials.addon.basic.config.BasicMessages;
 import dev.oribuin.essentials.command.AddonCommand;
 import dev.oribuin.essentials.config.AddonConfig;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -61,8 +67,17 @@ public class BasicAddon extends Addon {
                 new RepairCommand(),
                 new TopCommand(),
                 new TrashCommand(this),
-                new WeatherCommand(this)
+                new WeatherCommand(this),
+                new WhereAmICommand(this)
         );
+    }
+
+    /**
+     * Get all the listeners for the addon
+     */
+    @Override
+    public List<Listener> getListeners() {
+        return List.of(this);
     }
 
     /**
@@ -76,6 +91,14 @@ public class BasicAddon extends Addon {
         );
     }
 
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasPermission("essentials.fly") && player.hasPermission("essentials.fly.login")) {
+            player.setAllowFlight(true);
+        }
+    }
+    
     public static BasicAddon get() {
         return instance;
     }
