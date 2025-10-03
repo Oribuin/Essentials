@@ -6,6 +6,7 @@ import dev.oribuin.essentials.addon.teleport.command.TpAcceptCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpAskHereCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpCancelCommand;
+import dev.oribuin.essentials.addon.teleport.command.TpCommand;
 import dev.oribuin.essentials.addon.teleport.command.TpDenyCommand;
 import dev.oribuin.essentials.addon.teleport.config.TeleportConfig;
 import dev.oribuin.essentials.addon.teleport.config.TeleportMessages;
@@ -187,6 +188,7 @@ public class TeleportAddon extends Addon {
     public List<AddonCommand> getCommands() {
         return List.of(
                 new BackCommand(this),
+                new TpCommand(this),
                 new TpAcceptCommand(this),
                 new TpAskCommand(this),
                 new TpAskHereCommand(this),

@@ -28,7 +28,10 @@ public class TeleportMessages implements AddonConfig {
 
     @Comment("The message sent when a player tries to teleport to another player while on cooldown.")
     private TextMessage teleportCooldown = new TextMessage(PREFIX + "You must wait <#bc7dff><time> <white>before you can request another teleport.");
-
+    
+    private TextMessage forceTeleportToOther = new TextMessage(PREFIX + "You have teleported yourself to <#bc7dff><target><white>");
+    private TextMessage forceTeleportOthers = new TextMessage(PREFIX + "You have teleported <#bc7dff><target> <white>to <#bc7dff><destination>");
+    private TextMessage teleportPosition = new TextMessage(PREFIX + "You have teleported yourself to <#bc7dff><x><white>,<#bc7dff><y><white>,<#bc7dff><z><white> in <#bc7dff><world>");
     // Back Command
     private TextMessage teleportBack = new TextMessage(PREFIX + "You have teleported back to your previous location");
     private TextMessage teleportBackInvalid = new TextMessage(PREFIX + "You do not have a location you previously teleported from");
@@ -77,6 +80,18 @@ public class TeleportMessages implements AddonConfig {
     
     public TextMessage getDisabledWorld() {
         return disabledWorld;
+    }
+
+    public TextMessage getForceTeleportToOther() {
+        return forceTeleportToOther;
+    }
+
+    public TextMessage getForceTeleportOthers() {
+        return forceTeleportOthers;
+    }
+
+    public TextMessage getTeleportPosition() {
+        return teleportPosition;
     }
 
     public TextMessage getTeleportInvalid() {
