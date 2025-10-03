@@ -1,40 +1,30 @@
 package dev.oribuin.essentials.util;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
+import org.intellij.lang.annotations.Subst;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * An immutable class that holds a map of placeholders and their values
  */
 public final class StringPlaceholders {
 
-    private final static StringPlaceholders EMPTY = new StringPlaceholders(Collections.emptyMap(), "<", ">");
-    private final static LoadingCache<String, Pattern> PATTERN_CACHE = CacheBuilder.newBuilder()
-            .concurrencyLevel(2)
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build(new CacheLoader<>() {
-                @Override
-                public Pattern load(String key) throws Exception {
-                    return Pattern.compile(key);
-                }
-            });
+    private final static StringPlaceholders EMPTY = new StringPlaceholders(Collections.emptyMap());
 
-    private final String startDelimiter, endDelimiter;
-    private final Map<String, String> placeholders;
+    private final Map<String, Component> placeholders;
+    private TagResolver resolvers;
 
-    private StringPlaceholders(Map<String, String> placeholders, String startDelimiter, String endDelimiter) {
+    private StringPlaceholders(Map<String, Component> placeholders) {
         this.placeholders = Collections.unmodifiableMap(placeholders);
-        this.startDelimiter = startDelimiter;
-        this.endDelimiter = endDelimiter;
+        this.resolvers = TagResolver.standard();
     }
 
     /**
@@ -44,34 +34,43 @@ public final class StringPlaceholders {
      *
      * @return the string with the placeholders replaced
      */
-    public String apply(String string) {
-        for (String key : this.placeholders.keySet()) {
-            String patternKey = Pattern.quote(this.startDelimiter + key + this.endDelimiter);
-            Pattern pattern = PATTERN_CACHE.getUnchecked(patternKey);
-            string = pattern.matcher(string).replaceAll(Matcher.quoteReplacement(this.placeholders.get(key)));
+    public Component apply(String string) {
+        TagResolver.Builder builder = TagResolver.builder();
+        builder.resolvers(this.resolvers);
+
+        for (@Subst("") String key : this.placeholders.keySet()) {
+            Component value = this.placeholders.get(key);
+            builder.tag(key, Tag.selfClosingInserting(value));
         }
-        return string;
+
+        return EssUtils.MINI_MESSAGE.deserialize(string, builder.build())
+                .decoration(TextDecoration.ITALIC, false);
+    }
+    
+    /**
+     * Applies the placeholders to the given string
+     *
+     * @param string the string to apply the placeholders to
+     *
+     * @return the string with the placeholders replaced
+     */
+    public String applyString(String string) {
+        return EssUtils.LEGACY_SERIALIZER.serialize(EssUtils.MINI_MESSAGE.deserialize(string));
     }
 
     /**
      * @return an unmodifiable map of the placeholders
      */
-    public Map<String, String> getPlaceholders() {
+    public Map<String, Component> getPlaceholders() {
         return this.placeholders;
     }
 
-    /**
-     * @return the start delimiter
-     */
-    public String getStartDelimiter() {
-        return this.startDelimiter;
+    public TagResolver getResolvers() {
+        return resolvers;
     }
 
-    /**
-     * @return the end delimiter
-     */
-    public String getEndDelimiter() {
-        return this.endDelimiter;
+    public void setResolvers(TagResolver resolvers) {
+        this.resolvers = resolvers;
     }
 
     /**
@@ -89,7 +88,7 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders builder with delimiters initially set to % and a placeholder added
      */
-    public static Builder builder(String placeholder, Object value) {
+    public static Builder builder(String placeholder, Component value) {
         return new Builder().add(placeholder, value);
     }
 
@@ -108,8 +107,20 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders instance with delimiters set to % and one placeholder added
      */
-    public static StringPlaceholders of(String placeholder, Object value) {
+    public static StringPlaceholders of(String placeholder, Component value) {
         return builder(placeholder, value).build();
+    }
+
+    /**
+     * Creates a new StringPlaceholders instance with delimiters set to % and one placeholder added
+     *
+     * @param placeholder the placeholder to add
+     * @param value       the value to replace the placeholder with
+     *
+     * @return a new StringPlaceholders instance with delimiters set to % and one placeholder added
+     */
+    public static StringPlaceholders of(String placeholder, String value) {
+        return builder(placeholder, Component.text(value)).build();
     }
 
     /**
@@ -122,10 +133,27 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders instance with delimiters set to % and two placeholders added
      */
-    public static StringPlaceholders of(String placeholder1, Object value1,
-                                        String placeholder2, Object value2) {
+    public static StringPlaceholders of(String placeholder1, Component value1,
+                                        String placeholder2, Component value2) {
         return builder(placeholder1, value1)
                 .add(placeholder2, value2)
+                .build();
+    }
+
+    /**
+     * Creates a new StringPlaceholders instance with delimiters set to % and two placeholders added
+     *
+     * @param placeholder1 the first placeholder to add
+     * @param value1       the value to replace the first placeholder with
+     * @param placeholder2 the second placeholder to add
+     * @param value2       the value to replace the second placeholder with
+     *
+     * @return a new StringPlaceholders instance with delimiters set to % and two placeholders added
+     */
+    public static StringPlaceholders of(String placeholder1, String value1,
+                                        String placeholder2, String value2) {
+        return builder(placeholder1, Component.text(value1))
+                .add(placeholder2, Component.text(value2))
                 .build();
     }
 
@@ -141,12 +169,33 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders instance with delimiters set to % and three placeholders added
      */
-    public static StringPlaceholders of(String placeholder1, Object value1,
-                                        String placeholder2, Object value2,
-                                        String placeholder3, Object value3) {
+    public static StringPlaceholders of(String placeholder1, Component value1,
+                                        String placeholder2, Component value2,
+                                        String placeholder3, Component value3) {
         return builder(placeholder1, value1)
                 .add(placeholder2, value2)
                 .add(placeholder3, value3)
+                .build();
+    }
+
+    /**
+     * Creates a new StringPlaceholders instance with delimiters set to % and three placeholders added
+     *
+     * @param placeholder1 the first placeholder to add
+     * @param value1       the value to replace the first placeholder with
+     * @param placeholder2 the second placeholder to add
+     * @param value2       the value to replace the second placeholder with
+     * @param placeholder3 the third placeholder to add
+     * @param value3       the value to replace the third placeholder with
+     *
+     * @return a new StringPlaceholders instance with delimiters set to % and three placeholders added
+     */
+    public static StringPlaceholders of(String placeholder1, String value1,
+                                        String placeholder2, String value2,
+                                        String placeholder3, String value3) {
+        return builder(placeholder1, Component.text(value1))
+                .add(placeholder2, Component.text(value2))
+                .add(placeholder3, Component.text(value3))
                 .build();
     }
 
@@ -164,14 +213,39 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders instance with delimiters set to % and four placeholders added
      */
-    public static StringPlaceholders of(String placeholder1, Object value1,
-                                        String placeholder2, Object value2,
-                                        String placeholder3, Object value3,
-                                        String placeholder4, Object value4) {
+    public static StringPlaceholders of(String placeholder1, Component value1,
+                                        String placeholder2, Component value2,
+                                        String placeholder3, Component value3,
+                                        String placeholder4, Component value4) {
         return builder(placeholder1, value1)
                 .add(placeholder2, value2)
                 .add(placeholder3, value3)
                 .add(placeholder4, value4)
+                .build();
+    }
+
+    /**
+     * Creates a new StringPlaceholders instance with delimiters set to % and four placeholders added
+     *
+     * @param placeholder1 the first placeholder to add
+     * @param value1       the value to replace the first placeholder with
+     * @param placeholder2 the second placeholder to add
+     * @param value2       the value to replace the second placeholder with
+     * @param placeholder3 the third placeholder to add
+     * @param value3       the value to replace the third placeholder with
+     * @param placeholder4 the fourth placeholder to add
+     * @param value4       the value to replace the fourth placeholder with
+     *
+     * @return a new StringPlaceholders instance with delimiters set to % and four placeholders added
+     */
+    public static StringPlaceholders of(String placeholder1, String value1,
+                                        String placeholder2, String value2,
+                                        String placeholder3, String value3,
+                                        String placeholder4, String value4) {
+        return builder(placeholder1, Component.text(value1))
+                .add(placeholder2, Component.text(value2))
+                .add(placeholder3, Component.text(value3))
+                .add(placeholder4, Component.text(value4))
                 .build();
     }
 
@@ -191,11 +265,11 @@ public final class StringPlaceholders {
      *
      * @return a new StringPlaceholders instance with delimiters set to % and five placeholders added
      */
-    public static StringPlaceholders of(String placeholder1, Object value1,
-                                        String placeholder2, Object value2,
-                                        String placeholder3, Object value3,
-                                        String placeholder4, Object value4,
-                                        String placeholder5, Object value5) {
+    public static StringPlaceholders of(String placeholder1, Component value1,
+                                        String placeholder2, Component value2,
+                                        String placeholder3, Component value3,
+                                        String placeholder4, Component value4,
+                                        String placeholder5, Component value5) {
         return builder(placeholder1, value1)
                 .add(placeholder2, value2)
                 .add(placeholder3, value3)
@@ -204,14 +278,40 @@ public final class StringPlaceholders {
                 .build();
     }
 
+    /**
+     * Creates a new StringPlaceholders instance with delimiters set to % and five placeholders added
+     *
+     * @param placeholder1 the first placeholder to add
+     * @param value1       the value to replace the first placeholder with
+     * @param placeholder2 the second placeholder to add
+     * @param value2       the value to replace the second placeholder with
+     * @param placeholder3 the third placeholder to add
+     * @param value3       the value to replace the third placeholder with
+     * @param placeholder4 the fourth placeholder to add
+     * @param value4       the value to replace the fourth placeholder with
+     * @param placeholder5 the fifth placeholder to add
+     * @param value5       the value to replace the fifth placeholder with
+     *
+     * @return a new StringPlaceholders instance with delimiters set to % and five placeholders added
+     */
+    public static StringPlaceholders of(String placeholder1, String value1,
+                                        String placeholder2, String value2,
+                                        String placeholder3, String value3,
+                                        String placeholder4, String value4,
+                                        String placeholder5, String value5) {
+        return builder(placeholder1, Component.text(value1))
+                .add(placeholder2, Component.text(value2))
+                .add(placeholder3, Component.text(value3))
+                .add(placeholder4, Component.text(value4))
+                .add(placeholder5, Component.text(value5))
+                .build();
+    }
+
     public static class Builder {
 
-        private String startDelimiter, endDelimiter;
-        private final Map<String, String> placeholders;
+        private final Map<String, Component> placeholders;
 
         private Builder() {
-            this.startDelimiter = "<";
-            this.endDelimiter = ">";
             this.placeholders = new HashMap<>();
         }
 
@@ -223,38 +323,39 @@ public final class StringPlaceholders {
          *
          * @return this
          */
-        public Builder add(String placeholder, Object value) {
-            this.placeholders.put(placeholder, Objects.toString(value, "null"));
+        public Builder add(String placeholder, Component value) {
+            this.placeholders.put(placeholder, value != null ? value : Component.empty());
             return this;
         }
 
         /**
-         * Adds a placeholder with any % characters in the value removed
+         * Adds a placeholder
          *
          * @param placeholder The placeholder to add
          * @param value       The value to replace the placeholder with
          *
          * @return this
          */
-        public Builder addSanitized(String placeholder, Object value) {
-            this.placeholders.put(placeholder, Objects.toString(value, "null").replace("%", ""));
-            return this;
+        public Builder add(String placeholder, String value) {
+            return this.add(placeholder, Component.text(value));
         }
-
+        
         /**
-         * Sets the delimiters
+         * Adds a placeholder
          *
-         * @param startDelimiter The start delimiter
-         * @param endDelimiter   The end delimiter
+         * @param placeholder The placeholder to add
+         * @param value       The value to replace the placeholder with
          *
          * @return this
          */
-        public Builder delimiters(String startDelimiter, String endDelimiter) {
-            this.startDelimiter = startDelimiter;
-            this.endDelimiter = endDelimiter;
-            return this;
+        public Builder add(String placeholder, Object value) {
+            if (value instanceof Component component) {
+                return this.add(placeholder, component);
+            }
+            
+            return this.add(placeholder, Objects.toString(value, "null"));
         }
-
+        
         /**
          * Adds all placeholders from another StringPlaceholders instance
          *
@@ -273,7 +374,7 @@ public final class StringPlaceholders {
          *
          * @return this
          */
-        public Builder addAll(Map<String, String> placeholders) {
+        public Builder addAll(Map<String, Component> placeholders) {
             this.placeholders.putAll(placeholders);
             return this;
         }
@@ -282,7 +383,7 @@ public final class StringPlaceholders {
          * @return a new StringPlaceholders instance
          */
         public StringPlaceholders build() {
-            return new StringPlaceholders(this.placeholders, this.startDelimiter, this.endDelimiter);
+            return new StringPlaceholders(this.placeholders);
         }
 
     }

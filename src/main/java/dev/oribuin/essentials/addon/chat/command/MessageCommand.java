@@ -4,9 +4,13 @@ import dev.oribuin.essentials.addon.chat.ChatAddon;
 import dev.oribuin.essentials.addon.chat.config.ChatMessages;
 import dev.oribuin.essentials.addon.chat.database.ChatRepository;
 import dev.oribuin.essentials.addon.chat.database.ChatSender;
+import dev.oribuin.essentials.addon.chat.renderer.ChatAddonRenderer;
 import dev.oribuin.essentials.command.AddonCommand;
+import dev.oribuin.essentials.util.EssUtils;
 import dev.oribuin.essentials.util.StringPlaceholders;
 import dev.oribuin.essentials.util.model.Placeholders;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.annotation.specifier.Greedy;
 import org.incendo.cloud.annotations.Command;
@@ -96,8 +100,9 @@ public class MessageCommand implements AddonCommand {
             return;
         }
 
+        TagResolver[] resolvers = ChatAddonRenderer.getAvailable(sender).toArray(new TagResolver[]{});
         StringPlaceholders placeholders = Placeholders.of(
-                "message", message,
+                "message",  EssUtils.MINI_MESSAGE.stripTags(message, resolvers),
                 "sender", sender.getName(),
                 "recipient", receiver.getName()
         );

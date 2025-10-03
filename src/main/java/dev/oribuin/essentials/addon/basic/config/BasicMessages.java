@@ -70,6 +70,9 @@ public class BasicMessages implements AddonConfig {
     private TextMessage healCooldown = new TextMessage(PREFIX + "You cannot heal as you are on cooldown");
 
     // Repair Command
+    @Comment("The message sent when a player repair a single item")
+    private TextMessage repairSingleCommand = new TextMessage(PREFIX + "You have repaired <item>!");
+    
     @Comment("The message sent when a player repairs their items")
     private TextMessage repairCommand = new TextMessage(PREFIX + "You have repaired a total of <#bc7dff><amount><white> items!");
 
@@ -166,6 +169,10 @@ public class BasicMessages implements AddonConfig {
 
     public TextMessage getHealCooldown() {
         return healCooldown;
+    }
+
+    public TextMessage getRepairSingleCommand() {
+        return repairSingleCommand;
     }
 
     public TextMessage getRepairCommand() {

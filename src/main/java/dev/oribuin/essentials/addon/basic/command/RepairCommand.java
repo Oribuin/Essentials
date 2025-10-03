@@ -50,7 +50,7 @@ public class RepairCommand implements AddonCommand {
         // Repair the items and send the message
         this.cooldown.setCooldown(sender.getUniqueId(), config.getRepairCooldown());
         stack.resetData(DataComponentTypes.DAMAGE);
-        messages.getRepairCommand().send(sender, "amount", 1);
+        messages.getRepairSingleCommand().send(sender, "item", stack.displayName());
     }
 
     /**

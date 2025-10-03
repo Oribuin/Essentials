@@ -98,7 +98,7 @@ public class ChatAddonRenderer implements io.papermc.paper.chat.ChatRenderer.Vie
         );
     }
 
-    private static List<TagResolver> getAvailable(Player player) {
+    public static List<TagResolver> getAvailable(Player player) {
         return RESOLVER_MAP.entrySet().stream()
                 .filter(x -> player.hasPermission(x.getKey()))
                 .map(Map.Entry::getValue)

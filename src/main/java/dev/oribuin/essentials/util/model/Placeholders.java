@@ -2,12 +2,13 @@ package dev.oribuin.essentials.util.model;
 
 import dev.oribuin.essentials.util.StringPlaceholders;
 import dev.oribuin.essentials.util.StringPlaceholders.Builder;
+import net.kyori.adventure.text.Component;
+
+import java.util.Objects;
 
 public class Placeholders {
 
-    private static final StringPlaceholders EMPTY = Placeholders.builder()
-            .delimiters("<", ">")
-            .build();
+    private static final StringPlaceholders EMPTY = Placeholders.builder().build();
 
     /**
      * @return the empty StringPlaceholders instance
@@ -20,8 +21,7 @@ public class Placeholders {
      * @return a new StringPlaceholders builder with delimiters initially set to <>
      */
     public static StringPlaceholders.Builder builder() {
-        return StringPlaceholders.builder()
-                .delimiters("<", ">");
+        return StringPlaceholders.builder();
     }
 
     /**
@@ -32,8 +32,30 @@ public class Placeholders {
      *
      * @return a new StringPlaceholders builder with delimiters initially set to % and a placeholder added
      */
-    public static Builder builder(String placeholder, Object value) {
+    public static Builder builder(String placeholder, String value) {
         return builder().add(placeholder, value);
+    }
+    /**
+     * Creates a new builder with delimiters initially set to % and a placeholder added
+     *
+     * @param placeholder the placeholder to add
+     * @param value       the value to replace the placeholder with
+     *
+     * @return a new StringPlaceholders builder with delimiters initially set to % and a placeholder added
+     */
+    public static Builder builder(String placeholder, Component value) {
+        return builder().add(placeholder, value);
+    }
+    /**
+     * Creates a new builder with delimiters initially set to % and a placeholder added
+     *
+     * @param placeholder the placeholder to add
+     * @param value       the value to replace the placeholder with
+     *
+     * @return a new StringPlaceholders builder with delimiters initially set to % and a placeholder added
+     */
+    public static Builder builder(String placeholder, Object value) {
+        return builder().add(placeholder, Objects.toString(value,  "null"));
     }
 
 

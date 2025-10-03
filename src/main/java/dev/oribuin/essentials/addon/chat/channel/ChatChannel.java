@@ -29,7 +29,7 @@ public interface ChatChannel {
      * Get the target audience of the chat channel, deciding who will see it
      *
      * @param source The player sending the message to the audience
-     *
+     *:
      * @return The audience if available
      */
     @Nullable Audience getAudience(@NotNull Player source);
@@ -42,11 +42,12 @@ public interface ChatChannel {
      */
     default Audience filter(@NotNull Audience audience, @NotNull Player source) {
         return audience.filterAudience(aud -> {
-            if (!(aud instanceof Player player)) return false;
+            if (!(aud instanceof Player player)) return true;
 
             ChatSender viewer = ChatAddon.getInstance().getRepository().get(player.getUniqueId());
-            if (viewer.hasIgnored(source.getUniqueId())) return true;
-            return viewer.getMutedChannels().contains(this);
+            if (viewer.getMutedChannels().contains(this)) return false;
+            
+            return !viewer.hasIgnored(source.getUniqueId());
         });
     }
     

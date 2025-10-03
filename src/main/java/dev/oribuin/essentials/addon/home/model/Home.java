@@ -78,7 +78,7 @@ public final class Home implements Placeholder {
         return Placeholders.builder()
                 .add("homes", this.name)
                 .add("location", String.format("%s, %s, %s @ %s", this.location.x(), this.location.y(), this.location.z(), this.location.getWorld().getName()))
-                .add("owner-uuid", this.owner) // TODO: add %owner% = owner name
+                .add("owner-uuid", this.owner.toString()) // TODO: add %owner% = owner name
                 .build();
     }
 

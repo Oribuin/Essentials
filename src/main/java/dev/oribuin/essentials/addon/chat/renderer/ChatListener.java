@@ -46,11 +46,10 @@ public class ChatListener implements Listener {
             audience = Bukkit.getServer();
             sender.setChannel(ChatChannels.GLOBAL);
         }
-
+        
         event.viewers().clear();
         event.viewers().add(audience);
         event.setCancelled(true);
-
         Component format = ChatAddonRenderer.render(player, sender, event.message());
 
         // todo: caps check but wgaf

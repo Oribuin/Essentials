@@ -38,19 +38,7 @@ public class EssUtils {
         return MINI_MESSAGE.deserialize(text)
                 .decoration(TextDecoration.ITALIC, false);
     }
-
-    /**
-     * Convert a string into a component with placeholders applied
-     *
-     * @param text         The text to convert
-     * @param placeholders The placeholders to apply
-     *
-     * @return The component
-     */
-    public static Component kyorify(String text, StringPlaceholders placeholders) {
-        return MINI_MESSAGE.deserialize(placeholders.apply(text))
-                .decoration(TextDecoration.ITALIC, false);
-    }
+    
 
     /**
      * Convert a name into an enum value from a specific enum class

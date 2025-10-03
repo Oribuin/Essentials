@@ -131,6 +131,7 @@ public class TextMessage {
             if (placeholders[i] instanceof String placeholder) {
                 Object value = placeholders[i + 1];
                 if (value == null) value = "null";
+                
                 builder.add(placeholder, value);
             }
         }
@@ -184,8 +185,8 @@ public class TextMessage {
         boolean usePapi = this.placeholderapi != null ? this.placeholderapi : false;
 
         return usePapi
-                ? EssUtils.kyorify(placeholders.apply(PAPIProvider.apply(target, message)))
-                : EssUtils.kyorify(message, placeholders);
+                ? placeholders.apply(PAPIProvider.apply(target, message))
+                : placeholders.apply(message);
     }
 
     /**
@@ -221,24 +222,6 @@ public class TextMessage {
      */
     public Component parse(String message) {
         return this.parse(message, null, Placeholders.empty());
-    }
-
-    public void apply(StringPlaceholders placeholders) {
-        if (this.message != null) {
-            this.message = placeholders.apply(this.message);
-        }
-
-        if (this.actionbar != null) {
-            this.actionbar = placeholders.apply(this.actionbar);
-        }
-
-        if (this.titleHeader != null) {
-            this.titleHeader = placeholders.apply(this.titleHeader);
-        }
-
-        if (this.titleSubtitle != null) {
-            this.titleSubtitle = placeholders.apply(this.titleSubtitle);
-        }
     }
 
     public @Nullable String message() {
