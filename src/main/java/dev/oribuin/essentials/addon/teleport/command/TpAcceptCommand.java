@@ -68,12 +68,14 @@ public class TpAcceptCommand implements AddonCommand {
         Duration teleportDelay = config.getTeleportDelay();
         double cost = config.getTeleportCost();
         Location location = incoming.getWhere() != null ? incoming.getWhere() : commandSender.getLocation();
+        Player teleportTarget = incoming.getWhere() != null ? commandSender : requestSender;
         StringPlaceholders placeholders = Placeholders.of(
                 "target", commandSender.getName(),
                 "sender", requestSender.getName(),
                 "cost", cost,
                 "delay", EssUtils.fromDuration(teleportDelay)
         );
+        
 
         addon.requests().remove(incoming);
 
@@ -99,7 +101,7 @@ public class TpAcceptCommand implements AddonCommand {
             messages.getTeleportAcceptOther().send(requestSender, placeholders);
 
             // TELEPORT EFFECTS WOOO!!!!!!!!!!!
-            this.teleport(requestSender, location, cost, placeholders);
+            this.teleport(teleportTarget, location, cost, placeholders);
             return;
         }
 
@@ -108,7 +110,7 @@ public class TpAcceptCommand implements AddonCommand {
         if (config.isTeleportBar()) {
             long start = System.currentTimeMillis();
 
-            effectTask = this.addon.getScheduler().runTaskTimerAsync(() -> commandSender.sendActionBar(
+            effectTask = this.addon.getScheduler().runTaskTimerAsync(() -> teleportTarget.sendActionBar(
                     EssUtils.createTimerBar(teleportDelay.toMillis(), System.currentTimeMillis() - start)
             ), 0, 500, TimeUnit.MILLISECONDS);
         }
@@ -122,10 +124,10 @@ public class TpAcceptCommand implements AddonCommand {
         this.addon.getScheduler().runTaskLater(() -> {
             if (finalTask != null) {
                 finalTask.cancel();
-                commandSender.sendActionBar(EssUtils.TIMER_FINISHED);
+                teleportTarget.sendActionBar(EssUtils.TIMER_FINISHED);
             }
 
-            this.teleport(requestSender, location, cost, placeholders);
+            this.teleport(teleportTarget, location, cost, placeholders);
         }, teleportDelay.toSeconds(), TimeUnit.SECONDS);
     }
 
@@ -139,19 +141,14 @@ public class TpAcceptCommand implements AddonCommand {
      */
     private void teleport(Player player, Location target, double cost, StringPlaceholders placeholders) {
         player.teleportAsync(target, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(result -> {
-            System.out.println("grrr");
             // check if teleport failed
-            if (!result) {
-                TeleportMessages.getInstance().getTeleportFailed().send(player, placeholders);
-                return;
-            }
+            if (!result) return;
 
             // Take away the money from the player.
             if (cost > 0) {
                 VaultProvider.get().take(player, cost);
                 TeleportMessages.getInstance().getTeleportCost().send(player, placeholders);
             }
-
         });
     }
 

@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.permissions.Permission;
@@ -117,6 +118,7 @@ public class TeleportAddon extends Addon {
                 .orElse(null);
     }
 
+
     /**
      * Cleanup any hanging data left over when the user logs out
      *
@@ -160,6 +162,7 @@ public class TeleportAddon extends Addon {
     public void onDeath(PlayerDeathEvent event) {
         this.previousLocations.put(event.getPlayer().getUniqueId(), event.getPlayer().getLocation());
     }
+
 
     /**
      * Get all the configuration files for the addon

@@ -17,6 +17,27 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * order of operations :3
+ * a - the person who sent the request
+ * b - the person who is accepting the request (a is teleporting to b)
+ * <p>
+ * Check any outgoing requests from a
+ * <p>
+ * TeleportRequest request = new TeleportRequest(
+ * sender.getUniqueId(),
+ * target.getUniqueId(),
+ * System.currentTimeMillis()
+ * );
+ * <p>
+ * sender = a
+ * target = b
+ * ------------
+ * b types /tpaccept
+ * gets incoming request towards b, prioritising a if provided
+ * teleport request has location, use the location
+ * if no location, use position a location
+ */
 public class TpAskCommand implements AddonCommand {
 
     private final TeleportAddon addon;

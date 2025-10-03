@@ -43,10 +43,7 @@ public class BackCommand implements AddonCommand {
         }
 
         sender.teleportAsync(previous).thenAccept(result -> {
-            if (!result) {
-                messages.getTeleportFailed().send(sender);
-                return;
-            }
+            if (!result) return;
 
             messages.getTeleportBack().send(sender);
         });
@@ -77,10 +74,7 @@ public class BackCommand implements AddonCommand {
         }
 
         target.teleportAsync(previous).thenAccept(result -> {
-            if (!result) {
-                messages.getTeleportFailed().send(sender);
-                return;
-            }
+            if (!result) return;
 
             messages.getTeleportBackOther().send(sender);
         });

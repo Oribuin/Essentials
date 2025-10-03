@@ -18,9 +18,8 @@ public class TeleportMessages implements AddonConfig {
 
     private TextMessage disabledWorld = new TextMessage(PREFIX + "You are not allowed to teleport to the world.");
     private TextMessage teleportInvalid = new TextMessage(PREFIX + "This teleport request is no longer valid/doesn't exist");
-    private TextMessage teleportTimeout = new TextMessage(PREFIX + "Your teleport request to [<#bc7dff><target><white>] has timed out.");
-    private TextMessage teleportTimeoutOther = new TextMessage(PREFIX + "The teleport request from [<#bc7dff><sender><white>] has timed out.");
-    private TextMessage teleportFailed = new TextMessage(PREFIX + "Your teleport request was not successful. Please contact an admin about this.");
+    private TextMessage teleportTimeout = new TextMessage(PREFIX + "Your teleport request to [<#bc7dff><target><white>] has timed out");
+    private TextMessage teleportTimeoutOther = new TextMessage(PREFIX + "The teleport request from [<#bc7dff><sender><white>] has timed out");
 
     private TextMessage teleportCost = new TextMessage(PREFIX + "It cost you [<#bc7dff>$<cost><white>] to teleport to [<#bc7dff><target><white>]");
     private TextMessage teleportUnsafe = new TextMessage(PREFIX + "The teleport location is not safe, this request has been cancelled.");
@@ -75,7 +74,7 @@ public class TeleportMessages implements AddonConfig {
 
     // Teleport cancelled
     private TextMessage teleportCancelled = new TextMessage(PREFIX + "You have cancelled any outgoing teleport requests");
-
+    
     public TextMessage getDisabledWorld() {
         return disabledWorld;
     }
@@ -91,11 +90,7 @@ public class TeleportMessages implements AddonConfig {
     public TextMessage getTeleportTimeoutOther() {
         return teleportTimeoutOther;
     }
-
-    public TextMessage getTeleportFailed() {
-        return teleportFailed;
-    }
-
+    
     public TextMessage getTeleportCost() {
         return teleportCost;
     }

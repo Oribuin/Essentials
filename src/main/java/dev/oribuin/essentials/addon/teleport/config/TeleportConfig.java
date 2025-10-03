@@ -2,6 +2,7 @@ package dev.oribuin.essentials.addon.teleport.config;
 
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
 import dev.oribuin.essentials.config.AddonConfig;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -35,7 +36,7 @@ public class TeleportConfig implements AddonConfig {
 
     @Comment("Should there be a cooldown between each command usage?")
     private Duration teleportCooldown = Duration.ofSeconds(30);
-
+    
     /**
      * Check if the addon config is enabled
      *
@@ -69,4 +70,5 @@ public class TeleportConfig implements AddonConfig {
     public Duration getTeleportCooldown() {
         return teleportCooldown;
     }
+    
 }
