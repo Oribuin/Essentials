@@ -10,6 +10,7 @@ import dev.oribuin.essentials.addon.basic.command.HealCommand;
 import dev.oribuin.essentials.addon.basic.command.PingCommand;
 import dev.oribuin.essentials.addon.basic.command.PlayerWeatherCommand;
 import dev.oribuin.essentials.addon.basic.command.RepairCommand;
+import dev.oribuin.essentials.addon.basic.command.ScaleCommand;
 import dev.oribuin.essentials.addon.basic.command.TopCommand;
 import dev.oribuin.essentials.addon.basic.command.TrashCommand;
 import dev.oribuin.essentials.addon.basic.command.WeatherCommand;
@@ -65,6 +66,7 @@ public class BasicAddon extends Addon {
                 new PingCommand(),
                 new PlayerWeatherCommand(),
                 new RepairCommand(),
+                new ScaleCommand(),
                 new TopCommand(),
                 new TrashCommand(this),
                 new WeatherCommand(this),
@@ -96,6 +98,7 @@ public class BasicAddon extends Addon {
         Player player = event.getPlayer();
         if (player.hasPermission("essentials.fly") && player.hasPermission("essentials.fly.login")) {
             player.setAllowFlight(true);
+            player.setFlying(true);
         }
     }
     
@@ -103,3 +106,4 @@ public class BasicAddon extends Addon {
         return instance;
     }
 }
+    

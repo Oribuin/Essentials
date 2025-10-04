@@ -47,7 +47,7 @@ dependencies {
     api("com.jeff-media:MorePersistentDataTypes:2.4.0")
     
     // Spigot
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
     // External Plugins

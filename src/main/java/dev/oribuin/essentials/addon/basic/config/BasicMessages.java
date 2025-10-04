@@ -107,6 +107,12 @@ public class BasicMessages implements AddonConfig {
     @Comment("The message sent when someone checks someone else's location")
     private TextMessage whereIsOther = new TextMessage(PREFIX + "<#bc7dff><target><white> are currently at <#bc7dff><x><white>,<#bc7dff><y><white>,<#bc7dff><z><white> in world <#bc7dff><world>");
 
+    @Comment("The message sent when someone changes the scale of their character.")
+    private TextMessage rescaleSelf = new TextMessage(PREFIX + "You have changed your character size to <#bc7dff><scale>");
+    
+    @Comment("The message sent when someone changes the scale of their character.")
+    private TextMessage rescaleOther = new TextMessage(PREFIX + "You have changed <#bc7dff><target><white>'s character size to <#bc7dff><scale>");
+    
     public TextMessage getPingSelf() {
         return pingSelf;
     }
@@ -217,5 +223,13 @@ public class BasicMessages implements AddonConfig {
 
     public TextMessage getWhereIsOther() {
         return whereIsOther;
+    }
+
+    public TextMessage getRescaleSelf() {
+        return rescaleSelf;
+    }
+
+    public TextMessage getRescaleOther() {
+        return rescaleOther;
     }
 }
