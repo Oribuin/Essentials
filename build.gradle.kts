@@ -25,6 +25,7 @@ repositories {
     mavenCentral()
     mavenLocal()
 
+    maven("https://repo.oribuin.dev/repository/maven-public/")
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -45,7 +46,7 @@ dependencies {
     // Additional Utilities
     api("net.objecthunter:exp4j:0.4.8")
     api("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    
+
     // Spigot
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:23.0.0")

@@ -8,6 +8,7 @@ import dev.oribuin.essentials.addon.home.HomeAddon;
 import dev.oribuin.essentials.addon.serverlist.ServerListAddon;
 import dev.oribuin.essentials.addon.spawn.SpawnAddon;
 import dev.oribuin.essentials.addon.teleport.TeleportAddon;
+import dev.oribuin.essentials.addon.warp.WarpsAddon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,7 @@ public class AddonProvider {
     public static final ServerListAddon SERVER_LIST_ADDON = registerSupplier(ServerListAddon::new);
     public static final SpawnAddon SPAWN_ADDON = registerSupplier(SpawnAddon::new);
     public static final TeleportAddon TELEPORT_ADDON = registerSupplier(TeleportAddon::new);
+    public static final WarpsAddon WARPS_ADDON = registerSupplier(WarpsAddon::new);
 
     public static void init() {
         EssentialsPlugin.getInstance().getLogger().info("Initialised " + AddonProvider.class.getSimpleName() + " into the plugin.");

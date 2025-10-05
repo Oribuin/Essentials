@@ -49,9 +49,9 @@ public class HomeArgumentHandler implements ArgumentParser<CommandSender, Home> 
                 .filter(x -> x.name().equalsIgnoreCase(input))
                 .findFirst()
                 .orElse(null);
-
-        if (home == null) return ArgumentParseResult.failure(new HomeParserException(input, commandContext));
-        return ArgumentParseResult.success(home);
+        
+        commandInput.readString();
+        return home != null ? ArgumentParseResult.success(home) : ArgumentParseResult.failure(new HomeParserException(input, commandContext));
     }
 
     @Override

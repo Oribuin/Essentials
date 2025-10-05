@@ -14,7 +14,6 @@ import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
-@SuppressWarnings("UnstableApiUsage")
 public class AddonArgumentHandler implements ArgumentParser<CommandSender, Addon> {
 
     @Override
@@ -24,6 +23,7 @@ public class AddonArgumentHandler implements ArgumentParser<CommandSender, Addon
     ) {
         String input = commandInput.peekString();
         Addon addon = AddonProvider.addon(input);
+        commandInput.readString();
         if (input.isEmpty() || addon == null) return ArgumentParseResult.failure(new AddonParserException(input, commandContext));
 
         return ArgumentParseResult.success(addon);

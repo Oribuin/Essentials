@@ -83,7 +83,7 @@ public class EssentialsPlugin extends JavaPlugin {
         Configurable<ManagerSetting> commandSettings = this.commandManager.settings();
         commandSettings.set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         commandSettings.set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true);
-        commandSettings.set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
+//        commandSettings.set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
 
         this.parser = new AnnotationParser<>(this.commandManager, CommandSender.class);
         this.commandManager.parserRegistry().registerParser(
