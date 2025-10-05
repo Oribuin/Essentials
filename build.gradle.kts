@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 plugins {
     `java-library`
     `maven-publish`
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "9.2.2"
     id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
 
 }
@@ -12,8 +12,8 @@ group = "dev.oribuin"
 version = "1.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 
     disableAutoTargetJvm()
     toolchain {

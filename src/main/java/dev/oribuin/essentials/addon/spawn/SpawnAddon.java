@@ -92,6 +92,8 @@ public class SpawnAddon extends Addon {
         if (isFirstJoin) {
             if (config.isUseNewbieSpawn()) {
                 player.teleport(config.getNewbieSpawnpoint().asLoc());
+            } else {
+                player.teleport(config.getSpawnpoint().asLoc());
             }
 
             // Send the first join message to the server

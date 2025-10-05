@@ -93,7 +93,7 @@ public class BasicAddon extends Addon {
         );
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("essentials.fly") && player.hasPermission("essentials.fly.login")) {
